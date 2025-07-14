@@ -6,7 +6,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="mx-auto max-w-[400px]">
+    <div className="mx-2 max-w-[400px]">
       {children}
     </div>
   );

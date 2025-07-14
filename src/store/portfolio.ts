@@ -28,7 +28,10 @@ interface PortfolioState {
   setPositionList: (positionList?: TPosition[]) => void;
   selectedPosition?: TPosition;
   setSelectedPosition: (position?: TPosition) => void;
-
+  
+  portfolio?: any;
+  setPortfolio: (portfolio?: any) => void;
+  positionValue?: number;
 }
 
 export const usePortfolioStore = create<PortfolioState>((set) => ({
@@ -40,7 +43,7 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
   setSelectedCurrencyDetails: (details) => set({ selectedCurrencyDetails: details }),
   currencyList: undefined,
   setCurrencyList: (list) => set({ currencyList: list }),
-  loading: true,
+  loading: false,
   setLoading: (loading) => set({ loading }),
   eth_address: undefined,
   setEthAddress: (eth_address) => {
@@ -60,9 +63,19 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
   setTradeDirection: (tradeDirection) => set({ tradeDirection }),
 
   positionList: undefined,
-  setPositionList: (positionList) => set({ positionList }),
+  setPositionList: (positionList) => {
+    let positionValue = 0
+    positionList?.forEach(position => {
+      positionValue += Number(position.value)
+    })
+    
+    set({ positionList, positionValue })
+  },
+
   selectedPosition: undefined,
   setSelectedPosition: (position) => {
     set({ selectedPosition: position });
   },
+  portfolio: undefined,
+  setPortfolio: (portfolio) => set({ portfolio }),
 }))

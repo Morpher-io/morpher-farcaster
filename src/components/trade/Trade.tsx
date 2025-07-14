@@ -18,7 +18,7 @@ export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
   const [tradeError, setTradeError] = React.useState<string | undefined>(undefined);
   
-  const { selectedMarket, morpherTradeSDK } = useMarketStore();
+  const { selectedMarketId, morpherTradeSDK, selectedMarket } = useMarketStore();
   const {
       tradeAmount,
       selectedCurrency,
@@ -60,9 +60,9 @@ export function Trade() {
     }
 
     
-    
+    console.log('selectedMarket', selectedMarketId)
 
-    morpherTradeSDK.executeTrade({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarket?.market_id || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete })
+    morpherTradeSDK.executeTrade({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);
@@ -118,7 +118,7 @@ export function Trade() {
         <span className='text-white'>
           
 
-          Trade {selectedMarket?.symbol} {tradeType}
+          Trade {selectedMarket?.symbol || selectedMarketId} {tradeType}
         </span>
         
       </Button>

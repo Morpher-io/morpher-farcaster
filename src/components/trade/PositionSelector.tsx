@@ -154,7 +154,6 @@ export function PositionSelector() {
     }
 
     let positionList = await morpherTradeSDK.getPositions({eth_address: address})
-    console.log({positionList})
     setPositionList(positionList)
   }
 

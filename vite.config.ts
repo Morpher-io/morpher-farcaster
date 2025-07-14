@@ -13,8 +13,8 @@ export default defineConfig({
   },
   server: {
     allowedHosts: true,
-    //host: '127.0.0.1',
-    //port: 3019
+    host: '127.0.0.1',
+    port: 3019
   
   },
 });
