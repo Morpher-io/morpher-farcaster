@@ -24,8 +24,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import MorpherTradeSDK, { tokenValueFormatter, usdFormatter  } from "../../../../morpher-trading-sdk/src/index";
-import { TCurrency, TCurrencyDetails } from "../../../../morpher-trading-sdk/src/types";
+import { MorpherTradeSDK, tokenValueFormatter, usdFormatter  } from "morpher-trading-sdk";
+import { TCurrency, TCurrencyDetails } from "morpher-trading-sdk";
 import { useAccount, usePublicClient } from "wagmi";
 import { PublicClient } from "viem";
 import { useMarketStore } from "@/store/market";

@@ -7,7 +7,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { tokenValueFormatter } from "../../../../morpher-trading-sdk/src/index"
+import { tokenValueFormatter } from "morpher-trading-sdk"
 
 interface PortfolioChartProps {
   data: [number, number][] | undefined;

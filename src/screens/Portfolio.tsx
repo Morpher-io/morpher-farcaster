@@ -5,30 +5,22 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+
 import { Button } from "@/components/ui/button";
 import { PortfolioChart } from "@/components/trade/PortfolioChart";
 import { useMarketStore } from "@/store/market";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { TPosition } from "../../../morpher-trading-sdk/src/v2.router";
+import { TPosition } from "morpher-trading-sdk";
 import { usePortfolioStore } from "@/store/portfolio";
 import { useNavigate } from "react-router-dom";
-import { tokenValueFormatter, usdFormatter } from "../../../morpher-trading-sdk/src";
-import { Timer } from "lucide-react";
+import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
 
 export function PortfolioScreen() {
 
     const account = useAccount();
-    const { selectedMarket, morpherTradeSDK, setSelectedMarketId, setMarketType } = useMarketStore();
-    const { setSelectedPosition, setTradeDirection, positionList, setPositionList, portfolio, setPortfolio, positionValue, currencyList, setReturns, returns } = usePortfolioStore();
+    const {  morpherTradeSDK, setSelectedMarketId, setMarketType } = useMarketStore();
+    const { setSelectedPosition, setTradeDirection, positionList, setPositionList, setPortfolio, positionValue, currencyList, setReturns, returns } = usePortfolioStore();
     const [timeRange, setTimeRange] = useState<"d" | "w" | "m" | "y">("d");
     const [chartData, setChartData] = useState<[number, number][]>([]);
     let navigate = useNavigate();
@@ -68,7 +60,7 @@ export function PortfolioScreen() {
 
     }
 
-    const outputPosition = (position: TPosition, closeOverride?: number) => {
+    const outputPosition = (position: TPosition) => {
         return (
           <div className="flex w-full items-center justify-between border-b-1 mb-1 pb-1">
             <div className="flex items-center">

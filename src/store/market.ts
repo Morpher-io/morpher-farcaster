@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { TMarketType } from "../../../morpher-trading-sdk/src/types"
-import { TMarket, TMarketData, TOrder } from "../../../morpher-trading-sdk/src/v2.router"
-import MorpherTradeSDK, { MarketDetail } from "../../../morpher-trading-sdk/src/index"
+import { TMarketType } from "morpher-trading-sdk"
+import { TMarket, TMarketData, TOrder } from "morpher-trading-sdk"
+import { MorpherTradeSDK, MarketDetail } from "morpher-trading-sdk"
 
 
 

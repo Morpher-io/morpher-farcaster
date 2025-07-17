@@ -7,7 +7,7 @@ import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
 import { Loader2Icon } from "lucide-react"
-import  { TradeCallback } from "../../../../morpher-trading-sdk/src"
+import  { TradeCallback } from "morpher-trading-sdk"
 import { WalletClient } from "viem";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 

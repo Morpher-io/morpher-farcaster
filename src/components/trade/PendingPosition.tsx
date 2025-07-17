@@ -13,7 +13,7 @@ import { Loader2Icon } from "lucide-react";
 import {
   tokenValueFormatter,
   TradeCallback,
-} from "../../../../morpher-trading-sdk/src";
+} from "morpher-trading-sdk";
 
 export function PendingPosition() {
   const { marketData, morpherTradeSDK, order, setOrder } = useMarketStore();

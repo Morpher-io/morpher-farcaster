@@ -7,8 +7,8 @@ import {
 } from "@/components/ui/card";
 import { useAccount } from "wagmi";
 import { useMarketStore } from "@/store/market";
-import { tokenValueFormatter, usdFormatter } from "../../../../morpher-trading-sdk/src/index";
-import { TPosition } from "../../../../morpher-trading-sdk/src/v2.router";
+import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
+import { TPosition } from "morpher-trading-sdk";
 import { Button } from "../ui/button";
 import { Loader2Icon } from "lucide-react";
 import { usePortfolioStore } from "@/store/portfolio";

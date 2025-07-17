@@ -9,13 +9,13 @@ import {
 import { useMarketStore } from "@/store/market";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { TORders } from "../../../morpher-trading-sdk/src/v2.router";
-import { tokenValueFormatter } from "../../../morpher-trading-sdk/src";
+import { TORders } from "morpher-trading-sdk";
+import { tokenValueFormatter } from "morpher-trading-sdk";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function TradeHistoryScreen() {
     const account = useAccount();
-    const { selectedMarket, morpherTradeSDK } = useMarketStore();
+    const {  morpherTradeSDK } = useMarketStore();
     const [ orders, setOrders ] = useState<TORders | undefined>(undefined);
 
         const getOrders = async () => {

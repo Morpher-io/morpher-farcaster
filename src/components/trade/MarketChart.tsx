@@ -7,8 +7,8 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { StrictOHLCArray } from "../../../../morpher-trading-sdk/src/v2.router"
-import { tokenValueFormatter } from "../../../../morpher-trading-sdk/src/index"
+import { StrictOHLCArray } from "morpher-trading-sdk"
+import { tokenValueFormatter } from "morpher-trading-sdk"
 
 interface MarketChartProps {
   data: StrictOHLCArray[] | undefined;

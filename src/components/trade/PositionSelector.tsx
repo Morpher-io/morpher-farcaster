@@ -23,9 +23,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { tokenValueFormatter } from "../../../../morpher-trading-sdk/src/index";
-import { TMarketType } from "../../../../morpher-trading-sdk/src/types"
-import { TMarket, StrictOHLCArray, TPosition } from "../../../../morpher-trading-sdk/src/v2.router"
+import { tokenValueFormatter } from "morpher-trading-sdk";
+import { TMarketType } from "morpher-trading-sdk"
+import { TMarket, StrictOHLCArray, TPosition } from "morpher-trading-sdk"
 import { useAccount } from "wagmi"
 import { MarketChart } from "./MarketChart";
 import { useMarketStore } from "../../store/market";
