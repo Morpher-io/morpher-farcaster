@@ -7,22 +7,22 @@ import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
 import { Loader2Icon } from "lucide-react"
-import  { TradeCallback } from "../../../../morpher-trading-sdk/src"
+import  { TradeCallback } from "morpher-trading-sdk"
 import { WalletClient } from "viem";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 
 
 
 export function Trade() {
-  const [tradeType, setTradeType] = React.useState<'long' | 'short'>("long");
-  const [leverage, setLeverage] = React.useState([1]);
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
   const [tradeError, setTradeError] = React.useState<string | undefined>(undefined);
   
-  const { selectedMarket, morpherTradeSDK } = useMarketStore();
+  const { selectedMarketId, morpherTradeSDK, selectedMarket, tradeType, setTradeType, leverage, setLeverage, marketData } = useMarketStore();
   const {
       tradeAmount,
       selectedCurrency,
       currencyList,
+      setTradeComplete
       
   } = usePortfolioStore()
 
@@ -33,11 +33,13 @@ export function Trade() {
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
       setTradeError(result.err || 'An error occurred while executing the trade.')
-
+      return
     }
 
     console.log('tradeComplete', result)
-      setTimeout(() => {
+
+    setTradeComplete(true);
+    setTimeout(() => {
       setTradeExecuting(false)
 
     }, 2000)
@@ -60,9 +62,7 @@ export function Trade() {
     }
 
     
-    
-
-    morpherTradeSDK.executeTrade({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarket?.market_id || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete })
+    morpherTradeSDK.executeTrade({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);
@@ -72,8 +72,17 @@ export function Trade() {
   }
 
   return (
-    <div className="mt-4 flex flex-col gap-4 border rounded-lg p-4">
-      <div className="flex items-center justify-between">
+
+    <Card className="mb-4 mt-4 bg-white">
+      {marketData?.position_id && (
+        <CardHeader>
+        <CardTitle>Open New Position</CardTitle>
+      </CardHeader>
+      )}
+      
+      <CardContent>
+
+        <div className="flex items-center justify-between mb-2">
         <Label>Trade Type</Label>
         <ToggleGroup 
           type="single" 
@@ -102,13 +111,13 @@ export function Trade() {
           max={10}
           step={0.2}
           onValueChange={setLeverage}
-          className="mt-2"
+          className="mt-4 mb-6"
         />
       </div>
       <Button
         onClick={executeTrade}
         disabled={!tradeAmount || Number(tradeAmount) <= 0}
-        
+        className="w-full"
         variant={tradeType === 'long' ? "default" : "secondary"}
 
       >
@@ -118,18 +127,34 @@ export function Trade() {
         <span className='text-white'>
           
 
-          Trade {selectedMarket?.symbol} {tradeType}
+          Trade {selectedMarket?.symbol || selectedMarketId} {tradeType}
         </span>
         
       </Button>
+      {(!tradeAmount || Number(tradeAmount) <= 0) && (
+        <p className="text-[var(--info)] flex justify-center cursor-pointer mt-3" onClick={()=> {
+          window.scrollTo(0, 0)
+        }}>
+           <img
+           className="mr-2 w-5"
+
+                src={`/src/assets/icons/info.svg`}
+                alt={`Info Icon`}
+                 />
+          Enter amount to trade
+        </p>
+      )}
+
 
       {tradeError && (
         <div className="text-red-500 text-sm mt-2">
           {tradeError}
         </div>
       )}
+      
 
-
-    </div>
+      </CardContent>
+    </Card>
+    
   )
 }

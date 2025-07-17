@@ -23,9 +23,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { tokenValueFormatter } from "../../../../morpher-trading-sdk/src/index";
-import { TMarketType } from "../../../../morpher-trading-sdk/src/types"
-import { TMarket, StrictOHLCArray, TPosition } from "../../../../morpher-trading-sdk/src/v2.router"
+import { tokenValueFormatter } from "morpher-trading-sdk";
+import { TMarketType } from "morpher-trading-sdk"
+import { TMarket, StrictOHLCArray, TPosition } from "morpher-trading-sdk"
 import { useAccount } from "wagmi"
 import { MarketChart } from "./MarketChart";
 import { useMarketStore } from "../../store/market";
@@ -80,7 +80,8 @@ export function PositionSelector() {
           </div>
           <div
             id="marketName"
-            className="flex flex-col max-w-[200px] w-[190px] overflow-hidden text-left"
+            className="flex flex-col max-w-[140px] w-[140px] overflow-hidden text-left"
+
           >
             <p className="font-semibold">{position?.symbol}</p>
             <p className="font-normal">{position?.name}</p>
@@ -154,7 +155,6 @@ export function PositionSelector() {
     }
 
     let positionList = await morpherTradeSDK.getPositions({eth_address: address})
-    console.log({positionList})
     setPositionList(positionList)
   }
 
@@ -169,7 +169,7 @@ export function PositionSelector() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Select Market</CardTitle>
+        <CardTitle className="text-lg font-bold">Select Market</CardTitle>
       </CardHeader>
       <CardContent>
 

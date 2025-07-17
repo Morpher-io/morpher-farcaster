@@ -9,32 +9,25 @@ import {
 
 export function Header() {
   return (
-    <header className="flex items-center justify-between border-b pb-2">
-      <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-        Morpher x Farcaster
-      </h2>
+    <header className="flex items-center justify-between border-b  bg-[var(--primary)] px-4 py-3 items-center ">
+      <div>
+          <img
+            src={`/src/assets/logos/morpher-header.svg`}
+            alt={`Morpher Logo`}
+            className=""
+        />
+      </div>
       <nav>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4"
-              >
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
+          <DropdownMenuTrigger asChild className="">
+            <div>
+            
+              <img
+                src={`/src/assets/icons/menu.svg`}
+                alt={`Hamburger Menu`}
+                 />
               <span className="sr-only">Open menu</span>
-            </Button>
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>

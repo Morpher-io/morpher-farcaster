@@ -56,19 +56,22 @@ export function TradeTerminal() {
 
   return (
     <>
-      <div className="mt-5">
+      <div className="mt-5 mx-4 mb-6">
         {first}
         <div className="relative my-2 flex justify-center">
-          <div className="absolute inset-0 flex items-center">
+          {/* <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
-          </div>
+          </div> */}
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
-            className="relative z-10 size-8 rounded-full bg-background"
+            className="relative z-10 size-12 rounded-full bg-background"
             onClick={handleSwap}
           >
-            <ArrowUpDown className="size-4" />
+            <img
+                src={`/src/assets/icons/switch.svg`}
+                alt={`Switch Direction`}
+                 />
           </Button>
         </div>
         {second}

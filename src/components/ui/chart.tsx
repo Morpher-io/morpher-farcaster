@@ -261,7 +261,7 @@ function ChartLegendContent({
   }) {
   const { config } = useChart()
 
-  if (!payload?.length) {
+  if (!payload) {
     return null
   }
 

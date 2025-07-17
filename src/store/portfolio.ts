@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { TAddress, TCurrency, TCurrencyDetails } from '../../../morpher-trading-sdk/src/types'
-import MorpherTradeSDK from '../../../morpher-trading-sdk/src';
-import { TPosition } from '../../../morpher-trading-sdk/src/v2.router';
+import { TAddress, TCurrency, TCurrencyDetails } from 'morpher-trading-sdk'
+import { MorpherTradeSDK } from 'morpher-trading-sdk';
+import { TPortfolioDataPoint, TPosition } from 'morpher-trading-sdk';
 export type TCurrencyList = Partial<Record<TCurrency, TCurrencyDetails>>;
 const morpherTradeSDK = new MorpherTradeSDK(import.meta.env.VITE_MORPHER_API_ENDPOINT);
 
@@ -28,11 +28,19 @@ interface PortfolioState {
   setPositionList: (positionList?: TPosition[]) => void;
   selectedPosition?: TPosition;
   setSelectedPosition: (position?: TPosition) => void;
-
+  
+  portfolio?: any;
+  setPortfolio: (portfolio?: any) => void;
+  positionValue?: number;
+  tradeComplete: boolean;
+  setTradeComplete: (complete?: boolean) => void;
+  returns: {[type: string ]: TPortfolioDataPoint[]}
+  setReturns: (type: "d" | "w" | "m" | "y", returns?: TPortfolioDataPoint[]) => void;
 }
 
-export const usePortfolioStore = create<PortfolioState>((set) => ({
+export const usePortfolioStore = create<PortfolioState>((set, get) => ({
   tradeAmount: '',
+  returns: {},
   setTradeAmount: (tradeAmount) => set({ tradeAmount }),
   selectedCurrency: undefined,
   setSelectedCurrency: (currency) => set({ selectedCurrency: currency }),
@@ -40,7 +48,7 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
   setSelectedCurrencyDetails: (details) => set({ selectedCurrencyDetails: details }),
   currencyList: undefined,
   setCurrencyList: (list) => set({ currencyList: list }),
-  loading: true,
+  loading: false,
   setLoading: (loading) => set({ loading }),
   eth_address: undefined,
   setEthAddress: (eth_address) => {
@@ -54,15 +62,34 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
       morpherTradeSDK.subscribeToOrder("", () => {});
     }
   },
-  closePercentage: undefined,
+  closePercentage: 100,
   setClosePercentage: (closePercentage) => set({ closePercentage }),
-  tradeDirection: 'open',
+  tradeDirection: 'open' as 'open' | 'close',
   setTradeDirection: (tradeDirection) => set({ tradeDirection }),
 
   positionList: undefined,
-  setPositionList: (positionList) => set({ positionList }),
+  setPositionList: (positionList) => {
+    let positionValue = 0
+    positionList?.forEach(position => {
+      positionValue += Number(position.value)
+    })
+    
+    set({ positionList, positionValue })
+  },
+
   selectedPosition: undefined,
   setSelectedPosition: (position) => {
     set({ selectedPosition: position });
   },
+  portfolio: undefined,
+  tradeComplete: false,
+  setPortfolio: (portfolio) => set({ portfolio }),
+  setTradeComplete: (complete) => set({ tradeComplete: complete }),
+  setReturns: (type, returns) => {
+    if (!returns) returns = []; 
+    let r = get().returns
+    r[type] = returns
+    set({ returns: r })
+  }
+
 }))

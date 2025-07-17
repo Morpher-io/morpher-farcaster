@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts"
+import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import {
   ChartContainer,
@@ -7,44 +7,42 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { StrictOHLCArray } from "morpher-trading-sdk"
 import { tokenValueFormatter } from "morpher-trading-sdk"
 
-interface MarketChartProps {
-  data: StrictOHLCArray[] | undefined;
+interface PortfolioChartProps {
+  data: [number, number][] | undefined;
   timeRange: string
 }
 
-export const MarketChart = React.memo(function MarketChart({ data, timeRange }: MarketChartProps) {
+export const PortfolioChart = React.memo(function PortfolioChart({ data, timeRange }: PortfolioChartProps) {
   const chartData = React.useMemo(() => {
-    if (timeRange == '1D') {
-    return data?.map((d) => {
-      return {
-      timestamp: new Date(Number(d[0])).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      close: d[4],
-    }});
-
+    if (timeRange === 'd') {
+      return data?.map((d) => {
+        return {
+          timestamp: new Date(Number(d[0])).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          value: d[1],
+        }
+      });
     } else {
-    return data?.map((d) => ({
-      timestamp: new Date(Number(d[0])).toLocaleDateString([], { day: '2-digit', month: '2-digit' }),
-      close: d[4],
-    }));
-
+      return data?.map((d) => ({
+        timestamp: new Date(Number(d[0])).toLocaleDateString([], { day: '2-digit', month: '2-digit' }),
+        value: d[1],
+      }));
     }
-  }, [data]);
+  }, [data, timeRange]);
 
   const chartConfig = React.useMemo(() => {
-    const isIncreasing = chartData && chartData.length > 1 ? chartData[chartData.length - 1].close >= chartData[0].close : true;
+    const isIncreasing = chartData && chartData.length > 1 ? chartData[chartData.length - 1].value >= chartData[0].value : true;
     return {
-      close: {
-        label: "Price",
+      value: {
+        label: "Value",
         color: isIncreasing ? "var(--primary)" : "var(--secondary)",
       },
     } satisfies ChartConfig;
   }, [chartData]);
 
   if (!chartData || chartData.length === 0) {
-    return null;
+    return <div className="h-[200px] w-full mt-4 flex items-center justify-center"><p>No data available for this period.</p></div>;
   }
 
   return (
@@ -67,13 +65,6 @@ export const MarketChart = React.memo(function MarketChart({ data, timeRange }: 
               tickMargin={10}
               fontSize={12}
               type={'category'}
-              // tickFormatter={(tickFormat) => {
-              //   console.log('tickFormat', tickFormat)
-              //   return 'aa'
-              //   let date = new Date(Number(tickFormat))
-              //   console.log('date', date)
-              //   return Date.toString();
-              // }}
             />
             <YAxis
               tickLine={false}
@@ -88,9 +79,9 @@ export const MarketChart = React.memo(function MarketChart({ data, timeRange }: 
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Line
-              dataKey="close"
+              dataKey="value"
               type="monotone"
-              stroke="var(--color-close)"
+              stroke="var(--color-value)"
               strokeWidth={2}
               dot={false}
             />

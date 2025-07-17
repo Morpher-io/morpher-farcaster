@@ -3,6 +3,8 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { TradeScreen } from "./screens/Trade";
 import { TradeHistoryScreen } from "./screens/TradeHistory";
+import { TradeSuccessScreen } from "./screens/TradeSuccess";
+
 import { PortfolioScreen } from "./screens/Portfolio";
 import { Layout } from "./components/layout/Layout";
 import { Header } from "./components/app/Header";
@@ -12,10 +14,13 @@ import { Loader2 } from "lucide-react";
 
 
 function App() {
-  const { loading, setEthAddress } = usePortfolioStore();
+
+  
+
+  const { loading, setEthAddress, tradeComplete } = usePortfolioStore();
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   
 
   useEffect(() => {
@@ -36,19 +41,32 @@ function App() {
   return (
     <Layout>
       <Router>
-        <Header />
+        { (isConnected && !tradeComplete) && (
+          <Header />
+        )}
+        
         <main>
-          {loading && (
-            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
-              <Loader2 className="h-16 w-16 animate-spin" />
-              <p className="mt-4">Loading...</p>
-            </div>
+
+          {tradeComplete ? (
+            <>
+              <TradeSuccessScreen />
+            </>
+          ) : (
+            <>
+              {loading && (
+              <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
+                <Loader2 className="h-16 w-16 animate-spin" />
+                <p className="mt-4">Loading...</p>
+              </div>
+            )}
+            <Routes>
+              <Route path="/" element={<TradeScreen />} />
+              <Route path="/history" element={<TradeHistoryScreen />} />
+              <Route path="/portfolio" element={<PortfolioScreen />} />
+            </Routes>
+            </>
           )}
-          <Routes>
-            <Route path="/" element={<TradeScreen />} />
-            <Route path="/history" element={<TradeHistoryScreen />} />
-            <Route path="/portfolio" element={<PortfolioScreen />} />
-          </Routes>
+          
           
         </main>
       </Router>
