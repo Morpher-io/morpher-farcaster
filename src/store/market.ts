@@ -23,6 +23,10 @@ interface MarketState {
   setMarketData: (marketData?: MarketDetail) => void;
   order?: TOrder;
   setOrder: (orderData?: TOrder) => void;
+  tradeType: 'long' | 'short';
+  setTradeType: (tradeType: 'long' | 'short') => void;
+  leverage: number[];
+  setLeverage: (leverage: number[]) => void;
 }
 
 export const useMarketStore = create<MarketState>((set) => ({
@@ -54,5 +58,8 @@ export const useMarketStore = create<MarketState>((set) => ({
   setMarketData: (marketData) => set({ marketData }),
   order: undefined,
   setOrder: (order) => set({ order }),
-  
+  tradeType: 'long',
+  setTradeType: (tradeType) => set({ tradeType }),
+  leverage: [1],
+  setLeverage: (leverage) => set({ leverage }),
 }));

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { TAddress, TCurrency, TCurrencyDetails } from '../../../morpher-trading-sdk/src/types'
 import MorpherTradeSDK from '../../../morpher-trading-sdk/src';
-import { TPosition } from '../../../morpher-trading-sdk/src/v2.router';
+import { TPortfolioDataPoint, TPosition } from '../../../morpher-trading-sdk/src/v2.router';
 export type TCurrencyList = Partial<Record<TCurrency, TCurrencyDetails>>;
 const morpherTradeSDK = new MorpherTradeSDK(import.meta.env.VITE_MORPHER_API_ENDPOINT);
 
@@ -32,10 +32,15 @@ interface PortfolioState {
   portfolio?: any;
   setPortfolio: (portfolio?: any) => void;
   positionValue?: number;
+  tradeComplete: boolean;
+  setTradeComplete: (complete?: boolean) => void;
+  returns: {[type: string ]: TPortfolioDataPoint[]}
+  setReturns: (type: "d" | "w" | "m" | "y", returns?: TPortfolioDataPoint[]) => void;
 }
 
-export const usePortfolioStore = create<PortfolioState>((set) => ({
+export const usePortfolioStore = create<PortfolioState>((set, get) => ({
   tradeAmount: '',
+  returns: {},
   setTradeAmount: (tradeAmount) => set({ tradeAmount }),
   selectedCurrency: undefined,
   setSelectedCurrency: (currency) => set({ selectedCurrency: currency }),
@@ -57,9 +62,9 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
       morpherTradeSDK.subscribeToOrder("", () => {});
     }
   },
-  closePercentage: undefined,
+  closePercentage: 100,
   setClosePercentage: (closePercentage) => set({ closePercentage }),
-  tradeDirection: 'open',
+  tradeDirection: 'open' as 'open' | 'close',
   setTradeDirection: (tradeDirection) => set({ tradeDirection }),
 
   positionList: undefined,
@@ -77,5 +82,14 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
     set({ selectedPosition: position });
   },
   portfolio: undefined,
+  tradeComplete: false,
   setPortfolio: (portfolio) => set({ portfolio }),
+  setTradeComplete: (complete) => set({ tradeComplete: complete }),
+  setReturns: (type, returns) => {
+    if (!returns) returns = []; 
+    let r = get().returns
+    r[type] = returns
+    set({ returns: r })
+  }
+
 }))

@@ -148,7 +148,7 @@ export function MarketSelector() {
           </div>
           <div
             id="marketName"
-            className="flex flex-col max-w-[200px] w-[190px] overflow-hidden text-left"
+            className="flex flex-col max-w-[150px] w-[150px] overflow-hidden text-left"
           >
             <p className="font-semibold">{market?.symbol}</p>
             <p className="font-normal">{market?.name}</p>
@@ -237,9 +237,9 @@ export function MarketSelector() {
 
 
   return (
-    <Card>
+    <Card className="pb-6">
       <CardHeader>
-        <CardTitle>Select Market</CardTitle>
+        <CardTitle className="text-lg font-bold">Select Market</CardTitle>
       </CardHeader>
       <CardContent>
 
@@ -252,7 +252,7 @@ export function MarketSelector() {
           className={`mb-4 flex select-none gap-1 overflow-x-auto pb-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
         >
           
-          {(["stock", "forex", "commodity", "index"] as TMarketType[]).map((type) => (
+          {(["stock", "forex", "index", "commodity"] as TMarketType[]).map((type) => (
             <Button
               key={type}
               variant={marketType === type ? "default" : "outline"}
@@ -268,14 +268,14 @@ export function MarketSelector() {
                 alt={`${type} icon`}
                 className="mr-0 h-4 w-4"
               />
-              <span className={marketType === type ? "text-white" : "text-black"}>{type}</span>
+              <span className={`font-normal ${marketType === type ? "text-white" : "text-black"}`}>{type}</span>
               
             </Button>
           ))}
         
           
         </div>
-        <Label className="mb-2" htmlFor="email">Pick a {marketType} to invest in</Label>
+        <Label className="mb-2 mt-6" htmlFor="email">Pick a {marketType} to invest in</Label>
 
         
         <Popover open={open} onOpenChange={setOpen}>
@@ -318,7 +318,7 @@ export function MarketSelector() {
         {marketData && (
             <div>
               <MarketChart data={chartData} timeRange={timeRange}/>
-              <div className="flex justify-center gap-1 mt-2">
+              <div className="flex justify-center gap-1 mt-2 mb-4">
                 {['1D', '1W', '1M', '3M', '6M', '1Y'].map((range) => (
                   <Button
                     key={range}
@@ -337,7 +337,9 @@ export function MarketSelector() {
                 <PendingPosition />
               ) : (
                 <>
-                  {marketData.position_id && <Position />}
+                  {marketData.position_id && <>
+                    <Position />
+                  </>}
                   <Trade />
                 </>
               )}

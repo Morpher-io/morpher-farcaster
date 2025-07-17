@@ -40,7 +40,8 @@ export function TradeHistoryScreen() {
 
 
     return (
-        <>
+        <div className="mx-4">
+
             
             {/* <h2 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight">
                 Trade History
@@ -77,6 +78,6 @@ export function TradeHistoryScreen() {
                 </CardContent>
                 </Card>
             </div>
-        </>
+        </div>
     );
 }

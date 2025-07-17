@@ -80,7 +80,8 @@ export function PositionSelector() {
           </div>
           <div
             id="marketName"
-            className="flex flex-col max-w-[200px] w-[190px] overflow-hidden text-left"
+            className="flex flex-col max-w-[140px] w-[140px] overflow-hidden text-left"
+
           >
             <p className="font-semibold">{position?.symbol}</p>
             <p className="font-normal">{position?.name}</p>
@@ -168,7 +169,7 @@ export function PositionSelector() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Select Market</CardTitle>
+        <CardTitle className="text-lg font-bold">Select Market</CardTitle>
       </CardHeader>
       <CardContent>
 
