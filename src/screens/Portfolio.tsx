@@ -112,7 +112,7 @@ export function PortfolioScreen() {
             </div>
             <div id="marketValue" className="flex flex-col text-right">
               <p className="text-lg font-bold">
-                 {tokenValueFormatter(Number(position.value || 0) / 10**18)} MPH
+                 { currencyList?.MPH?.usd_exchange_rate ? '$ ' + (usdFormatter(Number(position.value || 0) / 10**18 * currencyList?.MPH?.usd_exchange_rate )) : tokenValueFormatter(Number(position.value || 0) / 10**18) + ' MPH'}
               </p>
               <div
                 id="marketPercent"

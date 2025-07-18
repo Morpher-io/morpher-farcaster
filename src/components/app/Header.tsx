@@ -29,15 +29,15 @@ export function Header() {
               <span className="sr-only">Open menu</span>
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent className="rounded-sm" align="end">
             <DropdownMenuItem asChild>
               <Link to="/">Trade</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/history">Trade History</Link>
+              <Link to="/portfolio">Portfolio</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/portfolio">Portfolio</Link>
+              <Link to="/history">Trade History</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

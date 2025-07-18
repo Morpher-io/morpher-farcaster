@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { tokenValueFormatter } from "morpher-trading-sdk";
+import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
 import { TMarketType } from "morpher-trading-sdk"
 import { TMarket, StrictOHLCArray, TPosition } from "morpher-trading-sdk"
 import { useAccount } from "wagmi"
@@ -40,7 +40,7 @@ export function PositionSelector() {
     tradeDirection,
     selectedPosition,
     setSelectedPosition,
-    
+    currencyList
 
 
   } = usePortfolioStore();
@@ -89,7 +89,7 @@ export function PositionSelector() {
         </div>
         <div id="marketValue" className="flex flex-col text-right">
           <p className="text-lg font-bold">
-             {tokenValueFormatter(Number(position.value || 0) / 10**18)} MPH
+             { currencyList?.MPH?.usd_exchange_rate ? '$ ' + (usdFormatter(Number(position.value || 0) / 10**18 * currencyList?.MPH?.usd_exchange_rate )) : tokenValueFormatter(Number(position.value || 0) / 10**18) + ' MPH'}
           </p>
           <div
             id="marketPercent"
