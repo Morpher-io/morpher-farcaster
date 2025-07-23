@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ChevronsUpDown } from "lucide-react"
+import { ChevronsUpDown, Loader2Icon } from "lucide-react"
 import { Label } from "@/components/ui/label"
 
 import { Button } from "@/components/ui/button"
@@ -40,6 +40,7 @@ export function MarketSelector() {
   const {morpherTradeSDK} = useMarketStore();
   const [open, setOpen] = React.useState(false)
   const [timeRange, setTimeRange] = React.useState('1D');
+  const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
   const {
     marketType,
     setMarketType,
@@ -184,9 +185,10 @@ export function MarketSelector() {
 
 
     const fetchMarketData = async ({eth_address, market_id}: {eth_address: `0x${string}`, market_id: string}) => {
+      setIsMarketDataLoading(true);
       const sdkMarketData = await morpherTradeSDK.getMarketData({eth_address, market_id})
         setMarketData(sdkMarketData);
-
+      setIsMarketDataLoading(false);
     }
 
   React.useEffect(() => {
@@ -316,14 +318,19 @@ export function MarketSelector() {
             </Command>
           </PopoverContent>
         </Popover>
-        {marketData && (
+        {isMarketDataLoading ? (
+          <div className="flex justify-center items-center h-[200px] w-full mt-4">
+            <Loader2Icon className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          marketData && (
             <div>
-              <MarketChart data={chartData} timeRange={timeRange}/>
+              <MarketChart data={chartData} timeRange={timeRange} />
               <div className="flex justify-center gap-1 mt-2 mb-4">
-                {['1D', '1W', '1M', '3M', '6M', '1Y'].map((range) => (
+                {["1D", "1W", "1M", "3M", "6M", "1Y"].map((range) => (
                   <Button
                     key={range}
-                    variant={timeRange === range ? 'outline' : 'ghost'}
+                    variant={timeRange === range ? "outline" : "ghost"}
                     size="sm"
                     onClick={() => setTimeRange(range)}
                     className="rounded-full px-3"
@@ -333,20 +340,21 @@ export function MarketSelector() {
                 ))}
               </div>
 
-              
               {marketData.pending_order_id ? (
                 <PendingPosition />
               ) : (
                 <>
-                  {marketData.position_id && <>
-                    <Position />
-                  </>}
+                  {marketData.position_id && (
+                    <>
+                      <Position />
+                    </>
+                  )}
                   <Trade />
                 </>
               )}
             </div>
           )
-        }
+        )}
       </CardContent>
     </Card>
   )
