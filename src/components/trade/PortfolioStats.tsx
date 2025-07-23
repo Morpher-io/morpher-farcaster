@@ -26,7 +26,7 @@ export function PortfolioStats() {
     return { value: change, percent: percentChange };
   }, [returns]);
 
-  if (loading && !portfolio) {
+  if (loading) {
     return (
       <div className="flex flex-col gap-2">
         <div className="flex justify-center items-center h-[78px]">

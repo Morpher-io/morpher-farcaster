@@ -103,7 +103,6 @@ export function ClosePosition() {
     if (address && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
       const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
       setCurrencyList(fetchedCurrencyList);
-      setLoading(false);
       sdk.actions.ready();
       
     }

@@ -20,7 +20,7 @@ export function PortfolioSummary() {
     return { value: change, percent: percentChange };
   }, [chartData]);
 
-  if (loading && !portfolio) {
+  if (loading) {
     return (
       <div className="flex flex-col gap-2">
         <div className="flex justify-center items-center h-[288px]">
@@ -29,7 +29,7 @@ export function PortfolioSummary() {
       </div>
     );
   }
-  
+
   if (!portfolio) {
     return null;
   }
