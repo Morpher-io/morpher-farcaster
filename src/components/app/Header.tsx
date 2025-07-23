@@ -39,6 +39,9 @@ export function Header() {
             <DropdownMenuItem asChild>
               <Link to="/history">Trade History</Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/leaderboard">Leaderboard</Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </nav>

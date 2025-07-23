@@ -4,12 +4,15 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { TradeScreen } from "./screens/Trade";
 import { TradeHistoryScreen } from "./screens/TradeHistory";
 import { TradeSuccessScreen } from "./screens/TradeSuccess";
+import { LeaderboardScreen } from "./screens/Leaderboard";
 
 import { PortfolioScreen } from "./screens/Portfolio";
 import { Layout } from "./components/layout/Layout";
 import { Header } from "./components/app/Header";
 import { usePortfolioStore } from "./store/portfolio";
 import { Loader2 } from "lucide-react";
+import { useMarketStore } from "./store/market";
+import { sdk } from "@farcaster/frame-sdk";
 
 
 
@@ -17,11 +20,35 @@ function App() {
 
   
 
-  const { loading, setEthAddress, tradeComplete } = usePortfolioStore();
+  const { morpherTradeSDK  } = useMarketStore();
+  const { loading, setEthAddress, tradeComplete, setContext  } = usePortfolioStore();
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
   const { address, isConnected } = useAccount();
   
+
+  useEffect(() => {
+    if (morpherTradeSDK.ready && address) {
+      sdk.context.then(context => {
+        
+        let user_data = {
+          app: import.meta.env.VITE_MORPHER_APP_NAME,
+          id: context.user.fid.toString(),
+          user_name: context.user.username,
+          display_name: context.user.displayName,
+          eth_address: address,
+          profile_image: context.user.pfpUrl
+        }
+
+        setContext(user_data)
+
+        
+
+      })
+        
+    }
+      
+  }, [morpherTradeSDK.ready, address]);
 
   useEffect(() => {
     if (chainId !== 84532) {
@@ -63,6 +90,7 @@ function App() {
               <Route path="/" element={<TradeScreen />} />
               <Route path="/history" element={<TradeHistoryScreen />} />
               <Route path="/portfolio" element={<PortfolioScreen />} />
+              <Route path="/leaderboard" element={<LeaderboardScreen />} />
             </Routes>
             </>
           )}

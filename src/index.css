@@ -41,6 +41,10 @@
   --light-red: rgba(243, 45, 80, .2);
   /* oklch(0.205 0 0); */ 
   --primary: #00c386;  
+  --light-green: #e9faf5;
+  --light-blue: #eafcff;
+  --blue: #0F59CD;
+  
   --dark: #039954;
   --primary-foreground: oklch(0.985 0 0);
   /* oklch(0.97 0 0); */

@@ -1,7 +1,11 @@
 import { create } from 'zustand'
-import { TAddress, TCurrency, TCurrencyDetails } from 'morpher-trading-sdk'
-import { MorpherTradeSDK } from 'morpher-trading-sdk';
-import { TPortfolioDataPoint, TPosition } from 'morpher-trading-sdk';
+import { TAddress, TCurrency, TCurrencyDetails } from '../../../morpher-trading-sdk/src/types'
+import { MorpherTradeSDK } from '../../../morpher-trading-sdk/src/index'
+import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from '../../../morpher-trading-sdk/src/v2.router';
+
+// import { TAddress, TCurrency, TCurrencyDetails } from 'morpher-trading-sdk'
+// import { MorpherTradeSDK } from 'morpher-trading-sdk';
+// import { TPortfolioDataPoint, TPosition } from 'morpher-trading-sdk';
 export type TCurrencyList = Partial<Record<TCurrency, TCurrencyDetails>>;
 const morpherTradeSDK = new MorpherTradeSDK(import.meta.env.VITE_MORPHER_API_ENDPOINT);
 
@@ -36,6 +40,17 @@ interface PortfolioState {
   setTradeComplete: (complete?: boolean) => void;
   returns: {[type: string ]: TPortfolioDataPoint[]}
   setReturns: (type: "d" | "w" | "m" | "y", returns?: TPortfolioDataPoint[]) => void;
+  leaderboard?: TLeaderBoard[];
+  getLeaderboard: (parameters: {app: string, type: "order" | "returns", eth_address: TAddress} ) => void;
+  context?: TContext;
+  setContext: (context?: {
+    eth_address: TAddress;
+    id: string;
+    app: string;
+    user_name?: string;
+    display_name?: string;
+    profile_image?: string;
+  }) => void;
 }
 
 export const usePortfolioStore = create<PortfolioState>((set, get) => ({
@@ -51,6 +66,25 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
   loading: false,
   setLoading: (loading) => set({ loading }),
   eth_address: undefined,
+  setContext: (context) => {
+    if (context) {
+      morpherTradeSDK.setContext(context).then (ctx => {
+        set({ context:ctx })
+      })
+    }
+  },
+  getLeaderboard: (parameters) => {
+
+    if (parameters) {
+      morpherTradeSDK.getLeaderboard({type: parameters.type, app: parameters.app, eth_address: parameters.eth_address}).then(data => {
+      console.log('lederboard data', data)
+      set({ leaderboard: data })
+
+      })
+      
+    }
+  
+  },
   setEthAddress: (eth_address) => {
     set({ eth_address })
     

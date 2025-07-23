@@ -8,6 +8,7 @@ import { sdk } from "@farcaster/frame-sdk";
 
 
 function ConnectMenu() {
+  
   const { isConnected } = useAccount();
   if (isConnected) {
     return <TradeTerminal />;
