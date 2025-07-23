@@ -69,6 +69,42 @@ export function MarketSelector() {
   const [startX, setStartX] = React.useState(0);
   const [scrollLeft, setScrollLeft] = React.useState(0);
   const hasDraggedRef = React.useRef(false);
+  const [showScrollFades, setShowScrollFades] = React.useState({
+    left: false,
+    right: false,
+  });
+
+  const checkFades = React.useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      const hasOverflow = scrollWidth > clientWidth;
+      setShowScrollFades({
+        left: hasOverflow && scrollLeft > 1,
+        right: hasOverflow && scrollLeft < scrollWidth - clientWidth - 1,
+      });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      checkFades();
+      
+      const handleEvents = () => checkFades();
+      el.addEventListener("scroll", handleEvents);
+      window.addEventListener("resize", handleEvents);
+
+      const observer = new MutationObserver(handleEvents);
+      observer.observe(el, { childList: true, subtree: true });
+
+      return () => {
+        el.removeEventListener("scroll", handleEvents);
+        window.removeEventListener("resize", handleEvents);
+        observer.disconnect();
+      };
+    }
+  }, [checkFades, marketList]);
 
 
 
@@ -134,6 +170,7 @@ export function MarketSelector() {
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
     const walk = (x - startX) * 1.5; // multiplier for scroll speed
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+    checkFades();
   };
 
   const outputMarket = (market: TMarket, closeOverride?: number) => {
@@ -244,12 +281,9 @@ export function MarketSelector() {
 
 
   return (
-    <Card className="pb-6">
-      <CardHeader>
-        <CardTitle className="text-lg font-bold">Select Market</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        <Popover open={open} onOpenChange={setOpen}>
+    <div className="flex flex-col gap-4">
+      <h2 className="text-lg font-bold">Select Market</h2>
+      <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -267,16 +301,21 @@ export function MarketSelector() {
           </PopoverTrigger>
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command>
-              <div
-                ref={scrollContainerRef}
-                onMouseDown={handleMouseDown}
-                onMouseLeave={handleMouseLeave}
-                onMouseUp={handleMouseUp}
-                onMouseMove={handleMouseMove}
-                className={`flex select-none gap-1 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-              >
-                {(["stock", "forex", "index", "commodity"] as TMarketType[]).map(
-                  (type) => (
+              <div className="relative">
+                {showScrollFades.left && (
+                  <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
+                )}
+                <div
+                  ref={scrollContainerRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseUp={handleMouseUp}
+                  onMouseMove={handleMouseMove}
+                  className={`flex select-none gap-1 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+                >
+                  {(
+                    ["stock", "forex", "index", "commodity"] as TMarketType[]
+                  ).map((type) => (
                     <Button
                       key={type}
                       variant={marketType === type ? "default" : "outline"}
@@ -294,7 +333,10 @@ export function MarketSelector() {
                       />
                       <span className="font-normal">{type}</span>
                     </Button>
-                  )
+                  ))}
+                </div>
+                {showScrollFades.right && (
+                  <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
                 )}
               </div>
               <CommandInput placeholder="Search market..." />
@@ -365,7 +407,6 @@ export function MarketSelector() {
             </div>
           )
         )}
-      </CardContent>
-    </Card>
+    </div>
   )
 }
