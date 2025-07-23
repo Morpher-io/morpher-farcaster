@@ -1,10 +1,9 @@
 import { usePortfolioStore } from "@/store/portfolio";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import {  usdFormatter } from "morpher-trading-sdk";
+import {  usdFormatter, TLeaderBoard } from "morpher-trading-sdk";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
-import {  TLeaderBoard } from '../../../morpher-trading-sdk/src/v2.router';
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
   
@@ -54,7 +53,7 @@ export function LeaderboardScreen() {
             <p className="text-base truncate">{displayName}</p>
             {type == "returns" ? (
               <p className=" text-xs">
-                <span className="text-primary">{value}</span> on Gold
+                <span className="text-primary">{value}</span> on {entry.market_name}
               </p>
             ) : (
               <p className=" text-xs">

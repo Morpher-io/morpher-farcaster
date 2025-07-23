@@ -30,6 +30,7 @@ export function TradeTerminal() {
   React.useEffect(()=> {
     if (address && publicClient && !currencyList && morpherTradeSDK.ready) {
       fetchCurrencyList()
+
     }
   }, [address, publicClient, currencyList, morpherTradeSDK.ready]) 
 

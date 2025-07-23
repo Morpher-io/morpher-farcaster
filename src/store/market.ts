@@ -27,6 +27,8 @@ interface MarketState {
   setTradeType: (tradeType: 'long' | 'short') => void;
   leverage: number[];
   setLeverage: (leverage: number[]) => void;
+  getTrendingMarkets: () => void;
+  trendingMarkets?: TMarketData[];
 }
 
 export const useMarketStore = create<MarketState>((set) => ({
@@ -54,6 +56,7 @@ export const useMarketStore = create<MarketState>((set) => ({
   selectedMarketClose: undefined,
   setSelectedMarketClose: (close) => set({ selectedMarketClose: close }),
 
+  trendingMarkets: undefined,
   marketData: undefined,
   setMarketData: (marketData) => set({ marketData }),
   order: undefined,
@@ -62,4 +65,11 @@ export const useMarketStore = create<MarketState>((set) => ({
   setTradeType: (tradeType) => set({ tradeType }),
   leverage: [1],
   setLeverage: (leverage) => set({ leverage }),
+  getTrendingMarkets: () => {
+    morpherTradeSDK.getTrendingMarkets().then(trendingMarkets => {
+      
+      
+      set({trendingMarkets})
+    })
+  }
 }));
