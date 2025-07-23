@@ -1,5 +1,4 @@
 import { useConnect } from "wagmi";
-import { ShinyButton } from "@/components/magicui/shiny-button";
 import { Button } from "../ui/button";
 
 export function Connect() {
