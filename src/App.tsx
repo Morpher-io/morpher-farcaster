@@ -54,7 +54,7 @@ function App() {
           ) : (
             <>
               {loading && (
-              <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
+              <div className="fixed inset-0 z-50 flex flex-col items-center justify-center backdrop-blur-sm">
                 <Loader2 className="h-16 w-16 animate-spin" />
                 <p className="mt-4">Loading...</p>
               </div>

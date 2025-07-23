@@ -282,7 +282,7 @@ export function MarketSelector() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold">Select Market</h2>
+      <h2 className="text-lg font-bold w-full">Select Market</h2>
       <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -299,8 +299,8 @@ export function MarketSelector() {
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-            <Command>
+          <PopoverContent className="w-90" align="center">
+            <Command className="w-full">
               <div className="relative">
                 {showScrollFades.left && (
                   <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
