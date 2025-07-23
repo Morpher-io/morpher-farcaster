@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ChevronsUpDown } from "lucide-react"
+import { ChevronsUpDown, Loader2Icon } from "lucide-react"
 import { Label } from "@/components/ui/label"
 
 import { Button } from "@/components/ui/button"
@@ -32,13 +32,16 @@ import { useMarketStore } from "../../store/market";
 import { Trade } from "./Trade";
 import { Position } from "./Position";
 import { PendingPosition } from "./PendingPosition";
-import { usePortfolioStore } from "@/store/portfolio"
+import { usePortfolioStore } from "@/store/portfolio";
+import { TokenSelector } from "./TokenSelector";
 
 export function MarketSelector() {
   
   const {morpherTradeSDK} = useMarketStore();
   const [open, setOpen] = React.useState(false)
   const [timeRange, setTimeRange] = React.useState('1D');
+  const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
+  const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
   const {
     marketType,
     setMarketType,
@@ -66,6 +69,42 @@ export function MarketSelector() {
   const [startX, setStartX] = React.useState(0);
   const [scrollLeft, setScrollLeft] = React.useState(0);
   const hasDraggedRef = React.useRef(false);
+  const [showScrollFades, setShowScrollFades] = React.useState({
+    left: false,
+    right: false,
+  });
+
+  const checkFades = React.useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      const hasOverflow = scrollWidth > clientWidth;
+      setShowScrollFades({
+        left: hasOverflow && scrollLeft > 1,
+        right: hasOverflow && scrollLeft < scrollWidth - clientWidth - 1,
+      });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      checkFades();
+      
+      const handleEvents = () => checkFades();
+      el.addEventListener("scroll", handleEvents);
+      window.addEventListener("resize", handleEvents);
+
+      const observer = new MutationObserver(handleEvents);
+      observer.observe(el, { childList: true, subtree: true });
+
+      return () => {
+        el.removeEventListener("scroll", handleEvents);
+        window.removeEventListener("resize", handleEvents);
+        observer.disconnect();
+      };
+    }
+  }, [checkFades, marketList]);
 
 
 
@@ -131,6 +170,7 @@ export function MarketSelector() {
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
     const walk = (x - startX) * 1.5; // multiplier for scroll speed
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+    checkFades();
   };
 
   const outputMarket = (market: TMarket, closeOverride?: number) => {
@@ -148,14 +188,14 @@ export function MarketSelector() {
           </div>
           <div
             id="marketName"
-            className="flex flex-col max-w-[150px] w-[150px] overflow-hidden text-left"
+            className="flex flex-col max-w-[130px] w-[130px] overflow-hidden text-left"
           >
             <p className="font-semibold">{market?.symbol}</p>
-            <p className="font-normal">{market?.name}</p>
+            <p className="font-normal truncate">{market?.name}</p>
           </div>
         </div>
         <div id="marketValue" className="flex flex-col text-right">
-          <p className="text-lg font-bold">
+          <p className="text-base font-bold">
             $ {tokenValueFormatter(closeOverride || market?.close)}
           </p>
           <div
@@ -183,9 +223,10 @@ export function MarketSelector() {
 
 
     const fetchMarketData = async ({eth_address, market_id}: {eth_address: `0x${string}`, market_id: string}) => {
+      setIsMarketDataLoading(true);
       const sdkMarketData = await morpherTradeSDK.getMarketData({eth_address, market_id})
         setMarketData(sdkMarketData);
-
+      setIsMarketDataLoading(false);
     }
 
   React.useEffect(() => {
@@ -206,8 +247,11 @@ export function MarketSelector() {
   }, [selectedMarketId, marketList, setSelectedMarket])
 
   const fetchMarkets = async ({type}: {type: TMarketType}) => {
+    setIsMarketListLoading(true);
+    setMarketList(undefined);
     let marketList = await morpherTradeSDK.getMarketList({type})
     setMarketList(marketList)
+    setIsMarketListLoading(false);
   }
 
   React.useEffect(() => {
@@ -237,48 +281,9 @@ export function MarketSelector() {
 
 
   return (
-    <Card className="pb-6">
-      <CardHeader>
-        <CardTitle className="text-lg font-bold">Select Market</CardTitle>
-      </CardHeader>
-      <CardContent>
-
-        <div
-          ref={scrollContainerRef}
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeave}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          className={`mb-4 flex select-none gap-1 overflow-x-auto pb-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-        >
-          
-          {(["stock", "forex", "index", "commodity"] as TMarketType[]).map((type) => (
-            <Button
-              key={type}
-              variant={marketType === type ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                if (hasDraggedRef.current) return;
-                setMarketType(type);
-              }}
-              className="capitalize rounded-full"
-            >
-              <img
-                src={`/src/assets/types/${type}.svg`}
-                alt={`${type} icon`}
-                className="mr-0 h-4 w-4"
-              />
-              <span className={`font-normal ${marketType === type ? "text-white" : "text-black"}`}>{type}</span>
-              
-            </Button>
-          ))}
-        
-          
-        </div>
-        <Label className="mb-2 mt-6" htmlFor="email">Pick a {marketType} to invest in</Label>
-
-        
-        <Popover open={open} onOpenChange={setOpen}>
+    <div className="flex flex-col gap-4">
+      <h2 className="text-lg font-bold w-full">Select Market</h2>
+      <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -286,43 +291,102 @@ export function MarketSelector() {
               aria-expanded={open}
               className="w-full justify-between h-[60px]"
             >
-              {selectedMarket ? outputMarket(selectedMarket, selectedMarketClose) : <></>}
-
+              {selectedMarket ? (
+                outputMarket(selectedMarket, selectedMarketClose)
+              ) : (
+                <span className="text-muted-foreground">Select a market...</span>
+              )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-            <Command>
+          <PopoverContent className="w-90" align="center">
+            <Command className="w-full">
+              <div className="relative">
+                {showScrollFades.left && (
+                  <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
+                )}
+                <div
+                  ref={scrollContainerRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseUp={handleMouseUp}
+                  onMouseMove={handleMouseMove}
+                  className={`flex select-none gap-1 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+                >
+                  {(
+                    ["stock", "forex", "index", "commodity"] as TMarketType[]
+                  ).map((type) => (
+                    <Button
+                      key={type}
+                      variant={marketType === type ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (hasDraggedRef.current) return;
+                        setMarketType(type);
+                      }}
+                      className="capitalize rounded-full flex-shrink-0"
+                    >
+                      <img
+                        src={`/src/assets/types/${type}.svg`}
+                        alt={`${type} icon`}
+                        className="mr-2 h-4 w-4"
+                      />
+                      <span className="font-normal">{type}</span>
+                    </Button>
+                  ))}
+                </div>
+                {showScrollFades.right && (
+                  <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
+                )}
+              </div>
               <CommandInput placeholder="Search market..." />
               <CommandList>
-                <CommandEmpty>No market found.</CommandEmpty>
+                <CommandEmpty>
+                  {isMarketListLoading ? (
+                    <div className="flex items-center justify-center p-2">
+                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    "No market found."
+                  )}
+                </CommandEmpty>
                 <CommandGroup>
-                  {marketList && Object.values(marketList).map((market) => (
-                    <CommandItem
-                      key={market.symbol}
-                      value={market.market_id}
-                      onSelect={(currentValue) => {
-                        setSelectedMarketId(currentValue === selectedMarketId ? "" : currentValue)
-                        setOpen(false)
-                      }}
-                    >
-                      {outputMarket(market)}
-                      
-                    </CommandItem>
-                  ))}
+                  {!isMarketListLoading &&
+                    marketList &&
+                    Object.values(marketList).map((market) => (
+                      <CommandItem
+                        key={market.symbol}
+                        value={market.market_id}
+                        onSelect={(currentValue) => {
+                          setSelectedMarketId(
+                            currentValue === selectedMarketId ? "" : currentValue
+                          );
+                          setOpen(false);
+                        }}
+                      >
+                        {outputMarket(market)}
+                      </CommandItem>
+                    ))}
                 </CommandGroup>
               </CommandList>
             </Command>
           </PopoverContent>
         </Popover>
-        {marketData && (
-            <div>
-              <MarketChart data={chartData} timeRange={timeRange}/>
-              <div className="flex justify-center gap-1 mt-2 mb-4">
-                {['1D', '1W', '1M', '3M', '6M', '1Y'].map((range) => (
+
+        {isMarketDataLoading ? (
+          <div className="flex justify-center items-center h-[200px] w-full">
+            <Loader2Icon className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          marketData && (
+            <div className="flex flex-col gap-4">
+              <MarketChart data={chartData} timeRange={timeRange} />
+              <div className="flex justify-center gap-1">
+                {["1D", "1W", "1M", "3M", "6M", "1Y"].map((range) => (
                   <Button
                     key={range}
-                    variant={timeRange === range ? 'outline' : 'ghost'}
+                    variant={timeRange === range ? "outline" : "ghost"}
                     size="sm"
                     onClick={() => setTimeRange(range)}
                     className="rounded-full px-3"
@@ -332,21 +396,17 @@ export function MarketSelector() {
                 ))}
               </div>
 
-              
               {marketData.pending_order_id ? (
                 <PendingPosition />
               ) : (
                 <>
-                  {marketData.position_id && <>
-                    <Position />
-                  </>}
+                  {marketData.position_id && <Position />}
                   <Trade />
                 </>
               )}
             </div>
           )
-         }
-      </CardContent>
-    </Card>
+        )}
+    </div>
   )
 }

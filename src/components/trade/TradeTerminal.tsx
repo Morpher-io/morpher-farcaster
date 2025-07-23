@@ -1,85 +1,46 @@
 import * as React from "react";
-import { useAccount, useSignMessage, useChainId, useWalletClient } from "wagmi";
-import { Button } from "@/components/ui/button";
 import { MarketSelector } from "./MarketSelector";
-import { TokenSelector } from "./TokenSelector";
-import { ArrowUpDown } from "lucide-react";
+import { MarketSuggestions } from "./MarketSuggestions";
+import { PortfolioSummary } from "./PortfolioSummary";
+import { PortfolioStats } from "./PortfolioStats";
+import { useAccount, usePublicClient } from "wagmi";
 import { usePortfolioStore } from "@/store/portfolio";
-import { PositionSelector } from "./PositionSelector";
-import { ClosePosition } from "./ClosePosition";
-
-
-function SignButton() {
-  const { signMessage, isPending, data, error } = useSignMessage();
-  
-
-    const chainId = useChainId()
-    
-
-    console.log('chainId', chainId)
-
-  return (
-    <>
-      <Button type="button" onClick={() => signMessage({ message: "hello world" })} disabled={isPending}>
-        {isPending ? "Signing..." : "Sign message"}
-      </Button>
-      {data && (
-        <>
-          <div>Signature</div>
-          <div>{data}</div>
-        </>
-      )}
-      {error && (
-        <>
-          <div>Error</div>
-          <div>{error.message}</div>
-        </>
-      )}
-    </>
-  );
-}
+import { useMarketStore } from "@/store/market";
 
 export function TradeTerminal() {
   const { address } = useAccount();
-  const {tradeDirection, setTradeDirection} = usePortfolioStore();
+  const { setEthAddress, setCurrencyList, currencyList } = usePortfolioStore();
+  const { morpherTradeSDK } = useMarketStore();
+  const publicClient = usePublicClient();
 
-  const handleSwap = () => {
-    if (tradeDirection == 'open') {
-      setTradeDirection('close')
-    } else {
-      setTradeDirection('open')
+  React.useEffect(() => {
+    console.log("TradeTerminal: address from useAccount:", address);
+    setEthAddress(address);
+  }, [address, setEthAddress]);
+
+  const fetchCurrencyList = async () => {
+    if (address && publicClient && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
+      console.log("TradeTerminal: Fetching currency list for", address);
+      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
+      console.log("TradeTerminal: Fetched currency list:", fetchedCurrencyList);
+      setCurrencyList(fetchedCurrencyList);
     }
-  };
+  }
 
-  const first = tradeDirection === 'close' ? <PositionSelector /> : <TokenSelector />;
-  const second = tradeDirection === 'close' ? <ClosePosition /> : <MarketSelector />;
+  React.useEffect(()=> {
+    if (address && publicClient && !currencyList && morpherTradeSDK.ready) {
+      fetchCurrencyList()
+    }
+  }, [address, publicClient, currencyList, morpherTradeSDK.ready]) 
+
 
   return (
-    <>
-      <div className="mt-5 mx-4 mb-6">
-        {first}
-        <div className="relative my-2 flex justify-center">
-          {/* <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div> */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative z-10 size-12 rounded-full bg-background"
-            onClick={handleSwap}
-          >
-            <img
-                src={`/src/assets/icons/switch.svg`}
-                alt={`Switch Direction`}
-                 />
-          </Button>
-        </div>
-        {second}
-      </div>
-      {/* <div>Connected account:</div>
-      <div>{address}</div>
-      <SignButton />
-      <BalanceChecker /> */}
-    </>
+    <div className="mt-5 mx-4 mb-6 flex flex-col gap-4 bg-white h-full">
+      <PortfolioSummary />
+      <div className="h-px bg-gray-200 my-2" />
+      <PortfolioStats />
+      <MarketSuggestions />
+      <MarketSelector />
+    </div>
   );
 }
