@@ -3,16 +3,36 @@ import { MarketSelector } from "./MarketSelector";
 import { MarketSuggestions } from "./MarketSuggestions";
 import { PortfolioSummary } from "./PortfolioSummary";
 import { PortfolioStats } from "./PortfolioStats";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import { usePortfolioStore } from "@/store/portfolio";
+import { useMarketStore } from "@/store/market";
 
 export function TradeTerminal() {
   const { address } = useAccount();
-  const { setEthAddress } = usePortfolioStore();
+  const { setEthAddress, setCurrencyList, currencyList } = usePortfolioStore();
+  const { morpherTradeSDK } = useMarketStore();
+  const publicClient = usePublicClient();
 
   React.useEffect(() => {
+    console.log("TradeTerminal: address from useAccount:", address);
     setEthAddress(address);
   }, [address, setEthAddress]);
+
+  const fetchCurrencyList = async () => {
+    if (address && publicClient && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
+      console.log("TradeTerminal: Fetching currency list for", address);
+      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
+      console.log("TradeTerminal: Fetched currency list:", fetchedCurrencyList);
+      setCurrencyList(fetchedCurrencyList);
+    }
+  }
+
+  React.useEffect(()=> {
+    if (address && publicClient && !currencyList && morpherTradeSDK.ready) {
+      fetchCurrencyList()
+    }
+  }, [address, publicClient, currencyList, morpherTradeSDK.ready]) 
+
 
   return (
     <div className="mt-5 mx-4 mb-6 flex flex-col gap-4 bg-white h-full">

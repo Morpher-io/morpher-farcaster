@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { TAddress, TCurrency, TCurrencyDetails } from 'morpher-trading-sdk'
 import { MorpherTradeSDK } from 'morpher-trading-sdk';
 import { TPortfolioDataPoint, TPosition } from 'morpher-trading-sdk';
+import { sdk } from "@farcaster/frame-sdk";
 export type TCurrencyList = Partial<Record<TCurrency, TCurrencyDetails>>;
 const morpherTradeSDK = new MorpherTradeSDK(import.meta.env.VITE_MORPHER_API_ENDPOINT);
 
@@ -41,16 +42,24 @@ interface PortfolioState {
 export const usePortfolioStore = create<PortfolioState>((set, get) => {
   const fetchPortfolioData = async () => {
     const { eth_address } = get();
-    if (!eth_address) return;
+    if (!eth_address) {
+      console.log("fetchPortfolioData: No eth_address, skipping fetch.");
+      set({ loading: false });
+      return;
+    }
+    console.log("fetchPortfolioData: Starting for address:", eth_address);
     set({ loading: true });
     try {
       const portfolio = await morpherTradeSDK.getPortfolio({ eth_address });
+      console.log("fetchPortfolioData: Fetched portfolio:", portfolio);
+
       const [returnsD, returnsW, returnsM, returnsY] = await Promise.all([
         morpherTradeSDK.getPortfolioReturns({ eth_address, timeframe: 'd' }),
         morpherTradeSDK.getPortfolioReturns({ eth_address, timeframe: 'w' }),
         morpherTradeSDK.getPortfolioReturns({ eth_address, timeframe: 'm' }),
         morpherTradeSDK.getPortfolioReturns({ eth_address, timeframe: 'y' }),
       ]);
+      console.log("fetchPortfolioData: Fetched returns.");
       
       set({
         portfolio,
@@ -63,8 +72,12 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       });
     } catch (error) {
       console.error("Failed to fetch portfolio data:", error);
+      // Ensure portfolio is cleared on error to avoid showing stale data
+      set({ portfolio: undefined, returns: {} });
     } finally {
+      console.log("fetchPortfolioData: Finished, setting loading to false.");
       set({ loading: false });
+      sdk.actions.ready();
     }
   };
 
@@ -82,16 +95,21 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     setLoading: (loading) => set({ loading }),
     eth_address: undefined,
     setEthAddress: (eth_address) => {
+      console.log("Setting eth_address:", eth_address);
+      const current_eth_address = get().eth_address;
+      if (eth_address === current_eth_address) return;
+
       set({ eth_address });
       if (eth_address) {
         fetchPortfolioData();
         morpherTradeSDK.subscribeToOrder(eth_address, (update: any) => {
+          console.log("Order update received:", update);
           set({ orderUpdate: update });
           fetchPortfolioData(); // Refetch on order update
         });
       } else {
         morpherTradeSDK.subscribeToOrder("", () => {});
-        set({ portfolio: undefined, returns: {} });
+        set({ portfolio: undefined, returns: {}, loading: false });
       }
     },
     closePercentage: 100,

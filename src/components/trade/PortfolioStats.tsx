@@ -7,6 +7,8 @@ import { usdFormatter } from "morpher-trading-sdk";
 export function PortfolioStats() {
   const { portfolio, returns, loading, currencyList } = usePortfolioStore();
 
+  console.log("PortfolioStats state:", { loading, portfolio, returns, currencyList });
+
   const availableToTrade = React.useMemo(() => {
     if (!currencyList) return 0;
     return Object.values(currencyList).reduce(

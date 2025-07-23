@@ -29,27 +29,12 @@ export function Trade() {
       setSelectedCurrencyDetails,
       currencyList,
       setCurrencyList,
-      setLoading,
       setTradeComplete
   } = usePortfolioStore()
 
   const account: any = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient:any = usePublicClient()
-
-  const fetchCurrencyList = async () => {
-    if (account.address && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
-      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address: account.address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
-      setCurrencyList(fetchedCurrencyList);
-      sdk.actions.ready();
-    }
-  }
-
-  React.useEffect(()=> {
-    if (account.address && publicClient && !currencyList) {
-      fetchCurrencyList()
-    }
-  }, [account.address, publicClient, currencyList, morpherTradeSDK.ready]) 
     
   React.useEffect(() => {
     if (selectedCurrency && currencyList) {

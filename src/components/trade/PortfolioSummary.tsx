@@ -9,6 +9,8 @@ export function PortfolioSummary() {
   const { portfolio, returns, loading } = usePortfolioStore();
   const [timeRange, setTimeRange] = React.useState<'d' | 'w' | 'm' | 'y'>('d');
 
+  console.log("PortfolioSummary state:", { loading, portfolio, returns });
+
   const chartData = returns[timeRange];
 
   const valueChange = React.useMemo(() => {

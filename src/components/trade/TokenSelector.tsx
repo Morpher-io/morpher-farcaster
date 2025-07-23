@@ -40,8 +40,7 @@ export function TokenSelector() {
     selectedCurrencyDetails, 
     setSelectedCurrencyDetails,
     currencyList,
-    setCurrencyList,
-    setLoading
+    setCurrencyList
   } = usePortfolioStore();
   const { address } = useAccount();
 
@@ -59,12 +58,6 @@ export function TokenSelector() {
     }
   }
 
-  useEffect(()=> {
-    if (address && publicClient && !currencyList) {
-      fetchCurrencyList()
-    }
-    
-  }, [address, setCurrencyList, currencyList, morpherTradeSDK.ready]) 
 
 
 

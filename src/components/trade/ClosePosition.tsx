@@ -42,7 +42,6 @@ export function ClosePosition() {
     setSelectedCurrencyDetails,
     currencyList,
     setCurrencyList,
-    setLoading,
     closePercentage,
     setClosePercentage,
     selectedPosition,
@@ -96,24 +95,6 @@ export function ClosePosition() {
     }
  
   }
-
-
-
-  const fetchCurrencyList = async () => {
-    if (address && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
-      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
-      setCurrencyList(fetchedCurrencyList);
-      sdk.actions.ready();
-      
-    }
-  }
-
-  useEffect(()=> {
-    if (address && publicClient && !currencyList) {
-      fetchCurrencyList()
-    }
-    
-  }, [address, setCurrencyList, currencyList, morpherTradeSDK.ready]) 
 
 
 
