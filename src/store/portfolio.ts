@@ -70,10 +70,23 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
           y: returnsY,
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch portfolio data:", error);
-      // Ensure portfolio is cleared on error to avoid showing stale data
-      set({ portfolio: undefined, returns: {} });
+      if (error.message && error.message.includes("No portfolio was found")) {
+        console.log("fetchPortfolioData: No portfolio exists for this user. Setting default state.");
+        set({
+          portfolio: {
+            total_portfolio_value: "0",
+            positions_count: 0,
+            total_portfolio_value_unrealized_pnl: '0',
+            total_open_position_value: '0',
+          },
+          returns: { d: [], w: [], m: [], y: [] },
+        });
+      } else {
+        // For other errors, clear the portfolio to avoid showing stale data
+        set({ portfolio: undefined, returns: {} });
+      }
     } finally {
       console.log("fetchPortfolioData: Finished, setting loading to false.");
       set({ loading: false });
