@@ -41,6 +41,7 @@ export function MarketSelector() {
   const [open, setOpen] = React.useState(false)
   const [timeRange, setTimeRange] = React.useState('1D');
   const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
+  const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
   const {
     marketType,
     setMarketType,
@@ -209,8 +210,11 @@ export function MarketSelector() {
   }, [selectedMarketId, marketList, setSelectedMarket])
 
   const fetchMarkets = async ({type}: {type: TMarketType}) => {
+    setIsMarketListLoading(true);
+    setMarketList(undefined);
     let marketList = await morpherTradeSDK.getMarketList({type})
     setMarketList(marketList)
+    setIsMarketListLoading(false);
   }
 
   React.useEffect(() => {
@@ -298,9 +302,16 @@ export function MarketSelector() {
             <Command>
               <CommandInput placeholder="Search market..." />
               <CommandList>
-                <CommandEmpty>No market found.</CommandEmpty>
+                <CommandEmpty>
+                  {isMarketListLoading ? (
+                    <div className="flex items-center justify-center p-2">
+                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                      <span>Loading...</span>
+                    </div>
+                  ) : "No market found."}
+                </CommandEmpty>
                 <CommandGroup>
-                  {marketList && Object.values(marketList).map((market) => (
+                  {!isMarketListLoading && marketList && Object.values(marketList).map((market) => (
                     <CommandItem
                       key={market.symbol}
                       value={market.market_id}
