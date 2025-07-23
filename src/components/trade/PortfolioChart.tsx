@@ -11,7 +11,7 @@ import { tokenValueFormatter } from "morpher-trading-sdk"
 
 interface PortfolioChartProps {
   data: [number, number][] | undefined;
-  timeRange: string
+  timeRange: 'd' | 'w' | 'm' | 'y';
 }
 
 export const PortfolioChart = React.memo(function PortfolioChart({ data, timeRange }: PortfolioChartProps) {
