@@ -1,8 +1,17 @@
 import { useConnect } from "wagmi";
-import { Button } from "../ui/button";
+import { useEffect } from "react";
+import { sdk } from "@farcaster/frame-sdk";
 
 export function Connect() {
   const { connect, connectors } = useConnect();
+
+  useEffect(() => {
+    sdk.actions.ready();
+    if (connectors.length > 0) {
+      connect({ connector: connectors[0] });
+    }
+  }, [connect, connectors]);
+
   return (
     <div className="bg-[var(--primary)] flex flex-col items-center p-4" style={{ minHeight: 'calc(100vh)' }}>
       <div className="flex-1 flex items-center justify-center">
@@ -12,12 +21,9 @@ export function Connect() {
             alt={`Morpher Logo`}
             className="h-25 w-25 animate-spin [animation-duration:20s]"
           />
-          <p className="text-white mt-4 text-xl">Ready to flip your next trade?</p>
+          <p className="text-white mt-4 text-xl">Connecting wallet...</p>
         </div>
       </div>
-      <Button className="w-full bg-white text-[var(--primary)] hover:bg-white/90 rounded-full mb-8" onClick={() => connect({ connector: connectors[0] })}>
-        Connect Wallet
-      </Button>
     </div>
     
   );
