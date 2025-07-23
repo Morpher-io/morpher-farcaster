@@ -47,16 +47,6 @@ export function TokenSelector() {
   const publicClient = usePublicClient()
 
   const { morpherTradeSDK } = useMarketStore()
-  
-
-  const fetchCurrencyList = async () => {
-    if (address && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
-      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
-      setCurrencyList(fetchedCurrencyList);
-      sdk.actions.ready();
-      
-    }
-  }
 
 
 
