@@ -248,43 +248,7 @@ export function MarketSelector() {
       <CardHeader>
         <CardTitle className="text-lg font-bold">Select Market</CardTitle>
       </CardHeader>
-      <CardContent>
-
-        <div
-          ref={scrollContainerRef}
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeave}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          className={`mb-4 flex select-none gap-1 overflow-x-auto pb-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-        >
-          
-          {(["stock", "forex", "index", "commodity"] as TMarketType[]).map((type) => (
-            <Button
-              key={type}
-              variant={marketType === type ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                if (hasDraggedRef.current) return;
-                setMarketType(type);
-              }}
-              className="capitalize rounded-full"
-            >
-              <img
-                src={`/src/assets/types/${type}.svg`}
-                alt={`${type} icon`}
-                className="mr-0 h-4 w-4"
-              />
-              <span className={`font-normal ${marketType === type ? "text-white" : "text-black"}`}>{type}</span>
-              
-            </Button>
-          ))}
-        
-          
-        </div>
-        <Label className="mb-2 mt-6" htmlFor="email">Pick a {marketType} to invest in</Label>
-
-        
+      <CardContent className="flex flex-col gap-4">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -293,13 +257,46 @@ export function MarketSelector() {
               aria-expanded={open}
               className="w-full justify-between h-[60px]"
             >
-              {selectedMarket ? outputMarket(selectedMarket, selectedMarketClose) : <></>}
-
+              {selectedMarket ? (
+                outputMarket(selectedMarket, selectedMarketClose)
+              ) : (
+                <span className="text-muted-foreground">Select a market...</span>
+              )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command>
+              <div
+                ref={scrollContainerRef}
+                onMouseDown={handleMouseDown}
+                onMouseLeave={handleMouseLeave}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+                className={`flex select-none gap-1 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+              >
+                {(["stock", "forex", "index", "commodity"] as TMarketType[]).map(
+                  (type) => (
+                    <Button
+                      key={type}
+                      variant={marketType === type ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (hasDraggedRef.current) return;
+                        setMarketType(type);
+                      }}
+                      className="capitalize rounded-full flex-shrink-0"
+                    >
+                      <img
+                        src={`/src/assets/types/${type}.svg`}
+                        alt={`${type} icon`}
+                        className="mr-2 h-4 w-4"
+                      />
+                      <span className="font-normal">{type}</span>
+                    </Button>
+                  )
+                )}
+              </div>
               <CommandInput placeholder="Search market..." />
               <CommandList>
                 <CommandEmpty>
@@ -308,36 +305,42 @@ export function MarketSelector() {
                       <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                       <span>Loading...</span>
                     </div>
-                  ) : "No market found."}
+                  ) : (
+                    "No market found."
+                  )}
                 </CommandEmpty>
                 <CommandGroup>
-                  {!isMarketListLoading && marketList && Object.values(marketList).map((market) => (
-                    <CommandItem
-                      key={market.symbol}
-                      value={market.market_id}
-                      onSelect={(currentValue) => {
-                        setSelectedMarketId(currentValue === selectedMarketId ? "" : currentValue)
-                        setOpen(false)
-                      }}
-                    >
-                      {outputMarket(market)}
-                      
-                    </CommandItem>
-                  ))}
+                  {!isMarketListLoading &&
+                    marketList &&
+                    Object.values(marketList).map((market) => (
+                      <CommandItem
+                        key={market.symbol}
+                        value={market.market_id}
+                        onSelect={(currentValue) => {
+                          setSelectedMarketId(
+                            currentValue === selectedMarketId ? "" : currentValue
+                          );
+                          setOpen(false);
+                        }}
+                      >
+                        {outputMarket(market)}
+                      </CommandItem>
+                    ))}
                 </CommandGroup>
               </CommandList>
             </Command>
           </PopoverContent>
         </Popover>
+
         {isMarketDataLoading ? (
-          <div className="flex justify-center items-center h-[200px] w-full mt-4">
+          <div className="flex justify-center items-center h-[200px] w-full">
             <Loader2Icon className="h-8 w-8 animate-spin" />
           </div>
         ) : (
           marketData && (
-            <div>
+            <div className="flex flex-col gap-4">
               <MarketChart data={chartData} timeRange={timeRange} />
-              <div className="flex justify-center gap-1 mt-2 mb-4">
+              <div className="flex justify-center gap-1">
                 {["1D", "1W", "1M", "3M", "6M", "1Y"].map((range) => (
                   <Button
                     key={range}
@@ -355,11 +358,7 @@ export function MarketSelector() {
                 <PendingPosition />
               ) : (
                 <>
-                  {marketData.position_id && (
-                    <>
-                      <Position />
-                    </>
-                  )}
+                  {marketData.position_id && <Position />}
                   <Trade />
                 </>
               )}
