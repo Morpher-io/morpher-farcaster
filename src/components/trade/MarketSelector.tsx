@@ -32,7 +32,8 @@ import { useMarketStore } from "../../store/market";
 import { Trade } from "./Trade";
 import { Position } from "./Position";
 import { PendingPosition } from "./PendingPosition";
-import { usePortfolioStore } from "@/store/portfolio"
+import { usePortfolioStore } from "@/store/portfolio";
+import { TokenSelector } from "./TokenSelector";
 
 export function MarketSelector() {
   
@@ -345,7 +346,7 @@ export function MarketSelector() {
               )}
             </div>
           )
-         }
+        }
       </CardContent>
     </Card>
   )
