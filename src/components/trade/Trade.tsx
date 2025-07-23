@@ -11,7 +11,7 @@ import  { TradeCallback, TCurrency, tokenValueFormatter, usdFormatter } from "mo
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
-import { Command, CommandEmpty, CommandGroup, CommandList } from "../ui/command"
+import { Command, CommandEmpty, CommandGroup, CommandList, CommandItem } from "../ui/command"
 import { sdk } from "@farcaster/frame-sdk"
 
 export function Trade() {
