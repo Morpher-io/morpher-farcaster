@@ -80,15 +80,14 @@ export function PositionSelector() {
           </div>
           <div
             id="marketName"
-            className="flex flex-col max-w-[140px] w-[140px] overflow-hidden text-left"
-
+            className="flex flex-col max-w-[130px] w-[130px] overflow-hidden text-left"
           >
             <p className="font-semibold">{position?.symbol}</p>
-            <p className="font-normal">{position?.name}</p>
+            <p className="font-normal truncate">{position?.name}</p>
           </div>
         </div>
         <div id="marketValue" className="flex flex-col text-right">
-          <p className="text-lg font-bold">
+          <p className="text-base font-bold">
              { currencyList?.MPH?.usd_exchange_rate ? '$ ' + (usdFormatter(Number(position.value || 0) / 10**18 * currencyList?.MPH?.usd_exchange_rate )) : tokenValueFormatter(Number(position.value || 0) / 10**18) + ' MPH'}
           </p>
           <div

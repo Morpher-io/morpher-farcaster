@@ -188,14 +188,14 @@ export function MarketSelector() {
           </div>
           <div
             id="marketName"
-            className="flex flex-col max-w-[150px] w-[150px] overflow-hidden text-left"
+            className="flex flex-col max-w-[130px] w-[130px] overflow-hidden text-left"
           >
             <p className="font-semibold">{market?.symbol}</p>
-            <p className="font-normal">{market?.name}</p>
+            <p className="font-normal truncate">{market?.name}</p>
           </div>
         </div>
         <div id="marketValue" className="flex flex-col text-right">
-          <p className="text-lg font-bold">
+          <p className="text-base font-bold">
             $ {tokenValueFormatter(closeOverride || market?.close)}
           </p>
           <div
