@@ -299,7 +299,23 @@ export function MarketSelector() {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-90" align="center">
-            <Command className="w-full">
+            <Command
+              className="w-full"
+              filter={(value, search) => {
+                try {
+                  const market = JSON.parse(value) as TMarket;
+                  if (
+                    market.name.toLowerCase().includes(search.toLowerCase()) ||
+                    market.symbol.toLowerCase().includes(search.toLowerCase())
+                  ) {
+                    return 1;
+                  }
+                } catch (e) {
+                  // ignore
+                }
+                return 0;
+              }}
+            >
               <div className="relative">
                 {showScrollFades.left && (
                   <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
@@ -372,11 +388,14 @@ export function MarketSelector() {
                     marketList &&
                     Object.values(marketList).map((market) => (
                       <CommandItem
-                        key={market.symbol}
-                        value={market.market_id}
+                        key={market.market_id}
+                        value={JSON.stringify(market)}
                         onSelect={(currentValue) => {
+                          const market: TMarket = JSON.parse(currentValue);
                           setSelectedMarketId(
-                            currentValue === selectedMarketId ? "" : currentValue
+                            market.market_id === selectedMarketId
+                              ? ""
+                              : market.market_id
                           );
                           setOpen(false);
                         }}
