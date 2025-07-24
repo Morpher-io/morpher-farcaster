@@ -69,10 +69,10 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       console.log("fetchPortfolioData: Fetched portfolio:", portfolio);
 
       const [returnsD, returnsW, returnsM, returnsY] = await Promise.all([
-        morpherTradeSDK.getPortfolioReturns({ eth_address, timeframe: 'd' }),
-        morpherTradeSDK.getPortfolioReturns({ eth_address, timeframe: 'w' }),
-        morpherTradeSDK.getPortfolioReturns({ eth_address, timeframe: 'm' }),
-        morpherTradeSDK.getPortfolioReturns({ eth_address, timeframe: 'y' }),
+        morpherTradeSDK.getReturns({ eth_address, type: 'd' }),
+        morpherTradeSDK.getReturns({ eth_address, type: 'w' }),
+        morpherTradeSDK.getReturns({ eth_address, type: 'm' }),
+        morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
       ]);
       console.log("fetchPortfolioData: Fetched returns.");
       
