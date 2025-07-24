@@ -4,7 +4,18 @@ import { usdFormatter } from "morpher-trading-sdk";
 import { Loader2Icon } from "lucide-react";
 
 export function PortfolioSummary() {
-  const { portfolio, loading, eth_address, leaderboard } = usePortfolioStore();
+  const { portfolio, loading, eth_address, leaderboard, positionValue, currencyList } = usePortfolioStore();
+
+  const totalPortfolioValueUSD = React.useMemo(() => {
+    if (!currencyList?.MPH?.usd_exchange_rate || !portfolio) return 0;
+
+    const freeCashInMphWei = BigInt(portfolio.total_portfolio_value || '0');
+    const positionsValueInMphWei = BigInt(positionValue || 0);
+
+    const totalMphWei = freeCashInMphWei + positionsValueInMphWei;
+
+    return (Number(totalMphWei) / 1e18) * currencyList.MPH.usd_exchange_rate;
+  }, [portfolio, positionValue, currencyList]);
 
   const userLeaderboardEntry = React.useMemo(() => {
     if (!leaderboard || !eth_address) return null;
@@ -43,7 +54,7 @@ export function PortfolioSummary() {
         <div>
           <p className="text-muted-foreground text-sm">Portfolio Value</p>
           <p className="text-2xl font-bold">
-            ${usdFormatter(portfolio.total_portfolio_value)}
+            ${usdFormatter(totalPortfolioValueUSD.toString())}
           </p>
         </div>
       </div>

@@ -87,9 +87,15 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         eth_address,
       });
       
+      let positionValue = 0;
+      positionList?.forEach((position) => {
+        positionValue += Number(position.value);
+      });
+
       set({
         portfolio,
         positionList,
+        positionValue,
         returns: {
           d: returnsD,
           w: returnsW,
