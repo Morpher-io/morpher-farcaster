@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ChevronsUpDown, Loader2Icon } from "lucide-react"
+import { ChevronsUpDown, Loader2Icon, Search } from "lucide-react"
 import { Label } from "@/components/ui/label"
 
 import { Button } from "@/components/ui/button"
@@ -42,6 +42,7 @@ export function MarketSelector() {
   const [timeRange, setTimeRange] = React.useState('1D');
   const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
   const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const {
     marketType,
     setMarketType,
@@ -63,6 +64,14 @@ export function MarketSelector() {
   } = usePortfolioStore();
   
   const { address } = useAccount();
+
+  React.useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [open]);
   
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -282,7 +291,6 @@ export function MarketSelector() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold w-full">Select Market</h2>
       <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -294,7 +302,10 @@ export function MarketSelector() {
               {selectedMarket ? (
                 outputMarket(selectedMarket, selectedMarketClose)
               ) : (
-                <span className="text-muted-foreground">Select a market...</span>
+                <span className="text-muted-foreground flex items-center">
+                  <Search className="mr-2 h-4 w-4" />
+                  Search Markets...
+                </span>
               )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -339,7 +350,7 @@ export function MarketSelector() {
                   <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
                 )}
               </div>
-              <CommandInput placeholder="Search market..." />
+              <CommandInput ref={inputRef} placeholder="Search market..." />
               <CommandList>
                 <CommandEmpty>
                   {isMarketListLoading ? (
