@@ -7,6 +7,7 @@ import { useAccount, usePublicClient } from "wagmi";
 import { usePortfolioStore } from "@/store/portfolio";
 import { useMarketStore } from "@/store/market";
 import { TPosition, usdFormatter, tokenValueFormatter } from "morpher-trading-sdk";
+import { cn } from "@/lib/utils";
 
 export function TradeTerminal() {
   const { address } = useAccount();
@@ -29,66 +30,101 @@ export function TradeTerminal() {
   }
 
   const outputPosition = (position: TPosition) => {
+    const pnl = Number(position.total_return || 0);
+    const pnlPercent = Number(position.total_return_percent || 0) * 100;
+    const isPositive = pnl >= 0;
+
+    const positionValueMph = Number(position.value || 0) / 10 ** 18;
+    const positionValueUsd = currencyList?.MPH?.usd_exchange_rate
+      ? positionValueMph * currencyList.MPH.usd_exchange_rate
+      : null;
+
+    const pnlMph = pnl / 10 ** 18;
+    const pnlUsd = currencyList?.MPH?.usd_exchange_rate
+      ? pnlMph * currencyList.MPH.usd_exchange_rate
+      : null;
+
     return (
-      <div className="flex w-full items-center justify-between border-b-1 mb-1 pb-1">
-        <div className="flex items-center">
-          <div>
+      <div className="border-b py-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
             {position.logo_image && (
               <img
                 src={`data:image/svg+xml;base64,${position.logo_image}`}
                 alt={`${position.name} logo`}
-                className="mr-4 ml--2 h-8 w-8 rounded-lg"
+                className="h-9 w-9 rounded-full"
               />
             )}
-          </div>
-          <div
-            id="marketName"
-            className="flex flex-col max-w-[130px] w-[130px] overflow-hidden text-left"
-
-          >
-            <p className="font-semibold">{position?.symbol}</p>
-            <p className="font-normal">{position?.name}</p>
-          </div>
-        </div>
-        <div id="marketValue" className="flex flex-col text-right  ">
-            <div
-            id="marketPercent"
-            className={`flex items-center justify-end ${(Number(position?.total_return_percent || 0)) >= 0 ? "text-primary" : "text-secondary"}`}
-          >
-            {(Number(position?.total_return_percent || 0)) !== 0 && (
-              <div
-                className="mr-1 h-3 w-3 bg-[currentColor]"
-                style={{
-                  mask: `url(/src/assets/icons/${(Number(position?.total_return_percent || 0)) > 0 ? "increase" : "decrease"}.svg) no-repeat center / contain`,
-                  WebkitMask: `url(/src/assets/icons/${(Number(position?.total_return_percent || 0)) > 0 ? "increase" : "decrease"}.svg) no-repeat center / contain`,
-                }}
-              />
-            )}
-            {(Number(position?.total_return_percent || 0)) > 0 ? "+" : ""}
-            {Number(Number(position?.total_return_percent || 0) * 100).toFixed(2)} %
-          </div>
-
-           <div
-            id="marketPercent"
-            className={`flex items-center justify-end ${(Number(position?.total_return || 0)) >= 0 ? "text-primary" : "text-secondary"}`}
-          >
-      
-            {(Number(position?.total_return || 0)) > 0 ? "+" : ""}
-            {Number(Number(position?.total_return || 0)/ 10**18).toFixed(2)} 
-          </div>
-
-        </div>
-        <div id="marketValue" className="flex flex-col text-right">
-          <p className="text-lg font-bold">
-             { currencyList?.MPH?.usd_exchange_rate ? '$ ' + (usdFormatter(Number(position.value || 0) / 10**18 * currencyList?.MPH?.usd_exchange_rate )) : tokenValueFormatter(Number(position.value || 0) / 10**18) + ' MPH'}
-          </p>
-          <div
-            id="marketPercent"
-            className={`flex items-center justify-end ${position.direction == "long"  ? "text-primary" : "text-secondary"}`}
-          >
-            <div className={(position.direction == "long" ? 'bg-[var(--light-green)]' : 'bg-[var(--light-red)]') + ' px-2 rounded-full '}>
-                {position.direction == "long" ? "Long" : "Short"}
+            <div>
+              <p className="font-semibold text-base">{position.symbol}</p>
+              <p className="text-sm text-muted-foreground truncate max-w-[150px]">
+                {position.name}
+              </p>
             </div>
+          </div>
+          <div
+            className={cn(
+              "text-xs font-semibold px-2 py-1 rounded-full capitalize",
+              position.direction === "long"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            )}
+          >
+            {position.direction}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+          <div className="text-muted-foreground">Value</div>
+          <div className="text-right font-medium">
+            {positionValueUsd ? (
+              <>
+                <span>${usdFormatter(positionValueUsd)}</span>
+                <span className="text-muted-foreground text-xs ml-1">
+                  ({tokenValueFormatter(positionValueMph)} MPH)
+                </span>
+              </>
+            ) : (
+              <span>{tokenValueFormatter(positionValueMph)} MPH</span>
+            )}
+          </div>
+
+          <div className="text-muted-foreground">Unrealized P/L</div>
+          <div
+            className={cn(
+              "text-right font-medium",
+              isPositive ? "text-primary" : "text-secondary"
+            )}
+          >
+            {pnlUsd ? (
+              <>
+                <span>
+                  {isPositive ? "+" : ""}${usdFormatter(pnlUsd)}
+                </span>
+                <span className="text-xs ml-1">
+                  ({isPositive ? "+" : ""}{pnlPercent.toFixed(2)}%)
+                </span>
+              </>
+            ) : (
+              <>
+                <span>
+                  {isPositive ? "+" : ""}{tokenValueFormatter(pnlMph)} MPH
+                </span>
+                <span className="text-xs ml-1">
+                  ({isPositive ? "+" : ""}{pnlPercent.toFixed(2)}%)
+                </span>
+              </>
+            )}
+          </div>
+
+          <div className="text-muted-foreground">Avg. Entry</div>
+          <div className="text-right font-medium">
+            ${usdFormatter(Number(position.average_price) / 10 ** 8)}
+          </div>
+
+          <div className="text-muted-foreground">Leverage</div>
+          <div className="text-right font-medium">
+            {(Number(position.average_leverage) / 10 ** 8).toFixed(1)}x
           </div>
         </div>
       </div>
