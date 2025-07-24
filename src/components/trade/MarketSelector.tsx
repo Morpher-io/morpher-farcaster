@@ -297,7 +297,7 @@ export function MarketSelector() {
 
     if (filter) {
       let merkets_symbol = merkets.filter(mark => mark.symbol?.toUpperCase().includes(filter.toUpperCase()))
-      let merkets_name = merkets.filter(mark => mark.name?.toUpperCase().includes(filter.toUpperCase()))
+      let merkets_name = merkets.filter(mark => mark.name?.toUpperCase().includes(filter.toUpperCase()) && !mark.symbol?.toUpperCase().includes(filter.toUpperCase()))
 
       merkets = merkets_symbol.concat(merkets_name)
     }
