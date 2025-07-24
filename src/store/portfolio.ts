@@ -112,7 +112,6 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     } finally {
       console.log("fetchPortfolioData: Finished, setting loading to false.");
       set({ loading: false });
-      sdk.actions.ready();
     }
   };
 

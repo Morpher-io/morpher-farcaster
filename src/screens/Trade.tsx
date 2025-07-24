@@ -29,10 +29,13 @@ export function TradeScreen() {
       if (!isConnected && loading) {
           setLoading(false);
       }
-        sdk.actions.ready();
+   }, [isConnected, loading, setLoading]);
 
-
-   }, [isConnected, loading])
+   useEffect(() => {
+      if (!loading) {
+         sdk.actions.ready();
+      }
+   }, [loading]);
   
 
 

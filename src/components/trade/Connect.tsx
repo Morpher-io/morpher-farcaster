@@ -6,7 +6,6 @@ export function Connect() {
   const { connect, connectors } = useConnect();
 
   useEffect(() => {
-    sdk.actions.ready();
     if (connectors.length > 0) {
       connect({ connector: connectors[0] });
     }
