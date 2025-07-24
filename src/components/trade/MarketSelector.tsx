@@ -1,16 +1,9 @@
 import * as React from "react"
 import { ChevronsUpDown, Loader2Icon, Search } from "lucide-react"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+
 import {
   Command,
   CommandEmpty,
@@ -34,7 +27,6 @@ import { Trade } from "./Trade";
 import { Position } from "./Position";
 import { PendingPosition } from "./PendingPosition";
 import { usePortfolioStore } from "@/store/portfolio";
-import { TokenSelector } from "./TokenSelector";
 
 export function MarketSelector() {
   
@@ -271,7 +263,7 @@ export function MarketSelector() {
             ${" "}
             {tokenValueFormatter(closeOverride || market?.close)}
           </p>
-          <div className="flex items-center gap-1.5 text-xs">
+          <div className="flex items-center gap-1 text-xs">
             <span
               className={
                 (market?.change_percent || 0) >= 0
@@ -281,10 +273,7 @@ export function MarketSelector() {
             >
               {(market?.change_percent || 0) > 0 ? "+" : ""}
               {Number(market?.change_percent || 0).toFixed(2)}%
-            </span>
-            <span className="text-muted-foreground">|</span>
-            <span className="text-muted-foreground">
-              Cap {formatMarketCap(market.market_cap)}
+
             </span>
           </div>
         </div>
