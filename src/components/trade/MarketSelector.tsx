@@ -37,7 +37,6 @@ export function MarketSelector() {
   const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
   const [displayCategory, setDisplayCategory] = React.useState<TMarketType | 'all'>('all');
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const isInitialMount = React.useRef(true);
   const {
     marketType,
     setMarketType,
@@ -61,11 +60,6 @@ export function MarketSelector() {
   const { address } = useAccount();
 
   React.useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
     if (marketType && marketType !== displayCategory) {
       setDisplayCategory(marketType);
     } else if (!marketType && displayCategory !== 'all') {

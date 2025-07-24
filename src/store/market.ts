@@ -8,9 +8,9 @@ import { MorpherTradeSDK, MarketDetail } from "morpher-trading-sdk"
 const morpherTradeSDK = new MorpherTradeSDK(import.meta.env.VITE_MORPHER_API_ENDPOINT);
 
 interface MarketState {
-  marketType: TMarketType;
+  marketType: TMarketType | undefined;
   morpherTradeSDK: MorpherTradeSDK;
-  setMarketType: (marketType: TMarketType) => void;
+  setMarketType: (marketType: TMarketType | undefined) => void;
   marketList?: TMarketData;
   setMarketList: (marketList?: TMarketData) => void;
   selectedMarketId: string;
@@ -32,7 +32,7 @@ interface MarketState {
 }
 
 export const useMarketStore = create<MarketState>((set) => ({
-  marketType: 'stock',
+  marketType: undefined,
   morpherTradeSDK: morpherTradeSDK,
   setMarketType: (marketType) => set({ marketType, selectedMarketId: "", marketList: undefined, marketData: undefined, selectedMarket: undefined }),
   marketList: undefined,
