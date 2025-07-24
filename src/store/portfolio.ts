@@ -68,6 +68,11 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       const portfolio = await morpherTradeSDK.getPortfolio({ eth_address });
       console.log("fetchPortfolioData: Fetched portfolio:", portfolio);
 
+      const positionList = await morpherTradeSDK.getPositions({ eth_address });
+      if (portfolio) {
+        portfolio.positions_count = positionList.length;
+      }
+      
       const [returnsD, returnsW, returnsM, returnsY] = await Promise.all([
         morpherTradeSDK.getReturns({ eth_address, type: 'd' }),
         morpherTradeSDK.getReturns({ eth_address, type: 'w' }),
@@ -78,6 +83,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       
       set({
         portfolio,
+        positionList,
         returns: {
           d: returnsD,
           w: returnsW,
@@ -96,11 +102,12 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
             total_portfolio_value_unrealized_pnl: '0',
             total_open_position_value: '0',
           },
+          positionList: [],
           returns: { d: [], w: [], m: [], y: [] },
         });
       } else {
         // For other errors, clear the portfolio to avoid showing stale data
-        set({ portfolio: undefined, returns: {} });
+        set({ portfolio: undefined, returns: {}, positionList: undefined });
       }
     } finally {
       console.log("fetchPortfolioData: Finished, setting loading to false.");

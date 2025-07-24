@@ -19,12 +19,21 @@ export function PortfolioStats() {
 
   const weeklyPnl = React.useMemo(() => {
     const weeklyReturns = returns["w"];
-    if (!weeklyReturns || weeklyReturns.length < 2)
+    if (!weeklyReturns || weeklyReturns.length < 2) {
       return { value: 0, percent: 0 };
+    }
     const startValue = weeklyReturns[0][1];
     const endValue = weeklyReturns[weeklyReturns.length - 1][1];
+
+    if (typeof startValue !== "number" || typeof endValue !== "number") {
+      return { value: 0, percent: 0 };
+    }
+
     const change = endValue - startValue;
-    const percentChange = startValue !== 0 ? (change / startValue) * 100 : 0;
+    if (startValue === 0) {
+      return { value: change, percent: change === 0 ? 0 : Infinity };
+    }
+    const percentChange = (change / startValue) * 100;
     return { value: change, percent: percentChange };
   }, [returns]);
 
@@ -52,7 +61,11 @@ export function PortfolioStats() {
       value: `${weeklyPnl.value >= 0 ? "+" : ""}$${usdFormatter(
         weeklyPnl.value
       )}`,
-      subValue: `(${weeklyPnl.percent.toFixed(2)}%)`,
+      subValue: `(${
+        isFinite(weeklyPnl.percent)
+          ? `${weeklyPnl.percent.toFixed(2)}%`
+          : "N/A"
+      })`,
       isPositive: weeklyPnl.value >= 0,
     },
     {
