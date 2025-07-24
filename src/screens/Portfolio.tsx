@@ -5,27 +5,12 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-
 import { Button } from "@/components/ui/button";
 import { PortfolioChart } from "@/components/trade/PortfolioChart";
 import { useMarketStore } from "@/store/market";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { TPosition } from "morpher-trading-sdk";
-import { usePortfolioStore } from "@/store/portfolio";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-
-import { Button } from "@/components/ui/button";
-import { PortfolioChart } from "@/components/trade/PortfolioChart";
-import { useMarketStore } from "@/store/market";
-import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { TPosition, usdFormatter, tokenValueFormatter } from "morpher-trading-sdk";
 import { usePortfolioStore } from "@/store/portfolio";
 import { useNavigate } from "react-router-dom";
 import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
