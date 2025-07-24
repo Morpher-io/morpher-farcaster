@@ -1,6 +1,7 @@
 import * as React from "react"
 import { ChevronsUpDown, Loader2Icon, Search } from "lucide-react"
 import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -189,46 +190,92 @@ export function MarketSelector() {
     checkFades();
   };
 
+  const formatMarketCap = (num: number | string | undefined | null): string => {
+    if (num === null || num === undefined) return "N/A";
+    const number = Number(num);
+    if (isNaN(number) || number === 0) return "N/A";
+
+    const tiers = [
+      { value: 1e12, symbol: "T" },
+      { value: 1e9, symbol: "B" },
+      { value: 1e6, symbol: "M" },
+      { value: 1e3, symbol: "k" },
+    ];
+
+    const tier = tiers.find((t) => number >= t.value);
+
+    if (tier) {
+      return `$${(number / tier.value).toFixed(2)}${tier.symbol}`;
+    }
+
+    return `$${number.toFixed(2)}`;
+  };
+
   const outputMarket = (market: TMarket, closeOverride?: number) => {
+    const StatusBadge = ({ status }: { status: string }) => {
+      const statusColors: { [key: string]: string } = {
+        open: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+        pre: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+        after: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+        closed: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+        "trade halt": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+      };
+      return (
+        <span
+          className={cn(
+            "text-xs font-semibold px-2 py-0.5 rounded-full capitalize",
+            statusColors[status.toLowerCase()] || "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+          )}
+        >
+          {status}
+        </span>
+      );
+    };
+    
     return (
-      <div className="flex w-full items-center justify-between">
-        <div className="flex items-center">
-          <div>
-            {market.logo_image && (
-              <img
-                src={`data:image/svg+xml;base64,${market.logo_image}`}
-                alt={`${market.name} logo`}
-                className="mr-4 ml--2 h-8 w-8 rounded-lg"
-              />
-            )}
-          </div>
-          <div
-            id="marketName"
-            className="flex flex-col max-w-[130px] w-[130px] overflow-hidden text-left"
-          >
-            <p className="font-semibold">{market?.symbol}</p>
-            <p className="font-normal truncate">{market?.name}</p>
+      <div className="flex w-full items-start justify-between py-1">
+        <div className="flex items-center gap-3">
+          {market.logo_image && (
+            <img
+              src={`data:image/svg+xml;base64,${market.logo_image}`}
+              alt={`${market.name} logo`}
+              className="h-10 w-10 rounded-lg mt-1"
+            />
+          )}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-base">{market?.symbol}</p>
+              {market.status && <StatusBadge status={market.status} />}
+              {market.is_paused && (
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                  Paused
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground truncate max-w-[150px]">
+              {market?.name}
+            </p>
           </div>
         </div>
-        <div id="marketValue" className="flex flex-col text-right">
+
+        <div className="flex flex-col text-right gap-1 items-end">
           <p className="text-base font-bold">
-            $ {tokenValueFormatter(closeOverride || market?.close)}
+            ${" "}
+            {tokenValueFormatter(closeOverride || market?.close)}
           </p>
           <div
-            id="marketPercent"
-            className={`flex items-center justify-end ${(market?.change_percent || 0) >= 0 ? "text-primary" : "text-secondary"}`}
+            className={`flex items-center justify-end text-sm font-medium ${
+              (market?.change_percent || 0) >= 0
+                ? "text-primary"
+                : "text-secondary"
+            }`}
           >
-            {(market?.change_percent || 0) !== 0 && (
-              <div
-                className="mr-1 h-3 w-3 bg-[currentColor]"
-                style={{
-                  mask: `url(/src/assets/icons/${(market?.change_percent || 0) > 0 ? "increase" : "decrease"}.svg) no-repeat center / contain`,
-                  WebkitMask: `url(/src/assets/icons/${(market?.change_percent || 0) > 0 ? "increase" : "decrease"}.svg) no-repeat center / contain`,
-                }}
-              />
-            )}
             {(market?.change_percent || 0) > 0 ? "+" : ""}
-            {Number(market?.change_percent || 0).toFixed(2)} %
+            {Number(market?.change_percent || 0).toFixed(2)}%
+          </div>
+          <div className="text-xs text-muted-foreground flex flex-col items-end gap-0.5 mt-1">
+            <span>Mkt Cap: {formatMarketCap(market.market_cap)}</span>
+            <span>Spread: {(Number(market.spread) * 100).toFixed(3)}%</span>
           </div>
         </div>
       </div>
@@ -400,6 +447,7 @@ export function MarketSelector() {
                           );
                           setOpen(false);
                         }}
+                        className="py-3"
                       >
                         {outputMarket(market)}
                       </CommandItem>
