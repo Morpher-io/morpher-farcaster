@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ChevronsUpDown, Loader2Icon, Search, SearchIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-
+import { useDebouncedCallback } from 'use-debounce';
 import { Button } from "@/components/ui/button"
 
 import {
@@ -310,6 +310,10 @@ export function MarketSelector() {
     
   };
 
+  const handleSearch = useDebouncedCallback((term) => {
+    setFilter(term)
+  }, 200);
+
   React.useEffect(() => {
     if (morpherTradeSDK.ready && marketListAll) {
       fetchMarkets(displayCategory);
@@ -426,7 +430,7 @@ export function MarketSelector() {
       <SearchIcon className="size-4 shrink-0 opacity-50" />
       <Input
         data-slot="command-input"
-        onChange={(e) => setFilter(e.target.value)} 
+        onChange={(e) => handleSearch(e.target.value)} 
 
         placeholder="Search market..."
         className={cn(
