@@ -3,14 +3,13 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { MarketChart } from "./MarketChart";
 import { Trade } from "./Trade";
 import { Position } from "./Position";
 import { PendingPosition } from "./PendingPosition";
-import { Loader2Icon, XIcon } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { useMarketStore } from "@/store/market";
 import { usePortfolioStore } from "@/store/portfolio";
 import { useAccount } from "wagmi";
@@ -149,11 +148,6 @@ export function TradeView() {
             ) : (
               <div />
             )}
-            <DialogClose asChild>
-              <Button variant="ghost" size="icon">
-                <XIcon className="h-5 w-5" />
-              </Button>
-            </DialogClose>
           </div>
         </DialogHeader>
 
