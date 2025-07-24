@@ -5,7 +5,7 @@ import { Card, CardContent } from "../ui/card";
 import { Loader2Icon } from "lucide-react";
 
 export function MarketSuggestions() {
-  const { morpherTradeSDK, setSelectedMarketId, setMarketType, marketType, trendingMarkets, getTrendingMarkets } = useMarketStore();
+  const { morpherTradeSDK, setSelectedMarketId, setMarketType, marketType, trendingMarkets, getTrendingMarkets, setSelectedMarket } = useMarketStore();
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -91,16 +91,11 @@ export function MarketSuggestions() {
   };
 
   const handleSelectMarket = (market: TMarket) => {
-    // Ensure market type is 'crypto' before selecting market.
-    if (marketType !== 'crypto') {
-      setMarketType('crypto');
+    if (market.type) {
+      setMarketType(market.type as TMarketType);
     }
-    
-    // Use a timeout to ensure the market list is updated in the selector component
-    // before the selected market ID is set. This prevents a race condition.
-    setTimeout(() => {
-      setSelectedMarketId(market.market_id);
-    }, 100);
+    setSelectedMarket(market);
+    setSelectedMarketId(market.market_id);
   };
 
   if (loading) {
