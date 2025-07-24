@@ -41,6 +41,11 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
     ? positionValueMph * currencyList.MPH.usd_exchange_rate
     : null;
 
+  const pnlMph = pnl / 10 ** 18;
+  const pnlUsd = currencyList?.MPH?.usd_exchange_rate
+    ? pnlMph * currencyList.MPH.usd_exchange_rate
+    : null;
+
   const tradeCompleteCallback = (result: TradeCallback) => {
     if (result.result === "error") {
       setTradeError(
@@ -133,9 +138,18 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               {position.direction}
             </div>
 
-            <div className="text-muted-foreground">Value (MPH)</div>
+            <div className="text-muted-foreground">Value</div>
             <div className="text-right font-medium">
-              {tokenValueFormatter(positionValueMph)} MPH
+              {positionValueUsd ? (
+                <>
+                  <span>${usdFormatter(positionValueUsd)}</span>
+                  <span className="text-muted-foreground text-xs ml-1">
+                    ({tokenValueFormatter(positionValueMph)} MPH)
+                  </span>
+                </>
+              ) : (
+                <span>{tokenValueFormatter(positionValueMph)} MPH</span>
+              )}
             </div>
 
             <div className="text-muted-foreground">Unrealized P/L</div>
@@ -145,8 +159,21 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
                 isPositive ? "text-primary" : "text-secondary"
               )}
             >
-              {isPositive ? "+" : ""}
-              {tokenValueFormatter(pnl / 10 ** 18)} MPH
+              {pnlUsd ? (
+                <>
+                  <span>
+                    {isPositive ? "+" : ""}${usdFormatter(pnlUsd)}
+                  </span>
+                  <span className="text-muted-foreground text-xs ml-1">
+                    ({isPositive ? "+" : ""}
+                    {tokenValueFormatter(pnlMph)} MPH)
+                  </span>
+                </>
+              ) : (
+                <span>
+                  {isPositive ? "+" : ""}{tokenValueFormatter(pnlMph)} MPH
+                </span>
+              )}
             </div>
 
             <div className="text-muted-foreground">Avg. Entry</div>
