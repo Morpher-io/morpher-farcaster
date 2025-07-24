@@ -352,7 +352,9 @@ export function MarketSelector() {
                           if (hasDraggedRef.current) return;
                           setDisplayCategory(type);
                           if (type !== "all") {
-                            setMarketType(type);
+                            setMarketType(type as TMarketType);
+                          } else {
+                            setMarketType(undefined);
                           }
                         }}
                         className="capitalize rounded-full flex-shrink-0"
