@@ -11,8 +11,10 @@ interface MarketState {
   marketType: TMarketType | undefined;
   morpherTradeSDK: MorpherTradeSDK;
   setMarketType: (marketType: TMarketType | undefined) => void;
-  marketList?: TMarketData;
-  setMarketList: (marketList?: TMarketData) => void;
+  marketList?: TMarket[];
+  setMarketList: (marketList?: TMarket[]) => void;
+  marketListAll?: TMarketData;
+  setMarketListAll: (marketList?: TMarketData) => void;
   selectedMarketId: string;
   setSelectedMarketId: (marketId: string) => void;
   selectedMarket?: TMarket;
@@ -37,6 +39,7 @@ export const useMarketStore = create<MarketState>((set) => ({
   setMarketType: (marketType) => set({ marketType, selectedMarketId: "", marketList: undefined, marketData: undefined, selectedMarket: undefined }),
   marketList: undefined,
   setMarketList: (marketList) => set({ marketList }),
+  setMarketListAll: (marketListAll) => set({ marketListAll }),
   selectedMarketId: "",
   setSelectedMarketId: (marketId) => set({ selectedMarketId: marketId }),
   selectedMarket: undefined,

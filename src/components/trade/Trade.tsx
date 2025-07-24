@@ -108,9 +108,9 @@ export function Trade() {
       <CardContent>
         <div className="flex items-center text-xl font-bold">
           <Input 
-            type="number" 
+            type="test" 
             placeholder="0.00" 
-            className="border-0 h-auto flex-1 p-0 text-xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 bg-white" 
+            className="border-0 rounded-0 h-auto flex-1 p-0 text-xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 round-sm bg-white  " 
             value={tradeAmount} 
             onChange={(e) => setTradeAmount(e.target.value)} 
           />
@@ -121,7 +121,7 @@ export function Trade() {
                   <img
                     src={`/src/assets/icons/${selectedCurrency}.svg`}
                     alt={`${selectedCurrency} logo`}
-                    className="mr-2 h-6 w-6"
+                    className="mr-0 h-6 w-6"
                   />
                 )}
                 {selectedCurrency}

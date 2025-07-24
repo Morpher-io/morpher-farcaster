@@ -50,7 +50,7 @@ export function PositionSelector() {
   const [timeRange, setTimeRange] = React.useState('1D');
   const {
 
-    marketList,
+    marketListAll,
     setMarketList,
     selectedMarketId,
     setSelectedMarketId,
@@ -141,12 +141,12 @@ export function PositionSelector() {
   }, [address, selectedMarketId, orderUpdate]);
 
   React.useEffect(() => {
-    if (selectedMarketId && marketList) {
-      setSelectedMarket(marketList[selectedMarketId])
+    if (selectedMarketId && marketListAll) {
+      setSelectedMarket(marketListAll[selectedMarketId])
     } else {
       setSelectedMarket(undefined)
     }
-  }, [selectedMarketId, marketList, setSelectedMarket])
+  }, [selectedMarketId, marketListAll, setSelectedMarket])
 
   const fetchPositions = async () => {
     if (!address) {

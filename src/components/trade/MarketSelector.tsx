@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ChevronsUpDown, Loader2Icon, Search } from "lucide-react"
+import { ChevronsUpDown, Loader2Icon, Search, SearchIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
@@ -23,11 +23,13 @@ import { TMarket, StrictOHLCArray } from "morpher-trading-sdk"
 import { useAccount } from "wagmi"
 import { useMarketStore } from "../../store/market";
 import { usePortfolioStore } from "@/store/portfolio";
+import { Input } from "../ui/input"
 
 export function MarketSelector() {
   
   const {morpherTradeSDK} = useMarketStore();
   const [open, setOpen] = React.useState(false)
+  const [filter, setFilter] = React.useState('')
   const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
   const [displayCategory, setDisplayCategory] = React.useState<TMarketType | 'all'>('all');
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -41,6 +43,8 @@ export function MarketSelector() {
     selectedMarket,
     selectedMarketClose,
     setSelectedMarket,
+    marketListAll,
+    setMarketListAll
   } = useMarketStore();
   
   const { address } = useAccount();
@@ -52,6 +56,42 @@ export function MarketSelector() {
       setDisplayCategory('all');
     }
   }, [marketType, displayCategory]);
+
+  const fetchMarketsAll = async () => {
+    setIsMarketListLoading(true);
+    console.log("Fetching all market categories.");
+    const marketTypes: TMarketType[] = [
+      "crypto",
+      "stock",
+      "forex",
+      "index",
+      "commodity",
+    ];
+    try {
+      const allMarketLists = await Promise.all(
+        marketTypes.map((type) => morpherTradeSDK.getMarketList({ type }))
+      );
+      const mergedMarkets = allMarketLists.reduce((acc, current) => {
+        return { ...acc, ...current };
+      }, {});
+      setMarketListAll(mergedMarkets);
+    } catch (error) {
+      console.error("Failed to fetch all markets:", error);
+      setMarketListAll({});
+    }
+
+    setIsMarketListLoading(false);
+  }
+  React.useEffect(() => {
+    
+    
+    if (!marketListAll) {
+      fetchMarketsAll()
+    }
+
+
+  }, [marketListAll])
+
 
   React.useEffect(() => {
     if (open) {
@@ -227,54 +267,54 @@ export function MarketSelector() {
   const account = useAccount();
 
   React.useEffect(() => {
-    if (selectedMarketId && marketList) {
-      setSelectedMarket(marketList[selectedMarketId])
+
+    if (selectedMarketId && marketListAll) {
+      setSelectedMarket(marketListAll[selectedMarketId])
     } else {
       setSelectedMarket(undefined)
     }
-  }, [selectedMarketId, marketList, setSelectedMarket])
+  }, [selectedMarketId, marketListAll, setSelectedMarket])
 
   const fetchMarkets = async (category: TMarketType | "all") => {
-    setIsMarketListLoading(true);
+    
     setMarketList(undefined);
 
+    let merkets: TMarket[] = []
     if (category === "all") {
-      console.log("Fetching all market categories.");
-      const marketTypes: TMarketType[] = [
-        "stock",
-        "forex",
-        "index",
-        "commodity",
-        "crypto",
-      ];
-      try {
-        const allMarketLists = await Promise.all(
-          marketTypes.map((type) => morpherTradeSDK.getMarketList({ type }))
-        );
-        const mergedMarkets = allMarketLists.reduce((acc, current) => {
-          return { ...acc, ...current };
-        }, {});
-        setMarketList(mergedMarkets);
-      } catch (error) {
-        console.error("Failed to fetch all markets:", error);
-        setMarketList({});
-      }
+      Object.values(marketListAll as any).forEach((market: any) => {
+        merkets.push(market)
+      })
+         
+
     } else {
-      console.log("Fetching markets with params:", { type: category });
-      const marketList = await morpherTradeSDK.getMarketList({
-        type: category,
-      });
-      setMarketList(marketList);
+      Object.values(marketListAll as any).forEach((market: any) => {
+        if (market.type == category) {
+          merkets.push(market)
+        }
+        
+      })
     }
 
-    setIsMarketListLoading(false);
+    if (filter) {
+      let merkets_symbol = merkets.filter(mark => mark.symbol?.toUpperCase().includes(filter.toUpperCase()))
+      let merkets_name = merkets.filter(mark => mark.name?.toUpperCase().includes(filter.toUpperCase()))
+
+      merkets = merkets_symbol.concat(merkets_name)
+    }
+
+    merkets = merkets.sort((a, b) => a.symbol < b.symbol ? -1 : 1)
+
+    
+    setMarketList(merkets);
+
+    
   };
 
   React.useEffect(() => {
-    if (morpherTradeSDK.ready) {
+    if (morpherTradeSDK.ready && marketListAll) {
       fetchMarkets(displayCategory);
     }
-  }, [displayCategory, morpherTradeSDK.ready]);
+  }, [displayCategory, morpherTradeSDK.ready, marketListAll, filter]);
 
 
   return (
@@ -299,6 +339,12 @@ export function MarketSelector() {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-90" align="center">
+
+
+    
+  
+            {/* <CommandInput ref={inputRef} placeholder="Search market..." /> */}
+
             <Command
               className="w-full"
               filter={(value, search) => {
@@ -336,6 +382,7 @@ export function MarketSelector() {
                       forex: "/src/assets/types/forex.svg",
                       index: "/src/assets/types/index.svg",
                       commodity: "/src/assets/types/commodity.svg",
+                      crypto: "/src/assets/types/crypto.svg",
                     };
                     const iconSrc = iconMap[type as TMarketType];
 
@@ -359,7 +406,7 @@ export function MarketSelector() {
                           <img
                             src={iconSrc}
                             alt={`${type} icon`}
-                            className="mr-2 h-4 w-4"
+                            className="mr-0 h-4 w-4"
                           />
                         )}
                         <span className="font-normal">{type}</span>
@@ -371,7 +418,25 @@ export function MarketSelector() {
                   <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
                 )}
               </div>
-              <CommandInput ref={inputRef} placeholder="Search market..." />
+
+              <div
+      data-slot="command-input-wrapper"
+      className="flex h-9 items-center gap-2 border-b px-3"
+    >
+      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      <Input
+        data-slot="command-input"
+        onChange={(e) => setFilter(e.target.value)} 
+
+        placeholder="Search market..."
+        className={cn(
+          "placeholder:text-muted-foreground flex h-10 w-full rounded-0 bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border-0 outline-0 border-transparent focus:border-transparent focus:ring-0 !outline-none focus:outline-none" ,
+          
+        )}
+        
+      />
+    </div>
+              
               <CommandList>
                 <CommandEmpty>
                   {isMarketListLoading ? (
@@ -386,23 +451,28 @@ export function MarketSelector() {
                 <CommandGroup>
                   {!isMarketListLoading &&
                     marketList &&
-                    Object.values(marketList).map((market) => (
-                      <CommandItem
-                        key={market.market_id}
-                        value={JSON.stringify(market)}
-                        onSelect={(currentValue) => {
-                          const market: TMarket = JSON.parse(currentValue);
-                          setSelectedMarketId(
-                            market.market_id === selectedMarketId
-                              ? ""
-                              : market.market_id
-                          );
-                          setOpen(false);
-                        }}
-                        className="py-3"
-                      >
-                        {outputMarket(market)}
-                      </CommandItem>
+                    marketList.map((market, index) => (
+                      
+                     <>
+                      {index < 80 && (
+                        <CommandItem
+                          key={market.market_id}
+                          value={JSON.stringify(market)}
+                          onSelect={(currentValue) => {
+                            const market: TMarket = JSON.parse(currentValue);
+                            setSelectedMarketId(
+                              market.market_id === selectedMarketId
+                                ? ""
+                                : market.market_id
+                            );
+                            setOpen(false);
+                          }}
+                          className="py-3"
+                        >
+                          {outputMarket(market)}
+                        </CommandItem>
+                      )}
+                     </>
                     ))}
                 </CommandGroup>
               </CommandList>

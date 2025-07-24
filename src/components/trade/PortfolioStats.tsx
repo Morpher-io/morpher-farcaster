@@ -22,19 +22,27 @@ export function PortfolioStats() {
     if (!weeklyReturns || weeklyReturns.length < 2) {
       return { value: 0, percent: 0 };
     }
-    const startValue = weeklyReturns[0][1];
-    const endValue = weeklyReturns[weeklyReturns.length - 1][1];
+    console.log('weeklyReturns', weeklyReturns)
+
+
+    const startValue = weeklyReturns[0].total;
+    const endValue = weeklyReturns[weeklyReturns.length - 1].total;
 
     if (typeof startValue !== "number" || typeof endValue !== "number") {
       return { value: 0, percent: 0 };
     }
+    let returnsPercent = 0
+
+    weeklyReturns.forEach(point => {
+    returnsPercent += point.returns
+    })
 
     const change = endValue - startValue;
     if (startValue === 0) {
       return { value: change, percent: change === 0 ? 0 : Infinity };
     }
-    const percentChange = (change / startValue) * 100;
-    return { value: change, percent: percentChange };
+    //const percentChange = (change / startValue) * 100;
+    return { value: change, percent: returnsPercent * 100 };
   }, [returns]);
 
   if (loading) {

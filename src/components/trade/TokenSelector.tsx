@@ -86,7 +86,7 @@ export function TokenSelector() {
       </CardHeader>
       <CardContent>
         <div className="flex items-center text-2xl font-bold">
-          <Input type="number" placeholder="0.00" className="border-0 h-auto flex-1 p-2 text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 bg-white" value={tradeAmount} onChange={(e) => setTradeAmount(e.target.value)} />
+          <Input type="number" placeholder="0.00" className="border-0 h-auto flex-1 p-2 text-2xl font-bold focus-visible:ring-0 round-sm focus-visible:ring-offset-0 bg-white" value={tradeAmount} onChange={(e) => setTradeAmount(e.target.value)} />
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button variant="ghost" role="combobox" aria-expanded={open} className="w-auto justify-between text-lg font-bold  p-2">

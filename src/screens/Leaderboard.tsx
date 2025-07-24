@@ -17,7 +17,7 @@ export function LeaderboardScreen() {
   const [filter, setFilter] = useState("");
   const [type, setType]= useState<'returns' | 'order'>('order');
   let navigate = useNavigate();
-  const { morpherTradeSDK, marketList } = useMarketStore();
+  const { morpherTradeSDK } = useMarketStore();
   const [selectedEntry, setSelectedEntry] = useState<TLeaderBoard>();
   
   
@@ -222,10 +222,10 @@ export function LeaderboardScreen() {
           />
       <h2 className="text-lg font-bold mt-4 m-auto">Leaderboard</h2>
       <div className="flex m-auto gap-3 text-sm mt-4 font-bold">
-        <div className={type=='order' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('returns')}>
+        <div className={type=='order' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('order')}>
           Big Wins
         </div>
-        <div className={type=='returns' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('order')}>
+        <div className={type=='returns' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('returns')}>
           Top Traders
         </div>
       </div>

@@ -65,7 +65,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     console.log("fetchPortfolioData: Starting for address:", eth_address);
     set({ loading: true });
     try {
-      const portfolio = await morpherTradeSDK.getPortfolio({ eth_address });
+      const portfolio:any = await morpherTradeSDK.getPortfolio({ eth_address });
       console.log("fetchPortfolioData: Fetched portfolio:", portfolio);
 
       const positionList = await morpherTradeSDK.getPositions({ eth_address });
@@ -73,11 +73,19 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         portfolio.positions_count = positionList.length;
       }
       
-      const [returnsD, returnsW, returnsM, returnsY] = await Promise.all([
+           
+      // const [returnsD, returnsW, returnsM, returnsY] = await Promise.all([
+      //   morpherTradeSDK.getReturns({ eth_address, type: 'd' }),
+      //   morpherTradeSDK.getReturns({ eth_address, type: 'w' }),
+      //   morpherTradeSDK.getReturns({ eth_address, type: 'm' }),
+      //   morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
+      // ]);
+      
+      const [returnsD, returnsW]:any = await Promise.all([
         morpherTradeSDK.getReturns({ eth_address, type: 'd' }),
         morpherTradeSDK.getReturns({ eth_address, type: 'w' }),
-        morpherTradeSDK.getReturns({ eth_address, type: 'm' }),
-        morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
+        //morpherTradeSDK.getReturns({ eth_address, type: 'm' }),
+        //morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
       ]);
       console.log("fetchPortfolioData: Fetched returns.");
 
@@ -99,8 +107,8 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         returns: {
           d: returnsD,
           w: returnsW,
-          m: returnsM,
-          y: returnsY,
+          // m: returnsM,
+          // y: returnsY,
         },
         leaderboard,
       });

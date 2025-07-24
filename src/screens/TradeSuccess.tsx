@@ -5,13 +5,16 @@ import { useAccount } from "wagmi";
 import { usePortfolioStore } from "@/store/portfolio";
 import { Button } from "@/components/ui/button";
 import { sdk } from "@farcaster/frame-sdk";
+import { usdFormatter } from "morpher-trading-sdk";
+import { useNavigate } from "react-router-dom";
 
 export function TradeSuccessScreen() {
+  const navigate = useNavigate();
 
-      const account: any = useAccount();
+   const account: any = useAccount();
     
-    const { selectedMarket, order, setOrder, morpherTradeSDK } = useMarketStore();
-    const { setTradeComplete, selectedCurrency, tradeAmount, orderUpdate } = usePortfolioStore();
+    const { selectedMarket, order, setOrder, morpherTradeSDK, marketListAll, setSelectedMarket, setTradeType, setLeverage } = useMarketStore();
+    const { setTradeComplete, selectedCurrency, tradeAmount, orderUpdate, tradeComplete, setTradeAmount, setClosePercentage } = usePortfolioStore();
 
       const getOrder = async () => {
     if (account.address === undefined) {
@@ -26,12 +29,27 @@ export function TradeSuccessScreen() {
     }
   };
 
+  useEffect(() => {
+
+    if (marketListAll && order && order.market_id && selectedMarket?.market_id !== order.market_id ) {
+      let market = marketListAll[order.market_id]
+      setSelectedMarket(market)
+    }
+  }, [marketListAll, order, selectedMarket ])
     const share = async () => {
-        const text = `I just ${
+
+        let text = `I just ${
           order?.direction == "long" ? "traded" : "shorted"
         } ${
           selectedMarket?.name || order?.market_id
         } with ${tradeAmount} ${selectedCurrency} on Morpher!`;
+
+        if (Number(order?.close_shares_amount || 0) > 0) {
+          text = `I just made +1.12% profit trading ${
+          selectedMarket?.name || order?.market_id
+        } on Morpher!`;
+        }
+
         const embeds:[string] = [`https://www.morpher.com/`];
 
         await sdk.actions.composeCast({
@@ -42,7 +60,19 @@ export function TradeSuccessScreen() {
 
     const closeTradeComplete = () => {
      setTradeComplete(false)   
+     navigate('/')
     }
+
+    useEffect(() => {
+      if (tradeComplete) {
+        setTradeAmount('')
+        setClosePercentage(undefined)
+        setTradeType('long')
+        setLeverage([1])
+        console.log('trade reset')
+
+      }
+    }, [tradeComplete])
 
     useEffect(() => {
         getOrder()
@@ -66,9 +96,15 @@ export function TradeSuccessScreen() {
           </div>
 
           <p className="text-4xl mt-4">Trade Complete</p>
-          <p className="text-lg mt-4">
-            You just {order?.direction == "long" ? "traded" : "shorted"}{" "}
-            {selectedMarket?.name || order?.market_id} with {tradeAmount} {selectedCurrency}
+          <p className="text-lg mt-4 text-center">
+            {(Number(order?.close_shares_amount || 0) > 0) ? <>
+              You just closed your {" "}
+            {selectedMarket?.name || order?.market_id} position and made <span className="text-primary">+ 1.12% ($ {usdFormatter(Number(order?.close_shares_amount || 0) * Number(order?.price || 0) / 10**18)})</span>
+            </> : <>
+              You just {order?.direction == "long" ? "traded" : "shorted"}{" "}
+              {selectedMarket?.name || order?.market_id} with {tradeAmount} {selectedCurrency}
+            </>}
+            
           </p>
 
           <div className="mt-auto mb-8 w-full">
@@ -81,7 +117,7 @@ export function TradeSuccessScreen() {
             </Button>
             <Button
               variant="outline"
-              className="w-full text-[var(--primary)] border-[var(--primary)] hover:bg-white/90 mt-4 mb-4 rounded-full "
+              className="w-full text-[var(--primary)] border-[var(--primary)] mt-4 mb-4 rounded-full "
               onClick={() => closeTradeComplete()}
             >
               Try another Trade

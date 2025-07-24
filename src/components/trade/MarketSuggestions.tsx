@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useMarketStore } from "@/store/market";
-import { TMarket } from "morpher-trading-sdk";
+import { TMarket, TMarketType } from "morpher-trading-sdk";
 import { Card, CardContent } from "../ui/card";
 import { Loader2Icon } from "lucide-react";
 
@@ -28,7 +28,7 @@ export function MarketSuggestions() {
   const sortedTrendingMarkets = React.useMemo(() => {
     if (!trendingMarkets) return [];
     return Object.values(trendingMarkets)
-      .sort((a, b) => (b.change_percent || 0) - (a.change_percent || 0));
+      .sort((a, b) => (Number(b.change_percent || 0)) - (Number(a.change_percent || 0)));
   }, [trendingMarkets]);
 
   const checkFades = React.useCallback(() => {
@@ -128,7 +128,7 @@ export function MarketSuggestions() {
           onMouseMove={handleMouseMove}
           className={`flex select-none gap-2 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
         >
-          {sortedTrendingMarkets.map((market) => (
+          {sortedTrendingMarkets.map((market: any) => (
             <Card key={market.market_id} className="p-2 cursor-pointer hover:bg-accent flex-shrink-0 w-32" onClick={() => handleSelectMarket(market)}>
               <CardContent className="flex flex-col items-center justify-center p-1 text-center">
                   <img
