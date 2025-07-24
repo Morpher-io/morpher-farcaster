@@ -6,33 +6,89 @@ import { Loader2Icon } from "lucide-react";
 
 export function MarketSuggestions() {
   const { morpherTradeSDK, setSelectedMarketId, setMarketType, marketType, trendingMarkets, getTrendingMarkets } = useMarketStore();
-  const [topMovers, setTopMovers] = React.useState<TMarket[]>([]);
-  const [loading, setLoading] = React.useState(true);
+
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [startX, setStartX] = React.useState(0);
+  const [scrollLeft, setScrollLeft] = React.useState(0);
+  const hasDraggedRef = React.useRef(false);
+  const [showScrollFades, setShowScrollFades] = React.useState({
+    left: false,
+    right: false,
+  });
 
   React.useEffect(() => {
-    const fetchTopMovers = async () => {
-      setLoading(true);
-      try {
-        const cryptoMarkets = await morpherTradeSDK.getMarketList({ type: 'crypto' });
-        if (cryptoMarkets) {
-          const sorted = Object.values(cryptoMarkets)
-            .sort((a, b) => (b.change_percent || 0) - (a.change_percent || 0))
-            .slice(0, 3);
-          setTopMovers(sorted);
-        }
-      } catch (error) {
-        console.error("Failed to fetch top movers:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (morpherTradeSDK.ready) {
-        fetchTopMovers();
-        getTrendingMarkets();
-
+      getTrendingMarkets();
     }
-  }, [morpherTradeSDK.ready]);
+  }, [morpherTradeSDK.ready, getTrendingMarkets]);
+
+  const loading = trendingMarkets === undefined;
+
+  const sortedTrendingMarkets = React.useMemo(() => {
+    if (!trendingMarkets) return [];
+    return Object.values(trendingMarkets)
+      .sort((a, b) => (b.change_percent || 0) - (a.change_percent || 0));
+  }, [trendingMarkets]);
+
+  const checkFades = React.useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      const hasOverflow = scrollWidth > clientWidth;
+      setShowScrollFades({
+        left: hasOverflow && scrollLeft > 1,
+        right: hasOverflow && scrollLeft < scrollWidth - clientWidth - 1,
+      });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      checkFades();
+      
+      const handleEvents = () => checkFades();
+      el.addEventListener("scroll", handleEvents);
+      window.addEventListener("resize", handleEvents);
+
+      const observer = new MutationObserver(handleEvents);
+      observer.observe(el, { childList: true, subtree: true });
+
+      return () => {
+        el.removeEventListener("scroll", handleEvents);
+        window.removeEventListener("resize", handleEvents);
+        observer.disconnect();
+      };
+    }
+  }, [checkFades, sortedTrendingMarkets]);
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (scrollContainerRef.current) {
+      setIsDragging(true);
+      hasDraggedRef.current = false;
+      setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+      setScrollLeft(scrollContainerRef.current.scrollLeft);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+    hasDraggedRef.current = true;
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // multiplier for scroll speed
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+    checkFades();
+  };
 
   const handleSelectMarket = (market: TMarket) => {
     // Ensure market type is 'crypto' before selecting market.
@@ -45,13 +101,12 @@ export function MarketSuggestions() {
     setTimeout(() => {
       setSelectedMarketId(market.market_id);
     }, 100);
-    
   };
 
   if (loading) {
     return (
         <div className="flex flex-col gap-2">
-            <h2 className="text-lg font-bold">Top Movers</h2>
+            <h2 className="text-lg font-bold">Trending</h2>
             <div className="flex justify-center items-center h-[100px]">
                 <Loader2Icon className="h-8 w-8 animate-spin" />
             </div>
@@ -59,63 +114,47 @@ export function MarketSuggestions() {
     );
   }
   
-  if (topMovers.length === 0) {
+  if (sortedTrendingMarkets.length === 0) {
       return null;
   }
 
   return (
     <div className="flex flex-col gap-2">
-      {trendingMarkets && Object.keys(trendingMarkets).length >0 && (
-          <>
-          <h2 className="text-lg font-bold">Trending</h2>
-          <div className="grid grid-cols-3 gap-2">
-          {Object.keys(trendingMarkets).map((market) => (
-                  <Card key={trendingMarkets[market].market_id} className="p-2 cursor-pointer hover:bg-accent" onClick={() => handleSelectMarket(market)}>
-            <CardContent className="flex flex-col items-center justify-center p-1 text-center">
-                <img
-                    src={`data:image/svg+xml;base64,${trendingMarkets[market].logo_image}`}
-                    alt={`${trendingMarkets[market].name} logo`}
-                    className="h-8 w-8 rounded-lg mb-2"
-                />
-              <p className="font-semibold text-sm truncate">{trendingMarkets[market].symbol}</p>
-              <div
-                className={`flex items-center justify-center text-xs ${(trendingMarkets[market]?.change_percent || 0) >= 0 ? "text-primary" : "text-secondary"}`}
-              >
-                {(trendingMarkets[market]?.change_percent || 0) > 0 ? "+" : ""}
-                {Number(trendingMarkets[market]?.change_percent || 0).toFixed(2)}%
-              </div>
-            </CardContent>
-          </Card>
+      <h2 className="text-lg font-bold">Trending</h2>
+      <div className="relative">
+        {showScrollFades.left && (
+          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
+        )}
+        <div
+          ref={scrollContainerRef}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          className={`flex select-none gap-2 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+        >
+          {sortedTrendingMarkets.map((market) => (
+            <Card key={market.market_id} className="p-2 cursor-pointer hover:bg-accent flex-shrink-0 w-32" onClick={() => handleSelectMarket(market)}>
+              <CardContent className="flex flex-col items-center justify-center p-1 text-center">
+                  <img
+                      src={`data:image/svg+xml;base64,${market.logo_image}`}
+                      alt={`${market.name} logo`}
+                      className="h-8 w-8 rounded-lg mb-2"
+                  />
+                <p className="font-semibold text-sm truncate">{market.symbol}</p>
+                <div
+                  className={`flex items-center justify-center text-xs ${(market?.change_percent || 0) >= 0 ? "text-primary" : "text-secondary"}`}
+                >
+                  {(market?.change_percent || 0) > 0 ? "+" : ""}
+                  {Number(market?.change_percent || 0).toFixed(2)}%
+                </div>
+              </CardContent>
+            </Card>
           ))}
-          </div>
-
-
-          </>
-      )}
-      
-
-
-      
-      <h2 className="text-lg font-bold">Top Movers</h2>
-      <div className="grid grid-cols-3 gap-2">
-        {topMovers.map((market) => (
-          <Card key={market.market_id} className="p-2 cursor-pointer hover:bg-accent" onClick={() => handleSelectMarket(market)}>
-            <CardContent className="flex flex-col items-center justify-center p-1 text-center">
-                <img
-                    src={`data:image/svg+xml;base64,${market.logo_image}`}
-                    alt={`${market.name} logo`}
-                    className="h-8 w-8 rounded-lg mb-2"
-                />
-              <p className="font-semibold text-sm truncate">{market.symbol}</p>
-              <div
-                className={`flex items-center justify-center text-xs ${(market?.change_percent || 0) >= 0 ? "text-primary" : "text-secondary"}`}
-              >
-                {(market?.change_percent || 0) > 0 ? "+" : ""}
-                {Number(market?.change_percent || 0).toFixed(2)}%
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        </div>
+        {showScrollFades.right && (
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
+        )}
       </div>
     </div>
   );
