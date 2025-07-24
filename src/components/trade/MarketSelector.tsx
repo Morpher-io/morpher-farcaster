@@ -305,9 +305,36 @@ export function MarketSelector() {
   const fetchMarkets = async (category: TMarketType | "all") => {
     setIsMarketListLoading(true);
     setMarketList(undefined);
-    const params = category === "all" ? {} : { type: category };
-    const marketList = await morpherTradeSDK.getMarketList(params);
-    setMarketList(marketList);
+
+    if (category === "all") {
+      console.log("Fetching all market categories.");
+      const marketTypes: TMarketType[] = [
+        "stock",
+        "forex",
+        "index",
+        "commodity",
+        "crypto",
+      ];
+      try {
+        const allMarketLists = await Promise.all(
+          marketTypes.map((type) => morpherTradeSDK.getMarketList({ type }))
+        );
+        const mergedMarkets = allMarketLists.reduce((acc, current) => {
+          return { ...acc, ...current };
+        }, {});
+        setMarketList(mergedMarkets);
+      } catch (error) {
+        console.error("Failed to fetch all markets:", error);
+        setMarketList({});
+      }
+    } else {
+      console.log("Fetching markets with params:", { type: category });
+      const marketList = await morpherTradeSDK.getMarketList({
+        type: category,
+      });
+      setMarketList(marketList);
+    }
+
     setIsMarketListLoading(false);
   };
 
