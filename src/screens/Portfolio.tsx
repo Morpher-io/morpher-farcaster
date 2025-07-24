@@ -13,34 +13,31 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { TPosition } from "morpher-trading-sdk";
 import { usePortfolioStore } from "@/store/portfolio";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+
+import { Button } from "@/components/ui/button";
+import { PortfolioChart } from "@/components/trade/PortfolioChart";
+import { useMarketStore } from "@/store/market";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+import { usePortfolioStore } from "@/store/portfolio";
 import { useNavigate } from "react-router-dom";
-import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
-import { cn } from "@/lib/utils";
+import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
 
 export function PortfolioScreen() {
 
     const account = useAccount();
-    const {  morpherTradeSDK, setSelectedMarketId, setMarketType } = useMarketStore();
-    const { setSelectedPosition, setTradeDirection, positionList, setPositionList, setPortfolio, positionValue, currencyList, setReturns, returns } = usePortfolioStore();
+    const {  morpherTradeSDK } = useMarketStore();
+    const { positionList, setPositionList, setPortfolio, positionValue, currencyList, setReturns, returns } = usePortfolioStore();
     const [timeRange, setTimeRange] = useState<"d" | "w" | "m" | "y">("d");
     const [chartData, setChartData] = useState<[number, number][]>([]);
     let navigate = useNavigate();
-
-    const selectPosition = (position_id: string) => {
-        let position = positionList?.find(pos => pos.id === position_id)
-        if (position) {
-            setSelectedPosition(position)
-            if (account.address) {
-                setMarketType('commodity')
-                setTradeDirection('close')
-
-                setSelectedMarketId(position.market_id)
-                navigate('/')
-            }
-            
-
-        }
-    }
 
     const getProtfolio = async () => {
         if (account?.address && morpherTradeSDK) {
@@ -60,108 +57,6 @@ export function PortfolioScreen() {
         }
 
     }
-
-    const outputPosition = (position: TPosition) => {
-    const pnl = Number(position.total_return || 0);
-    const pnlPercent = Number(position.total_return_percent || 0) * 100;
-    const isPositive = pnl >= 0;
-
-    const positionValueMph = Number(position.value || 0) / 10 ** 18;
-    const positionValueUsd = currencyList?.MPH?.usd_exchange_rate
-      ? positionValueMph * currencyList.MPH.usd_exchange_rate
-      : null;
-
-    const pnlMph = pnl / 10 ** 18;
-    const pnlUsd = currencyList?.MPH?.usd_exchange_rate
-      ? pnlMph * currencyList.MPH.usd_exchange_rate
-      : null;
-
-    return (
-      <div className="border-b py-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            {position.logo_image && (
-              <img
-                src={`data:image/svg+xml;base64,${position.logo_image}`}
-                alt={`${position.name} logo`}
-                className="h-9 w-9 rounded-full"
-              />
-            )}
-            <div>
-              <p className="font-semibold text-base">{position.symbol}</p>
-              <p className="text-sm text-muted-foreground truncate max-w-[150px]">
-                {position.name}
-              </p>
-            </div>
-          </div>
-          <div
-            className={cn(
-              "text-xs font-semibold px-2 py-1 rounded-full capitalize",
-              position.direction === "long"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            )}
-          >
-            {position.direction}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-          <div className="text-muted-foreground">Value</div>
-          <div className="text-right font-medium">
-            {positionValueUsd ? (
-              <>
-                <span>${usdFormatter(positionValueUsd)}</span>
-                <span className="text-muted-foreground text-xs ml-1">
-                  ({tokenValueFormatter(positionValueMph)} MPH)
-                </span>
-              </>
-            ) : (
-              <span>{tokenValueFormatter(positionValueMph)} MPH</span>
-            )}
-          </div>
-
-          <div className="text-muted-foreground">Unrealized P/L</div>
-          <div
-            className={cn(
-              "text-right font-medium",
-              isPositive ? "text-primary" : "text-secondary"
-            )}
-          >
-            {pnlUsd ? (
-              <>
-                <span>
-                  {isPositive ? "+" : ""}${usdFormatter(pnlUsd)}
-                </span>
-                <span className="text-xs ml-1">
-                  ({isPositive ? "+" : ""}{pnlPercent.toFixed(2)}%)
-                </span>
-              </>
-            ) : (
-              <>
-                <span>
-                  {isPositive ? "+" : ""}{tokenValueFormatter(pnlMph)} MPH
-                </span>
-                <span className="text-xs ml-1">
-                  ({isPositive ? "+" : ""}{pnlPercent.toFixed(2)}%)
-                </span>
-              </>
-            )}
-          </div>
-
-          <div className="text-muted-foreground">Avg. Entry</div>
-          <div className="text-right font-medium">
-            ${usdFormatter(Number(position.average_price) / 10 ** 8)}
-          </div>
-
-          <div className="text-muted-foreground">Leverage</div>
-          <div className="text-right font-medium">
-            {(Number(position.average_leverage) / 10 ** 8).toFixed(1)}x
-          </div>
-        </div>
-      </div>
-    );
-  };
 
     const getReturns = async (type: "d" | "w" | "m" | "y") => {
         if (account?.address && morpherTradeSDK) {
@@ -251,15 +146,9 @@ export function PortfolioScreen() {
             </Card>
             <h2 className="text-lg font-bold mt-6 mb-2">Positions</h2>
 
-            {positionList && Object.values(positionList).map((position) => (
-                    <div
-                      key={position.id}
-                      onClick={() => {selectPosition(position.id)}}
-                      className="cursor-pointer"
-                    >
-                      {outputPosition(position)}
-                    </div>
-                  ))}
+            {positionList && positionList.map((position) => (
+                <OpenPositionItem key={position.id} position={position} />
+            ))}
 {/*             
             {positionList && positionList.length > 0 ? (
                 <div className="mt-4">
