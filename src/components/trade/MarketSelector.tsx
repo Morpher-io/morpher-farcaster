@@ -42,6 +42,7 @@ export function MarketSelector() {
   const [timeRange, setTimeRange] = React.useState('1D');
   const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
   const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
+  const [displayCategory, setDisplayCategory] = React.useState<TMarketType | 'all'>('all');
   const inputRef = React.useRef<HTMLInputElement>(null);
   const {
     marketType,
@@ -64,6 +65,12 @@ export function MarketSelector() {
   } = usePortfolioStore();
   
   const { address } = useAccount();
+
+  React.useEffect(() => {
+    if (marketType && marketType !== displayCategory) {
+      setDisplayCategory(marketType);
+    }
+  }, [marketType]);
 
   React.useEffect(() => {
     if (open) {
@@ -255,19 +262,20 @@ export function MarketSelector() {
     }
   }, [selectedMarketId, marketList, setSelectedMarket])
 
-  const fetchMarkets = async ({type}: {type: TMarketType}) => {
+  const fetchMarkets = async (category: TMarketType | "all") => {
     setIsMarketListLoading(true);
     setMarketList(undefined);
-    let marketList = await morpherTradeSDK.getMarketList({type})
-    setMarketList(marketList)
+    const params = category === "all" ? {} : { type: category };
+    const marketList = await morpherTradeSDK.getMarketList(params);
+    setMarketList(marketList);
     setIsMarketListLoading(false);
-  }
+  };
 
   React.useEffect(() => {
-    if (marketType) {
-      fetchMarkets({ type: marketType });
+    if (morpherTradeSDK.ready) {
+      fetchMarkets(displayCategory);
     }
-  }, [marketType]);
+  }, [displayCategory, morpherTradeSDK.ready]);
 
    const getPosition = async () => {
         if (account.address === undefined || marketData?.position_id == undefined) {
@@ -325,26 +333,41 @@ export function MarketSelector() {
                   className={`flex select-none gap-1 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
                 >
                   {(
-                    ["stock", "forex", "index", "commodity"] as TMarketType[]
-                  ).map((type) => (
-                    <Button
-                      key={type}
-                      variant={marketType === type ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        if (hasDraggedRef.current) return;
-                        setMarketType(type);
-                      }}
-                      className="capitalize rounded-full flex-shrink-0"
-                    >
-                      <img
-                        src={`/src/assets/types/${type}.svg`}
-                        alt={`${type} icon`}
-                        className="mr-2 h-4 w-4"
-                      />
-                      <span className="font-normal">{type}</span>
-                    </Button>
-                  ))}
+                    ["all", "stock", "forex", "index", "commodity", "crypto"] as (TMarketType | "all")[]
+                  ).map((type) => {
+                    const iconMap: Partial<Record<TMarketType, string>> = {
+                      stock: "/src/assets/types/stock.svg",
+                      forex: "/src/assets/types/forex.svg",
+                      index: "/src/assets/types/index.svg",
+                      commodity: "/src/assets/types/commodity.svg",
+                    };
+                    const iconSrc = iconMap[type as TMarketType];
+
+                    return (
+                      <Button
+                        key={type}
+                        variant={displayCategory === type ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          if (hasDraggedRef.current) return;
+                          setDisplayCategory(type);
+                          if (type !== "all") {
+                            setMarketType(type);
+                          }
+                        }}
+                        className="capitalize rounded-full flex-shrink-0"
+                      >
+                        {iconSrc && (
+                          <img
+                            src={iconSrc}
+                            alt={`${type} icon`}
+                            className="mr-2 h-4 w-4"
+                          />
+                        )}
+                        <span className="font-normal">{type}</span>
+                      </Button>
+                    );
+                  })}
                 </div>
                 {showScrollFades.right && (
                   <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
