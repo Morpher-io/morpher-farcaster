@@ -271,19 +271,21 @@ export function MarketSelector() {
             ${" "}
             {tokenValueFormatter(closeOverride || market?.close)}
           </p>
-          <div
-            className={`flex items-center justify-end text-sm font-medium ${
-              (market?.change_percent || 0) >= 0
-                ? "text-primary"
-                : "text-secondary"
-            }`}
-          >
-            {(market?.change_percent || 0) > 0 ? "+" : ""}
-            {Number(market?.change_percent || 0).toFixed(2)}%
-          </div>
-          <div className="text-xs text-muted-foreground flex flex-col items-end gap-0.5 mt-1">
-            <span>Mkt Cap: {formatMarketCap(market.market_cap)}</span>
-            <span>Spread: {(Number(market.spread) * 100).toFixed(3)}%</span>
+          <div className="flex items-center gap-1.5 text-xs">
+            <span
+              className={
+                (market?.change_percent || 0) >= 0
+                  ? "text-primary"
+                  : "text-secondary"
+              }
+            >
+              {(market?.change_percent || 0) > 0 ? "+" : ""}
+              {Number(market?.change_percent || 0).toFixed(2)}%
+            </span>
+            <span className="text-muted-foreground">|</span>
+            <span className="text-muted-foreground">
+              Cap {formatMarketCap(market.market_cap)}
+            </span>
           </div>
         </div>
       </div>
