@@ -80,6 +80,12 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
       ]);
       console.log("fetchPortfolioData: Fetched returns.");
+
+      const leaderboard = await morpherTradeSDK.getLeaderboard({
+        app: import.meta.env.VITE_MORPHER_APP_NAME,
+        type: 'returns',
+        eth_address,
+      });
       
       set({
         portfolio,
@@ -90,6 +96,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
           m: returnsM,
           y: returnsY,
         },
+        leaderboard,
       });
     } catch (error: any) {
       console.error("Failed to fetch portfolio data:", error);
@@ -107,7 +114,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         });
       } else {
         // For other errors, clear the portfolio to avoid showing stale data
-        set({ portfolio: undefined, returns: {}, positionList: undefined });
+        set({ portfolio: undefined, returns: {}, positionList: undefined, leaderboard: undefined });
       }
     } finally {
       console.log("fetchPortfolioData: Finished, setting loading to false.");

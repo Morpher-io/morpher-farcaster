@@ -4,9 +4,19 @@ import { usdFormatter } from "morpher-trading-sdk";
 import { Loader2Icon } from "lucide-react";
 
 export function PortfolioSummary() {
-  const { portfolio, loading } = usePortfolioStore();
+  const { portfolio, loading, eth_address, leaderboard } = usePortfolioStore();
 
-  console.log("PortfolioSummary state:", { loading, portfolio });
+  const userLeaderboardEntry = React.useMemo(() => {
+    if (!leaderboard || !eth_address) return null;
+    return leaderboard.find(
+      (entry) => entry.eth_address.toLowerCase() === eth_address.toLowerCase()
+    );
+  }, [leaderboard, eth_address]);
+
+  const profileImage =
+    userLeaderboardEntry?.profile_image ||
+    `https://source.boringavatars.com/beam/40/${eth_address || "default"}`;
+  const rank = userLeaderboardEntry?.rank;
 
   if (loading) {
     return (
@@ -23,11 +33,26 @@ export function PortfolioSummary() {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-muted-foreground text-sm">Portfolio Value</p>
-      <div className="flex items-baseline gap-2">
-        <p className="text-2xl font-bold">${usdFormatter(portfolio.total_portfolio_value)}</p>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <img
+          src={profileImage}
+          alt="User profile"
+          className="h-10 w-10 rounded-full"
+        />
+        <div>
+          <p className="text-muted-foreground text-sm">Portfolio Value</p>
+          <p className="text-2xl font-bold">
+            ${usdFormatter(portfolio.total_portfolio_value)}
+          </p>
+        </div>
       </div>
+      {rank && (
+        <div className="text-right">
+          <p className="text-sm font-semibold text-muted-foreground">Rank</p>
+          <p className="text-xl font-bold text-primary">#{rank}</p>
+        </div>
+      )}
     </div>
   );
 }
