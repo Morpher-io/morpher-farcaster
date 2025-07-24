@@ -7,6 +7,7 @@ import { useAccount, usePublicClient } from "wagmi";
 import { usePortfolioStore } from "@/store/portfolio";
 import { useMarketStore } from "@/store/market";
 import { OpenPositionItem } from "./OpenPositionItem";
+import { TradeView } from "./TradeView";
 
 export function TradeTerminal() {
   const { address } = useAccount();
@@ -51,6 +52,7 @@ export function TradeTerminal() {
           ))}
         </>
       )}
+      <TradeView />
     </div>
   );
 }

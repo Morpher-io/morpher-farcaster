@@ -21,19 +21,13 @@ import { tokenValueFormatter } from "morpher-trading-sdk";
 import { TMarketType } from "morpher-trading-sdk"
 import { TMarket, StrictOHLCArray } from "morpher-trading-sdk"
 import { useAccount } from "wagmi"
-import { MarketChart } from "./MarketChart";
 import { useMarketStore } from "../../store/market";
-import { Trade } from "./Trade";
-import { Position } from "./Position";
-import { PendingPosition } from "./PendingPosition";
 import { usePortfolioStore } from "@/store/portfolio";
 
 export function MarketSelector() {
   
   const {morpherTradeSDK} = useMarketStore();
   const [open, setOpen] = React.useState(false)
-  const [timeRange, setTimeRange] = React.useState('1D');
-  const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
   const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
   const [displayCategory, setDisplayCategory] = React.useState<TMarketType | 'all'>('all');
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -47,15 +41,7 @@ export function MarketSelector() {
     selectedMarket,
     selectedMarketClose,
     setSelectedMarket,
-    marketData,
-    setMarketData,
   } = useMarketStore();
-
-  const {
-    orderUpdate,
-    tradeDirection,
-    setSelectedPosition
-  } = usePortfolioStore();
   
   const { address } = useAccount();
 
@@ -119,43 +105,6 @@ export function MarketSelector() {
 
 
 
-  const chartData = React.useMemo(() => {
-    if (!marketData) return undefined;
-
-    const now = new Date();
-    const filterData = (data: StrictOHLCArray[] | undefined, days: number) => {
-      if (!data) return undefined;
-      const cutoff = new Date();
-      cutoff.setDate(now.getDate() - days);
-      const cutoffTimestamp = cutoff.getTime() / 1000;
-      return data.filter(d => d[0] >= cutoffTimestamp);
-    };
-
-    const filterDataMonths = (data: StrictOHLCArray[] | undefined, months: number) => {
-      if (!data) return undefined;
-      const cutoff = new Date();
-      cutoff.setMonth(now.getMonth() - months);
-      const cutoffTimestamp = cutoff.getTime() ;
-      return data.filter(d => d[0] >= cutoffTimestamp);
-    };
-
-    switch (timeRange) {
-      case '1D':
-        return marketData.data_minutely;
-      case '1W':
-        return filterData(marketData.data_hourly, 7);
-      case '1M':
-        return filterDataMonths(marketData.data_daily, 1);
-      case '3M':
-        return filterDataMonths(marketData.data_daily, 3);
-      case '6M':
-        return filterDataMonths(marketData.data_daily, 6);
-      case '1Y':
-        return filterDataMonths(marketData.data_daily, 12);
-      default:
-        return marketData.data_minutely;
-    }
-  }, [marketData, timeRange]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (scrollContainerRef.current) {
@@ -277,23 +226,6 @@ export function MarketSelector() {
 
   const account = useAccount();
 
-
-    const fetchMarketData = async ({eth_address, market_id}: {eth_address: `0x${string}`, market_id: string}) => {
-      setIsMarketDataLoading(true);
-      const sdkMarketData = await morpherTradeSDK.getMarketData({eth_address, market_id})
-        setMarketData(sdkMarketData);
-      setIsMarketDataLoading(false);
-    }
-
-  React.useEffect(() => {
-    if (address && selectedMarketId) {
-      fetchMarketData({eth_address: address, market_id: selectedMarketId})
-    } else {
-      setMarketData(undefined);
-    }
-    
-  }, [address, selectedMarketId, orderUpdate]);
-
   React.useEffect(() => {
     if (selectedMarketId && marketList) {
       setSelectedMarket(marketList[selectedMarketId])
@@ -343,25 +275,6 @@ export function MarketSelector() {
       fetchMarkets(displayCategory);
     }
   }, [displayCategory, morpherTradeSDK.ready]);
-
-   const getPosition = async () => {
-        if (account.address === undefined || marketData?.position_id == undefined) {
-          return;
-        }
-        let positions = await morpherTradeSDK.getPositions({
-          eth_address: account.address,
-          position_id: marketData.position_id,
-        });
-        if (positions && positions.length > 0) {
-          setSelectedPosition(positions[0]);
-        }
-      };
-    
-      React.useEffect(() => {
-        if (account.address && marketData?.position_id) {
-          getPosition();
-        }
-      }, [account, marketData?.position_id]);
 
 
   return (
@@ -477,40 +390,6 @@ export function MarketSelector() {
             </Command>
           </PopoverContent>
         </Popover>
-
-        {isMarketDataLoading ? (
-          <div className="flex justify-center items-center h-[200px] w-full">
-            <Loader2Icon className="h-8 w-8 animate-spin" />
-          </div>
-        ) : (
-          marketData && (
-            <div className="flex flex-col gap-4">
-              <MarketChart data={chartData} timeRange={timeRange} />
-              <div className="flex justify-center gap-1">
-                {["1D", "1W", "1M", "3M", "6M", "1Y"].map((range) => (
-                  <Button
-                    key={range}
-                    variant={timeRange === range ? "outline" : "ghost"}
-                    size="sm"
-                    onClick={() => setTimeRange(range)}
-                    className="rounded-full px-3"
-                  >
-                    {range}
-                  </Button>
-                ))}
-              </div>
-
-              {marketData.pending_order_id ? (
-                <PendingPosition />
-              ) : (
-                <>
-                  {marketData.position_id && <Position />}
-                  <Trade />
-                </>
-              )}
-            </div>
-          )
-        )}
     </div>
   )
 }
