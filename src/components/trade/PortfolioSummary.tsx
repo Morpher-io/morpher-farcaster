@@ -55,18 +55,17 @@ export function PortfolioSummary() {
 
   const chartData = React.useMemo(() => {
     if (!returns || !returns[timeRange]) return [];
-    let data: [number, number][] = [];
-    returns[timeRange].forEach((point) => {
-      data.push([point.timestamp, point.positions]);
-    });
-    return data;
+    return returns[timeRange].map((point) => ({
+      timestamp: point.timestamp,
+      value: point.positions,
+    }));
   }, [returns, timeRange]);
 
   const { displayValue, displaySubtext } = React.useMemo(() => {
     const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
     
     if (activePoint) {
-      const firstValue = chartData.length > 0 ? chartData[0][1] : 0;
+      const firstValue = chartData.length > 0 ? chartData[0].value : 0;
       const activeValueUsd = (activePoint.value / 1e18) * mphToUsdRate;
       const change = activePoint.value - firstValue;
       const changeUsd = (change / 1e18) * mphToUsdRate;
@@ -176,7 +175,10 @@ export function PortfolioSummary() {
                       state.activePayload.length > 0
                     ) {
                       const point = state.activePayload[0].payload;
-                      setActivePoint({ value: point[1], date: point[0] });
+                      setActivePoint({
+                        value: point.value,
+                        date: point.timestamp,
+                      });
                     }
                   }}
                   onMouseLeave={() => {
@@ -212,7 +214,7 @@ export function PortfolioSummary() {
                     }}
                   />
                   <XAxis
-                    dataKey="0"
+                    dataKey="timestamp"
                     tickLine={false}
                     axisLine={false}
                     tickMargin={8}
@@ -224,7 +226,7 @@ export function PortfolioSummary() {
                     hide
                   />
                   <Area
-                    dataKey="1"
+                    dataKey="value"
                     type="natural"
                     fill="url(#chart-fill)"
                     stroke="hsl(var(--primary))"
