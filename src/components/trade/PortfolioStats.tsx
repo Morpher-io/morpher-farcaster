@@ -84,9 +84,11 @@ export function PortfolioStats() {
                 <>
                   <p className={`font-semibold text-sm ${stat.data.isPositive === false ? "text-secondary" : "text-primary"}`}>
                     {stat.data.isPositive ? "+" : ""}${usdFormatter(stat.data.valueUsd)}
-                    <span className="text-xs ml-1">
-                      ({isFinite(stat.data.percent) ? `${stat.data.percent.toFixed(2)}%` : "N/A"})
-                    </span>
+                    {isFinite(stat.data.percent) && (
+                      <span className="text-xs ml-1">
+                        ({stat.data.percent.toFixed(2)}%)
+                      </span>
+                    )}
                   </p>
                   <p className={`text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-primary"}`}>
                     {stat.data.isPositive ? "+" : ""}{tokenValueFormatter(stat.data.valueMph)} MPH
