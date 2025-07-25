@@ -27,7 +27,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
 
   const { currencyList, selectedCurrency, setTradeComplete } =
     usePortfolioStore();
-  const { morpherTradeSDK } = useMarketStore();
+  const { morpherTradeSDK, setSelectedMarketId } = useMarketStore();
   const account = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
@@ -183,6 +183,14 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               {(Number(position.average_leverage) / 10 ** 8).toFixed(1)}x
             </div>
           </div>
+
+          <Button
+            variant="outline"
+            className="w-full mb-4"
+            onClick={() => setSelectedMarketId(position.market_id)}
+          >
+            View Market
+          </Button>
 
           <div className="space-y-4">
             <div className="text-center font-semibold text-lg">
