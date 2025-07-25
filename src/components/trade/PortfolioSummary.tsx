@@ -67,7 +67,7 @@ export function PortfolioSummary() {
     () => ({
       value: {
         label: "Value",
-        color: isIncreasing ? "hsl(var(--primary))" : "hsl(var(--secondary))",
+        color: isIncreasing ? "var(--primary)" : "var(--secondary)",
       },
     }),
     [isIncreasing]
