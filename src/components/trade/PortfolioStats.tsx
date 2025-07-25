@@ -2,7 +2,7 @@ import * as React from "react";
 import { usePortfolioStore } from "@/store/portfolio";
 import { Card, CardContent } from "../ui/card";
 import { Loader2Icon } from "lucide-react";
-import { usdFormatter } from "morpher-trading-sdk";
+import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
 
 export function PortfolioStats() {
   const { portfolio, returns, loading, currencyList } = usePortfolioStore();
@@ -18,32 +18,31 @@ export function PortfolioStats() {
   }, [currencyList]);
 
   const weeklyPnl = React.useMemo(() => {
+    const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
     const weeklyReturns = returns["w"];
     if (!weeklyReturns || weeklyReturns.length < 2) {
-      return { value: 0, percent: 0 };
+      return { valueMph: 0, valueUsd: 0, percent: 0, isPositive: true };
     }
-    console.log('weeklyReturns', weeklyReturns)
-
 
     const startValue = weeklyReturns[0].total;
     const endValue = weeklyReturns[weeklyReturns.length - 1].total;
 
     if (typeof startValue !== "number" || typeof endValue !== "number") {
-      return { value: 0, percent: 0 };
+      return { valueMph: 0, valueUsd: 0, percent: 0, isPositive: true };
     }
-    let returnsPercent = 0
 
-    weeklyReturns.forEach(point => {
-    returnsPercent += point.returns
-    })
+    const changeMph = endValue - startValue;
+    const changeUsd = changeMph * mphToUsdRate;
 
-    const change = endValue - startValue;
-    if (startValue === 0) {
-      return { value: change, percent: change === 0 ? 0 : Infinity };
+    let percentChange = 0;
+    if (startValue !== 0) {
+      percentChange = (changeMph / startValue) * 100;
+    } else if (changeMph !== 0) {
+      percentChange = Infinity;
     }
-    //const percentChange = (change / startValue) * 100;
-    return { value: change, percent: returnsPercent * 100 };
-  }, [returns]);
+
+    return { valueMph: changeMph, valueUsd: changeUsd, percent: percentChange, isPositive: changeMph >= 0 };
+  }, [returns, currencyList]);
 
   if (loading) {
     return (
@@ -66,15 +65,7 @@ export function PortfolioStats() {
     },
     {
       title: "Weekly P/L",
-      value: `${weeklyPnl.value >= 0 ? "+" : ""}$${usdFormatter(
-        weeklyPnl.value
-      )}`,
-      subValue: `(${
-        isFinite(weeklyPnl.percent)
-          ? `${weeklyPnl.percent.toFixed(2)}%`
-          : "N/A"
-      })`,
-      isPositive: weeklyPnl.value >= 0,
+      data: weeklyPnl,
     },
     {
       title: "Open Positions",
@@ -89,13 +80,20 @@ export function PortfolioStats() {
           <CardContent className="flex flex-col items-center justify-center p-1 text-center h-full">
             <p className="font-semibold text-muted-foreground text-xs leading-tight mb-1">{stat.title}</p>
             <div className="flex-grow flex flex-col justify-center">
-              <p className={`font-semibold text-sm ${stat.isPositive === false ? "text-secondary" : stat.isPositive === true ? "text-primary" : ""}`}>
-                {stat.value}
-              </p>
-              {stat.subValue && (
-                <p className={`text-xs ${stat.isPositive === false ? "text-secondary" : "text-primary"}`}>
-                  {stat.subValue}
-                </p>
+              {stat.data ? (
+                <>
+                  <p className={`font-semibold text-sm ${stat.data.isPositive === false ? "text-secondary" : "text-primary"}`}>
+                    {stat.data.isPositive ? "+" : ""}${usdFormatter(stat.data.valueUsd)}
+                    <span className="text-xs ml-1">
+                      ({isFinite(stat.data.percent) ? `${stat.data.percent.toFixed(2)}%` : "N/A"})
+                    </span>
+                  </p>
+                  <p className={`text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-primary"}`}>
+                    {stat.data.isPositive ? "+" : ""}{tokenValueFormatter(stat.data.valueMph)} MPH
+                  </p>
+                </>
+              ) : (
+                <p className="font-semibold text-sm">{stat.value}</p>
               )}
             </div>
           </CardContent>
