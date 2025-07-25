@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { format as formatDate } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -26,10 +25,22 @@ export function PortfolioSummary() {
   } = usePortfolioStore();
   const [isChartOpen, setIsChartOpen] = React.useState(false);
   const [timeRange, setTimeRange] = React.useState<"d" | "w" | "m" | "y">("d");
-  const [activePoint, setActivePoint] = React.useState<{
-    value: number;
-    date: number;
-  } | null>(null);
+  const [primaryColor, setPrimaryColor] = React.useState("hsl(262.1 83.3% 57.8%)");
+  const [secondaryColor, setSecondaryColor] = React.useState("hsl(350 89% 60%)");
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const style = getComputedStyle(document.documentElement);
+      const primary = style.getPropertyValue("--primary")?.trim();
+      if (primary) {
+        setPrimaryColor(`hsl(${primary})`);
+      }
+      const secondary = style.getPropertyValue("--secondary")?.trim();
+      if (secondary) {
+        setSecondaryColor(`hsl(${secondary})`);
+      }
+    }
+  }, []);
 
   const totalPortfolioValueUSD = React.useMemo(() => {
     if (!currencyList?.MPH?.usd_exchange_rate || !portfolio) return 0;
@@ -67,59 +78,7 @@ export function PortfolioSummary() {
     return chartData[chartData.length - 1].value >= chartData[0].value;
   }, [chartData]);
 
-  const chartConfig = React.useMemo(
-    () => ({
-      value: {
-        label: "Value",
-        color: isIncreasing ? "var(--primary)" : "var(--secondary)",
-      },
-    }),
-    [isIncreasing]
-  );
-
-  const { displayValue, displaySubtext } = React.useMemo(() => {
-    const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
-    
-    if (activePoint) {
-      const firstValue = chartData.length > 0 ? chartData[0].value : 0;
-      const activeValueUsd = (activePoint.value / 1e18) * mphToUsdRate;
-      const change = activePoint.value - firstValue;
-      const changeUsd = (change / 1e18) * mphToUsdRate;
-      const changePercent = firstValue > 0 ? (change / firstValue) * 100 : 0;
-      const isPositive = change >= 0;
-
-      const timeFormat = timeRange === "d" ? "p" : "PP p";
-      const dateText = formatDate(new Date(activePoint.date), timeFormat);
-
-      const subtext = (
-        <div className="flex items-center justify-center gap-2">
-          <span>{dateText}</span>
-          <span className={cn(isPositive ? "text-primary" : "text-secondary")}>
-            {isPositive ? "+" : ""}${usdFormatter(changeUsd.toString())} (
-            {isPositive ? "+" : ""}
-            {changePercent.toFixed(2)}%)
-          </span>
-        </div>
-      );
-
-      return {
-        displayValue: `$${usdFormatter(activeValueUsd.toString())}`,
-        displaySubtext: subtext,
-      };
-    }
-
-    const totalValueMph = mphToUsdRate > 0 ? totalPortfolioValueUSD / mphToUsdRate : 0;
-    return {
-      displayValue: `$${usdFormatter(totalPortfolioValueUSD.toString())}`,
-      displaySubtext: `(${tokenValueFormatter(totalValueMph)} MPH)`,
-    };
-  }, [
-    activePoint,
-    chartData,
-    totalPortfolioValueUSD,
-    currencyList,
-    timeRange,
-  ]);
+  const chartColor = isIncreasing ? primaryColor : secondaryColor;
 
   if (loading) {
     return (
@@ -175,37 +134,24 @@ export function PortfolioSummary() {
           </DialogHeader>
           <div className="mt-4">
             <div className="mb-4 text-center min-h-[48px]">
-              <p className="text-2xl font-bold">{displayValue}</p>
-              <div className="text-sm text-muted-foreground">
-                {displaySubtext}
-              </div>
+              <p className="text-2xl font-bold">
+                ${usdFormatter(totalPortfolioValueUSD.toString())}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                ({tokenValueFormatter(
+                  (totalPortfolioValueUSD /
+                    (currencyList?.MPH?.usd_exchange_rate || 1))
+                )}{" "}
+                MPH)
+              </p>
             </div>
             <div className="-mx-6 h-[200px]">
-              <ChartContainer config={chartConfig} className="w-full h-full">
-                <LineChart
-                  data={chartData}
-                  onMouseMove={(state) => {
-                    console.log("Chart hover state:", state);
-                    if (
-                      state.isTooltipActive &&
-                      state.activePayload &&
-                      state.activePayload.length > 0
-                    ) {
-                      const point = state.activePayload[0].payload;
-                      setActivePoint({
-                        value: point.value,
-                        date: point.timestamp,
-                      });
-                    }
-                  }}
-                  onMouseLeave={() => {
-                    setActivePoint(null);
-                  }}
-                >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
                   <Tooltip
-                    content={<ChartTooltipContent className="hidden" formatter={() => null} />}
+                    content={<CustomTooltip />}
                     cursor={{
-                      stroke: "var(--color-value)",
+                      stroke: chartColor,
                       strokeWidth: 1,
                       strokeDasharray: "3 3",
                     }}
@@ -225,19 +171,19 @@ export function PortfolioSummary() {
                   <Line
                     dataKey="value"
                     type="monotone"
-                    stroke="var(--color-value)"
+                    stroke={chartColor}
                     strokeWidth={2}
                     dot={false}
                     activeDot={{
                       r: 4,
                       style: {
-                        fill: "var(--color-value)",
+                        fill: chartColor,
                         stroke: "var(--background)",
                       },
                     }}
                   />
                 </LineChart>
-              </ChartContainer>
+              </ResponsiveContainer>
             </div>
             <div className="flex justify-center gap-2 mt-4">
               <Button
