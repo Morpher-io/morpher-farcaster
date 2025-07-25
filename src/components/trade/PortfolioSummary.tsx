@@ -80,27 +80,28 @@ export function PortfolioSummary() {
             className="h-10 w-10 rounded-full"
           />
           <div>
-            <p className="text-muted-foreground text-sm">Portfolio Value</p>
+            <div className="flex items-center gap-1">
+              <p className="text-muted-foreground text-sm">Portfolio Value</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => setIsChartOpen(true)}
+              >
+                <LineChartIcon className="h-4 w-4" />
+              </Button>
+            </div>
             <p className="text-2xl font-bold">
               ${usdFormatter(totalPortfolioValueUSD.toString())}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {rank && (
-            <div className="text-right">
-              <p className="text-sm font-semibold text-muted-foreground">Rank</p>
-              <p className="text-xl font-bold text-primary">#{rank}</p>
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsChartOpen(true)}
-          >
-            <LineChartIcon className="h-6 w-6" />
-          </Button>
-        </div>
+        {rank && (
+          <div className="text-right">
+            <p className="text-sm font-semibold text-muted-foreground">Rank</p>
+            <p className="text-xl font-bold text-primary">#{rank}</p>
+          </div>
+        )}
       </div>
       <Dialog open={isChartOpen} onOpenChange={setIsChartOpen}>
         <DialogContent>
@@ -120,7 +121,9 @@ export function PortfolioSummary() {
                 MPH)
               </p>
             </div>
-            <PortfolioChart data={chartData} timeRange={timeRange} />
+            <div className="-mx-6">
+              <PortfolioChart data={chartData} timeRange={timeRange} />
+            </div>
             <div className="flex justify-center gap-2 mt-4">
               <Button
                 variant={timeRange === "d" ? "outline" : "ghost"}
