@@ -29,6 +29,17 @@ export function PortfolioSummary() {
     value: number;
     date: number;
   } | null>(null);
+  const [primaryColor, setPrimaryColor] = React.useState("hsl(262.1 83.3% 57.8%)");
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const style = getComputedStyle(document.body);
+      const primary = style.getPropertyValue('--primary').trim();
+      if (primary) {
+        setPrimaryColor(`hsl(${primary})`);
+      }
+    }
+  }, []);
 
   const totalPortfolioValueUSD = React.useMemo(() => {
     if (!currencyList?.MPH?.usd_exchange_rate || !portfolio) return 0;
@@ -195,12 +206,12 @@ export function PortfolioSummary() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="hsl(var(--primary))"
+                        stopColor={primaryColor}
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor="hsl(var(--primary))"
+                        stopColor={primaryColor}
                         stopOpacity={0.1}
                       />
                     </linearGradient>
@@ -208,7 +219,7 @@ export function PortfolioSummary() {
                   <Tooltip
                     content={<></>}
                     cursor={{
-                      stroke: "hsl(var(--primary))",
+                      stroke: primaryColor,
                       strokeWidth: 1,
                       strokeDasharray: "3 3",
                     }}
@@ -229,9 +240,13 @@ export function PortfolioSummary() {
                     dataKey="value"
                     type="natural"
                     fill="url(#chart-fill)"
-                    stroke="hsl(var(--primary))"
+                    stroke={primaryColor}
                     stackId="a"
                     dot={false}
+                    activeDot={{
+                      r: 4,
+                      style: { fill: primaryColor, stroke: "#fff" },
+                    }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
