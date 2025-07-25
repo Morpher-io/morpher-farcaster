@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { format as formatDate } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -135,8 +135,6 @@ export function PortfolioSummary() {
     return null;
   }
 
-  const EmptyTooltipContent = () => null;
-
   return (
     <>
       <div className="flex items-center justify-between">
@@ -187,6 +185,7 @@ export function PortfolioSummary() {
                 <LineChart
                   data={chartData}
                   onMouseMove={(state) => {
+                    console.log("Chart hover state:", state);
                     if (
                       state.isTooltipActive &&
                       state.activePayload &&
@@ -204,7 +203,7 @@ export function PortfolioSummary() {
                   }}
                 >
                   <Tooltip
-                    content={<EmptyTooltipContent />}
+                    content={<ChartTooltipContent className="hidden" formatter={() => null} />}
                     cursor={{
                       stroke: "var(--color-value)",
                       strokeWidth: 1,
