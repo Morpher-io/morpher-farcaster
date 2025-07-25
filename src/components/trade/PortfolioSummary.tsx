@@ -109,7 +109,6 @@ export function PortfolioSummary() {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      console.log(data);
       const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
       const firstValue = chartData.length > 0 ? chartData[0].value : 0;
 

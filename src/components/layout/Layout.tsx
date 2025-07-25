@@ -6,10 +6,9 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const { isConnected } = useAccount();
   
   return (
-    <div className={`max-w-[400px]`}>
+    <div className={`max-w-[400px] min-h-screen`}>
       {children}
     </div>
   );

@@ -216,7 +216,7 @@ export function TradeView() {
                     className="h-8 w-8 rounded-full"
                   />
                 )}
-                <div>
+                <div className="text-left">
                   <p className="font-semibold">{selectedMarket.symbol}</p>
                   <p className="text-sm text-muted-foreground">
                     {selectedMarket.name}
