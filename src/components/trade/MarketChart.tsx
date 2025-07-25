@@ -20,18 +20,18 @@ export const MarketChart = React.memo(function MarketChart({ data, timeRange }: 
     if (timeRange == '1D') {
     return data?.map((d) => {
       return {
-      timestamp: new Date(Number(d[0])).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date(Number(d[0]) * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       close: d[4],
     }});
 
     } else {
     return data?.map((d) => ({
-      timestamp: new Date(Number(d[0])).toLocaleDateString([], { day: '2-digit', month: '2-digit' }),
+      timestamp: new Date(Number(d[0]) * 1000).toLocaleDateString([], { day: '2-digit', month: '2-digit' }),
       close: d[4],
     }));
 
     }
-  }, [data]);
+  }, [data, timeRange]);
 
   const chartConfig = React.useMemo(() => {
     const isIncreasing = chartData && chartData.length > 1 ? chartData[chartData.length - 1].close >= chartData[0].close : true;
