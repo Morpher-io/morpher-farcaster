@@ -132,7 +132,7 @@ export function Trade() {
                     key={currency}
                     value={currency}
                     aria-label={`Select ${currency}`}
-                    className="flex-col h-auto py-2 data-[state=on]:bg-muted data-[state=on]:border"
+                    className="flex-col h-auto py-3 data-[state=on]:bg-muted data-[state=on]:border"
                     disabled={!details.balance || BigInt(details.balance) === 0n}
                   >
                     <img
@@ -141,6 +141,12 @@ export function Trade() {
                       className="h-6 w-6 mb-1"
                     />
                     <span className="font-semibold">{currency}</span>
+                    <span className="text-xs font-normal text-muted-foreground">
+                      {tokenValueFormatter(
+                        Number(details.balance || 0) /
+                          10 ** (details.decimals || 1)
+                      )}
+                    </span>
                   </ToggleGroupItem>
                 ))}
             </ToggleGroup>
