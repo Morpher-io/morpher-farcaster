@@ -9,7 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PortfolioChart } from "./PortfolioChart";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { format as formatDate } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export function PortfolioSummary() {
   const {
@@ -23,6 +25,10 @@ export function PortfolioSummary() {
   } = usePortfolioStore();
   const [isChartOpen, setIsChartOpen] = React.useState(false);
   const [timeRange, setTimeRange] = React.useState<"d" | "w" | "m" | "y">("d");
+  const [activePoint, setActivePoint] = React.useState<{
+    value: number;
+    date: number;
+  } | null>(null);
 
   const totalPortfolioValueUSD = React.useMemo(() => {
     if (!currencyList?.MPH?.usd_exchange_rate || !portfolio) return 0;
@@ -55,6 +61,50 @@ export function PortfolioSummary() {
     });
     return data;
   }, [returns, timeRange]);
+
+  const { displayValue, displaySubtext } = React.useMemo(() => {
+    const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
+    
+    if (activePoint) {
+      const firstValue = chartData.length > 0 ? chartData[0][1] : 0;
+      const activeValueUsd = (activePoint.value / 1e18) * mphToUsdRate;
+      const change = activePoint.value - firstValue;
+      const changeUsd = (change / 1e18) * mphToUsdRate;
+      const changePercent = firstValue > 0 ? (change / firstValue) * 100 : 0;
+      const isPositive = change >= 0;
+
+      const timeFormat = timeRange === "d" ? "p" : "PP p";
+      const dateText = formatDate(new Date(activePoint.date), timeFormat);
+
+      const subtext = (
+        <div className="flex items-center justify-center gap-2">
+          <span>{dateText}</span>
+          <span className={cn(isPositive ? "text-primary" : "text-secondary")}>
+            {isPositive ? "+" : ""}${usdFormatter(changeUsd.toString())} (
+            {isPositive ? "+" : ""}
+            {changePercent.toFixed(2)}%)
+          </span>
+        </div>
+      );
+
+      return {
+        displayValue: `$${usdFormatter(activeValueUsd.toString())}`,
+        displaySubtext: subtext,
+      };
+    }
+
+    const totalValueMph = mphToUsdRate > 0 ? totalPortfolioValueUSD / mphToUsdRate : 0;
+    return {
+      displayValue: `$${usdFormatter(totalPortfolioValueUSD.toString())}`,
+      displaySubtext: `(${tokenValueFormatter(totalValueMph)} MPH)`,
+    };
+  }, [
+    activePoint,
+    chartData,
+    totalPortfolioValueUSD,
+    currencyList,
+    timeRange,
+  ]);
 
   if (loading) {
     return (
@@ -109,20 +159,80 @@ export function PortfolioSummary() {
             <DialogTitle>Portfolio Performance</DialogTitle>
           </DialogHeader>
           <div className="mt-4">
-            <div className="mb-4 text-center">
-              <p className="text-2xl font-bold">
-                ${usdFormatter(totalPortfolioValueUSD.toString())}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                ({tokenValueFormatter(
-                  (totalPortfolioValueUSD /
-                    (currencyList?.MPH?.usd_exchange_rate || 1))
-                )}{" "}
-                MPH)
-              </p>
+            <div className="mb-4 text-center min-h-[48px]">
+              <p className="text-2xl font-bold">{displayValue}</p>
+              <div className="text-sm text-muted-foreground">
+                {displaySubtext}
+              </div>
             </div>
-            <div className="-mx-6">
-              <PortfolioChart data={chartData} timeRange={timeRange} />
+            <div className="-mx-6 h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={chartData}
+                  onMouseMove={(state) => {
+                    if (
+                      state.isTooltipActive &&
+                      state.activePayload &&
+                      state.activePayload.length > 0
+                    ) {
+                      const point = state.activePayload[0].payload;
+                      setActivePoint({ value: point[1], date: point[0] });
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    setActivePoint(null);
+                  }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="chart-fill"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="hsl(var(--primary))"
+                        stopOpacity={0.8}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="hsl(var(--primary))"
+                        stopOpacity={0.1}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <Tooltip
+                    content={<></>}
+                    cursor={{
+                      stroke: "hsl(var(--primary))",
+                      strokeWidth: 1,
+                      strokeDasharray: "3 3",
+                    }}
+                  />
+                  <XAxis
+                    dataKey="0"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      const format = timeRange === "d" ? "HH:mm" : "MMM d";
+                      return formatDate(date, format);
+                    }}
+                    hide
+                  />
+                  <Area
+                    dataKey="1"
+                    type="natural"
+                    fill="url(#chart-fill)"
+                    stroke="hsl(var(--primary))"
+                    stackId="a"
+                    dot={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
             <div className="flex justify-center gap-2 mt-4">
               <Button
