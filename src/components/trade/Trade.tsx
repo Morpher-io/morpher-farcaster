@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Skeleton } from "../ui/skeleton"
 import { sdk } from "@farcaster/frame-sdk"
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
 
 export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
@@ -117,20 +118,20 @@ export function Trade() {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="">
             <Tabs
               value={selectedCurrency}
               onValueChange={(value) => setSelectedCurrency(value as TCurrency)}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="w-full rounded-b-none border border-b-none">
                 {currencyList &&
                   Object.entries(currencyList).map(([currency, details]) => (
                     <TabsTrigger
                       key={currency}
                       value={currency}
                       disabled={!details.balance || BigInt(details.balance) === 0n}
-                      className="flex-col h-auto py-2"
+                      className="flex-col h-auto"
                     >
                       <img
                         src={`/src/assets/icons/${currency}.svg`}
@@ -153,7 +154,7 @@ export function Trade() {
                 <Input
                   type="number"
                   placeholder="0.00"
-                  className="h-12 pr-28 text-2xl font-bold bg-muted"
+                  className="h-12 pr-28 text-2xl font-bold bg-muted border-t-none"
                   value={tradeAmount}
                   onChange={(e) => setTradeAmount(e.target.value)}
                 />
