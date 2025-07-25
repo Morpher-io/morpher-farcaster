@@ -87,7 +87,7 @@ export function ClosePosition() {
     }
 
 
-    morpherTradeSDK.executeTrade({ account, walletClient: walletClient as any, leverage: 1, direction: 'short', publicClient, market_id: selectedPosition?.market_id || '', currency: selectedCurrency || 'ETH', closePercentage:closePercentage, callback: tradeComplete })
+    morpherTradeSDK.closePosition({ account, walletClient: walletClient as any, publicClient, market_id: selectedPosition?.market_id || '', closePercentage:closePercentage || 0, callback: tradeComplete })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);

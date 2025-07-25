@@ -66,15 +66,12 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
     setTradeError(undefined);
     setIsClosing(true);
 
-    morpherTradeSDK.executeTrade({
+    morpherTradeSDK.closePosition({
       account: account as any,
       walletClient: walletClient as any,
       publicClient: publicClient as any,
       market_id: position.market_id,
       closePercentage: closePercentage,
-      direction: "short",
-      leverage: 1,
-      currency: selectedCurrency || "MPH",
       callback: tradeCompleteCallback,
     });
   };

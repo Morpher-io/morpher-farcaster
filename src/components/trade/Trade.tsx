@@ -74,7 +74,7 @@ export function Trade() {
     }, 2000)
   }
   
-  const executeTrade = () => {
+  const openPosition = () => {
     try {
       setTradeError(undefined)
       if (tradeExecuting) {
@@ -89,7 +89,7 @@ export function Trade() {
           tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10**(currencyDetails.decimals || 18)));
       }
       
-      morpherTradeSDK.executeTrade({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete })
+      morpherTradeSDK.openPosition({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);
@@ -204,7 +204,7 @@ export function Trade() {
           />
         </div>
         <Button
-          onClick={executeTrade}
+          onClick={openPosition}
           disabled={!tradeAmount || Number(tradeAmount) <= 0}
           className="w-full"
           variant={tradeType === 'long' ? "default" : "secondary"}
