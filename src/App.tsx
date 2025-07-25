@@ -10,7 +10,6 @@ import { PortfolioScreen } from "./screens/Portfolio";
 import { Layout } from "./components/layout/Layout";
 import { Header } from "./components/app/Header";
 import { usePortfolioStore } from "./store/portfolio";
-import { Loader2 } from "lucide-react";
 import { useMarketStore } from "./store/market";
 import { sdk } from "@farcaster/frame-sdk";
 
@@ -21,7 +20,7 @@ function App() {
   
 
   const { morpherTradeSDK  } = useMarketStore();
-  const { loading, setEthAddress, tradeComplete, setContext  } = usePortfolioStore();
+  const { setEthAddress, tradeComplete, setContext  } = usePortfolioStore();
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
   const { address, isConnected } = useAccount();
@@ -63,6 +62,10 @@ function App() {
       setEthAddress(undefined);
     }
   }, [address]);
+
+  useEffect(() => {
+    sdk.actions.ready();
+  }, [])
   
 
   return (
@@ -80,12 +83,6 @@ function App() {
             </>
           ) : (
             <>
-              {loading && (
-              <div className="fixed inset-0 z-50 flex flex-col items-center justify-center backdrop-blur-sm">
-                <Loader2 className="h-16 w-16 animate-spin" />
-                <p className="mt-4">Loading...</p>
-              </div>
-            )}
             <Routes>
               <Route path="/" element={<TradeScreen />} />
               <Route path="/history" element={<TradeHistoryScreen />} />

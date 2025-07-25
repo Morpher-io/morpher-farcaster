@@ -1,8 +1,9 @@
 import * as React from "react";
 import { usePortfolioStore } from "@/store/portfolio";
 import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
-import { Loader2Icon, LineChart as LineChartIcon } from "lucide-react";
+import { LineChart as LineChartIcon } from "lucide-react";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -94,9 +95,17 @@ export function PortfolioSummary() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-center items-center h-[52px]">
-          <Loader2Icon className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div>
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-7 w-32 mt-1" />
+          </div>
+        </div>
+        <div className="text-right">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-6 w-16 mt-1" />
         </div>
       </div>
     );

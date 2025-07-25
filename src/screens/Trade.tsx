@@ -1,9 +1,7 @@
 import { useAccount } from "wagmi";
 import { TradeTerminal } from "../components/trade/TradeTerminal";
 import { Connect } from "../components/trade/Connect";
-import { usePortfolioStore } from "@/store/portfolio";
-import { useEffect } from "react";
-import { sdk } from "@farcaster/frame-sdk";
+
 
 
 
@@ -19,27 +17,7 @@ function ConnectMenu() {
 
 
 export function TradeScreen() {
-   const { isConnected } = useAccount();
-  const { 
-      loading,
-      setLoading,
-  } = usePortfolioStore(); 
-
-   useEffect(() => {
-      if (!isConnected && loading) {
-          setLoading(false);
-      }
-   }, [isConnected, loading, setLoading]);
-
-   useEffect(() => {
-      if (!loading) {
-         sdk.actions.ready();
-      }
-   }, [loading]);
-  
-
-
-    return (
+   return (
         <>
             <ConnectMenu />
         </>

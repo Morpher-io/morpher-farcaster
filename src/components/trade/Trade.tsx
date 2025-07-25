@@ -10,6 +10,7 @@ import { ChevronsUpDown, Loader2Icon } from "lucide-react"
 import  { TradeCallback, TCurrency, tokenValueFormatter, usdFormatter } from "morpher-trading-sdk"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
+import { Skeleton } from "../ui/skeleton"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandList, CommandItem } from "../ui/command"
 import { sdk } from "@farcaster/frame-sdk"
@@ -28,7 +29,7 @@ export function Trade() {
       selectedCurrencyDetails, 
       setSelectedCurrencyDetails,
       currencyList,
-      setCurrencyList,
+      loading,
       setTradeComplete
   } = usePortfolioStore()
 
@@ -106,69 +107,83 @@ export function Trade() {
       )}
       
       <CardContent>
-        <div className="flex items-center text-xl font-bold">
-          <Input 
-            type="test" 
-            placeholder="0.00" 
-            className="border-0 rounded-0 h-auto flex-1 p-0 text-xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 round-sm bg-white  " 
-            value={tradeAmount} 
-            onChange={(e) => setTradeAmount(e.target.value)} 
-          />
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" role="combobox" aria-expanded={open} className="w-auto justify-between text-lg font-bold p-2">
-                {selectedCurrency && (
-                  <img
-                    src={`/src/assets/icons/${selectedCurrency}.svg`}
-                    alt={`${selectedCurrency} logo`}
-                    className="mr-0 h-6 w-6"
-                  />
-                )}
-                {selectedCurrency}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Command>
-                <CommandList>
-                  <CommandEmpty>No token found.</CommandEmpty>
-                  <CommandGroup>
-                    {currencyList && Object.entries(currencyList).map(([currency, details]) => (
-                      <CommandItem
-                        key={currency}
-                        value={currency}
-                        onSelect={(currentValue) => {
-                          setSelectedCurrency(currentValue.toUpperCase() as TCurrency)
-                          setOpen(false)
-                        }}
-                      >
-                        <div className="flex items-center">
-                          <img
-                            src={`/src/assets/icons/${currency}.svg`}
-                            alt={`${currency} logo`}
-                            className="mr-2 h-4 w-4"
-                          />
-                          {currency}
-                        </div>
-                        <div className="ml-auto text-right text-sm">
-                          <div>{(Number(details.balance || 0) / (10 ** (details.decimals || 1))).toFixed(4)}</div>
-                          <div className="text-sm ">${(details.usd || 0).toFixed(2)}</div>
-                        </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="text-sm flex justify-between mt-1">
-          <p>$ {usdFormatter(selectedCurrencyDetails?.usd)}</p>
-          <p id="tokenAmount" className="cursor-pointer" onClick={() => setTradeAmount(tokenValueFormatter(Number(selectedCurrencyDetails?.balance || 0) / (10 ** (selectedCurrencyDetails?.decimals || 1))))}>
-            {tokenValueFormatter(Number(selectedCurrencyDetails?.balance || 0) / (10** (selectedCurrencyDetails?.decimals || 1)))} {selectedCurrencyDetails?.symbol.toUpperCase()}
-          </p>
-        </div>
-
+        {loading ? (
+          <div>
+            <div className="flex items-center text-xl font-bold">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-10 w-32 ml-2" />
+            </div>
+            <div className="text-sm flex justify-between mt-1">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center text-xl font-bold">
+              <Input
+                type="test"
+                placeholder="0.00"
+                className="border-0 rounded-0 h-auto flex-1 p-0 text-xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 round-sm bg-white  "
+                value={tradeAmount}
+                onChange={(e) => setTradeAmount(e.target.value)}
+              />
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" role="combobox" aria-expanded={open} className="w-auto justify-between text-lg font-bold p-2">
+                    {selectedCurrency && (
+                      <img
+                        src={`/src/assets/icons/${selectedCurrency}.svg`}
+                        alt={`${selectedCurrency} logo`}
+                        className="mr-0 h-6 w-6"
+                      />
+                    )}
+                    {selectedCurrency}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Command>
+                    <CommandList>
+                      <CommandEmpty>No token found.</CommandEmpty>
+                      <CommandGroup>
+                        {currencyList && Object.entries(currencyList).map(([currency, details]) => (
+                          <CommandItem
+                            key={currency}
+                            value={currency}
+                            onSelect={(currentValue) => {
+                              setSelectedCurrency(currentValue.toUpperCase() as TCurrency)
+                              setOpen(false)
+                            }}
+                          >
+                            <div className="flex items-center">
+                              <img
+                                src={`/src/assets/icons/${currency}.svg`}
+                                alt={`${currency} logo`}
+                                className="mr-2 h-4 w-4"
+                              />
+                              {currency}
+                            </div>
+                            <div className="ml-auto text-right text-sm">
+                              <div>{(Number(details.balance || 0) / (10 ** (details.decimals || 1))).toFixed(4)}</div>
+                              <div className="text-sm ">${(details.usd || 0).toFixed(2)}</div>
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="text-sm flex justify-between mt-1">
+              <p>$ {usdFormatter(selectedCurrencyDetails?.usd)}</p>
+              <p id="tokenAmount" className="cursor-pointer" onClick={() => setTradeAmount(tokenValueFormatter(Number(selectedCurrencyDetails?.balance || 0) / (10 ** (selectedCurrencyDetails?.decimals || 1))))}>
+                {tokenValueFormatter(Number(selectedCurrencyDetails?.balance || 0) / (10 ** (selectedCurrencyDetails?.decimals || 1)))} {selectedCurrencyDetails?.symbol.toUpperCase()}
+              </p>
+            </div>
+          </>
+        )}
         <div className="my-4 h-px bg-gray-200" />
 
         <div className="flex items-center justify-between mb-2">

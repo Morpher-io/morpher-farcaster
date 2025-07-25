@@ -7,6 +7,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
+import { Skeleton } from "@/components/ui/skeleton"
 import { StrictOHLCArray } from "morpher-trading-sdk"
 import { tokenValueFormatter } from "morpher-trading-sdk"
 
@@ -44,7 +45,7 @@ export const MarketChart = React.memo(function MarketChart({ data, timeRange }: 
   }, [chartData]);
 
   if (!chartData || chartData.length === 0) {
-    return null;
+    return <Skeleton className="h-[200px] w-full mt-4" />;
   }
 
   return (
