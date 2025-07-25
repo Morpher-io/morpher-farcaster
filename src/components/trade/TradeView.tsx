@@ -6,6 +6,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
+import { Slider } from "../ui/slider";
+import { Card, CardContent } from "../ui/card";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { Trade } from "./Trade";
@@ -14,8 +16,13 @@ import { PendingPosition } from "./PendingPosition";
 import { Loader2Icon } from "lucide-react";
 import { useMarketStore } from "@/store/market";
 import { usePortfolioStore } from "@/store/portfolio";
-import { useAccount } from "wagmi";
-import { StrictOHLCArray, tokenValueFormatter } from "morpher-trading-sdk";
+import { useAccount, useWalletClient, usePublicClient } from "wagmi";
+import {
+  StrictOHLCArray,
+  tokenValueFormatter,
+  TradeCallback,
+  usdFormatter,
+} from "morpher-trading-sdk";
 import { cn } from "@/lib/utils";
 import { format as formatDate } from "date-fns";
 
@@ -29,11 +36,25 @@ export function TradeView() {
     setMarketData,
     morpherTradeSDK,
   } = useMarketStore();
-  const { orderUpdate, setSelectedPosition } = usePortfolioStore();
+  const {
+    orderUpdate,
+    setSelectedPosition,
+    selectedPosition,
+    setTradeComplete,
+    currencyList,
+  } = usePortfolioStore();
 
   const [timeRange, setTimeRange] = React.useState("1D");
   const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
   const account = useAccount();
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
+
+  const [closePercentage, setClosePercentage] = React.useState(100);
+  const [isClosing, setIsClosing] = React.useState(false);
+  const [tradeError, setTradeError] = React.useState<string | undefined>(
+    undefined
+  );
 
   const open = !!selectedMarketId;
 
@@ -169,6 +190,49 @@ export function TradeView() {
     return [minValue - margin, maxValue + margin];
   }, [formattedChartData]);
 
+  const tradeCompleteCallback = (result: TradeCallback) => {
+    if (result.result === "error") {
+      setTradeError(
+        result.err || "An error occurred while executing the trade."
+      );
+    } else {
+      setTradeComplete(true);
+      setSelectedMarketId("");
+    }
+    setIsClosing(false);
+  };
+
+  const handleClosePosition = () => {
+    if (!walletClient || !selectedPosition) {
+      setTradeError("Wallet client or position not available.");
+      return;
+    }
+    setTradeError(undefined);
+    setIsClosing(true);
+
+    morpherTradeSDK.closePosition({
+      account: account as any,
+      walletClient: walletClient as any,
+      publicClient: publicClient as any,
+      market_id: selectedPosition.market_id,
+      closePercentage: closePercentage,
+      callback: tradeCompleteCallback,
+    });
+  };
+
+  const pnl = selectedPosition ? Number(selectedPosition.total_return || 0) : 0;
+  const isPositive = pnl >= 0;
+  const pnlMph = pnl / 10 ** 18;
+  const pnlUsd = currencyList?.MPH?.usd_exchange_rate
+    ? pnlMph * currencyList.MPH.usd_exchange_rate
+    : null;
+  const positionValueMph = selectedPosition
+    ? Number(selectedPosition.value || 0) / 10 ** 18
+    : 0;
+  const positionValueUsd = currencyList?.MPH?.usd_exchange_rate
+    ? positionValueMph * currencyList.MPH.usd_exchange_rate
+    : null;
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -292,11 +356,114 @@ export function TradeView() {
 
                 {marketData.pending_order_id ? (
                   <PendingPosition />
+                ) : marketData.position_id && selectedPosition ? (
+                  <Card className="bg-white">
+                    <CardContent className="p-4">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-4">
+                        <div className="text-muted-foreground">Direction</div>
+                        <div
+                          className={cn(
+                            "text-right font-medium capitalize",
+                            selectedPosition.direction === "long"
+                              ? "text-primary"
+                              : "text-secondary"
+                          )}
+                        >
+                          {selectedPosition.direction}
+                        </div>
+
+                        <div className="text-muted-foreground">Value</div>
+                        <div className="text-right font-medium">
+                          {positionValueUsd ? (
+                            <>
+                              <span>${usdFormatter(positionValueUsd)}</span>
+                              <span className="text-muted-foreground text-xs ml-1">
+                                ({tokenValueFormatter(positionValueMph)} MPH)
+                              </span>
+                            </>
+                          ) : (
+                            <span>
+                              {tokenValueFormatter(positionValueMph)} MPH
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-muted-foreground">
+                          Unrealized P/L
+                        </div>
+                        <div
+                          className={cn(
+                            "text-right font-medium",
+                            isPositive ? "text-primary" : "text-secondary"
+                          )}
+                        >
+                          {pnlUsd ? (
+                            <>
+                              <span>
+                                {isPositive ? "+" : ""}
+                                ${usdFormatter(pnlUsd)}
+                              </span>
+                              <span className="text-muted-foreground text-xs ml-1">
+                                ({isPositive ? "+" : ""}
+                                {tokenValueFormatter(pnlMph)} MPH)
+                              </span>
+                            </>
+                          ) : (
+                            <span>
+                              {isPositive ? "+" : ""}
+                              {tokenValueFormatter(pnlMph)} MPH
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-muted-foreground">Avg. Entry</div>
+                        <div className="text-right font-medium">
+                          $
+                          {usdFormatter(
+                            Number(selectedPosition.average_price) / 10 ** 8
+                          )}
+                        </div>
+
+                        <div className="text-muted-foreground">Leverage</div>
+                        <div className="text-right font-medium">
+                          {(
+                            Number(selectedPosition.average_leverage) /
+                            10 ** 8
+                          ).toFixed(1)}
+                          x
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="text-center font-semibold text-lg">
+                          {closePercentage}%
+                        </div>
+                        <Slider
+                          value={[closePercentage]}
+                          onValueChange={(value) => setClosePercentage(value[0])}
+                          max={100}
+                          step={5}
+                        />
+                        <Button
+                          onClick={handleClosePosition}
+                          disabled={isClosing || closePercentage === 0}
+                          className="w-full"
+                        >
+                          {isClosing && (
+                            <Loader2Icon className="animate-spin mr-2" />
+                          )}
+                          Close {closePercentage}% of Position
+                        </Button>
+                        {tradeError && (
+                          <p className="text-red-500 text-sm text-center">
+                            {tradeError}
+                          </p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 ) : (
-                  <>
-                    {marketData.position_id && <Position />}
-                    <Trade />
-                  </>
+                  <Trade />
                 )}
               </div>
             )
