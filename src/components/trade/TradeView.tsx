@@ -237,9 +237,9 @@ export function TradeView() {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col text-center">
                     <p className="text-2xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
-                    <p className={cn("text-sm font-semibold", (marketData.change_percent || 0) >= 0 ? "text-primary" : "text-secondary")}>
-                        {(marketData.change_percent || 0) >= 0 ? "+" : ""}
-                        {tokenValueFormatter(marketData.change)} ({(marketData.change_percent || 0).toFixed(2)}%)
+                    <p className={cn("text-sm font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
+                        {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
+                        {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
                     </p>
                 </div>
 
