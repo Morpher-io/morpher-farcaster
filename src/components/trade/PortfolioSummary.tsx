@@ -114,11 +114,11 @@ export function PortfolioSummary() {
       const firstValue = chartData.length > 0 ? chartData[0].value : 0;
 
       const currentValue = data.value;
-      const currentValueMph = currentValue / 1e18;
+      const currentValueMph = currentValue;
       const currentValueUsd = currentValueMph * mphToUsdRate;
 
       const change = currentValue - firstValue;
-      const changeMph = change / 1e18;
+      const changeMph = change;
       const changeUsd = changeMph * mphToUsdRate;
       const changePercent = firstValue > 0 ? (change / firstValue) * 100 : 0;
       const isPositive = change >= 0;
