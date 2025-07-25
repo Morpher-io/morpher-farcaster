@@ -192,7 +192,7 @@ export function PortfolioSummary() {
                   />
                   <XAxis
                     dataKey="timestamp"
-                    tickLine={false}
+                    tickLine={true}
                     axisLine={false}
                     tickMargin={8}
                     tickFormatter={(value) => {
@@ -200,7 +200,7 @@ export function PortfolioSummary() {
                       const format = timeRange === "d" ? "HH:mm" : "MMM d";
                       return formatDate(date, format);
                     }}
-                    hide
+                    
                   />
                   <Line
                     dataKey="value"
