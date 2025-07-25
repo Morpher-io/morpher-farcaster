@@ -5,8 +5,8 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
-import { ChartTooltipContent } from "@/components/ui/chart";
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { Trade } from "./Trade";
 import { Position } from "./Position";
 import { PendingPosition } from "./PendingPosition";
@@ -32,22 +32,6 @@ export function TradeView() {
   const [timeRange, setTimeRange] = React.useState("1D");
   const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
   const account = useAccount();
-  const [primaryColor, setPrimaryColor] = React.useState("hsl(262.1 83.3% 57.8%)");
-  const [secondaryColor, setSecondaryColor] = React.useState("hsl(350 89% 60%)");
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const style = getComputedStyle(document.body);
-      const primary = style.getPropertyValue('--primary')?.trim();
-      if (primary) {
-        setPrimaryColor(`hsl(${primary})`);
-      }
-      const secondary = style.getPropertyValue('--secondary')?.trim();
-      if (secondary) {
-        setSecondaryColor(`hsl(${secondary})`);
-      }
-    }
-  }, []);
 
   const open = !!selectedMarketId;
 
@@ -154,7 +138,15 @@ export function TradeView() {
     return formattedChartData[formattedChartData.length - 1].value >= formattedChartData[0].value;
   }, [formattedChartData]);
 
-  const chartColor = isIncreasing ? primaryColor : secondaryColor;
+  const chartConfig = React.useMemo(
+    () => ({
+      value: {
+        label: "Value",
+        color: isIncreasing ? "hsl(var(--primary))" : "hsl(var(--secondary))",
+      },
+    }),
+    [isIncreasing]
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -200,17 +192,11 @@ export function TradeView() {
                 </div>
 
                 <div className="-mx-4 h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={formattedChartData}>
-                      <defs>
-                        <linearGradient id="chart-fill-market" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={chartColor} stopOpacity={0.8} />
-                          <stop offset="95%" stopColor={chartColor} stopOpacity={0.1} />
-                        </linearGradient>
-                      </defs>
+                  <ChartContainer config={chartConfig} className="w-full h-full">
+                    <LineChart data={formattedChartData}>
                       <Tooltip
                         cursor={{
-                          stroke: chartColor,
+                          stroke: "var(--color-value)",
                           strokeWidth: 1,
                           strokeDasharray: "3 3",
                         }}
@@ -220,20 +206,22 @@ export function TradeView() {
                         />}
                       />
                       <XAxis dataKey="timestamp" hide />
-                      <Area
+                      <Line
                         dataKey="value"
-                        type="natural"
-                        fill="url(#chart-fill-market)"
-                        stroke={chartColor}
-                        stackId="a"
+                        type="monotone"
+                        stroke="var(--color-value)"
+                        strokeWidth={2}
                         dot={false}
                         activeDot={{
                           r: 4,
-                          style: { fill: chartColor, stroke: "#fff" },
+                          style: {
+                            fill: "var(--color-value)",
+                            stroke: "var(--background)",
+                          },
                         }}
                       />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                    </LineChart>
+                  </ChartContainer>
                 </div>
 
                 <div className="flex justify-center gap-1">
