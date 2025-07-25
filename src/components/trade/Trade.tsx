@@ -6,17 +6,14 @@ import { Label } from "@/components/ui/label"
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
-import { ChevronsUpDown, Loader2Icon } from "lucide-react"
+import { Loader2Icon } from "lucide-react"
 import  { TradeCallback, TCurrency, tokenValueFormatter, usdFormatter } from "morpher-trading-sdk"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Skeleton } from "../ui/skeleton"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
-import { Command, CommandEmpty, CommandGroup, CommandList, CommandItem } from "../ui/command"
 import { sdk } from "@farcaster/frame-sdk"
 
 export function Trade() {
-  const [open, setOpen] = React.useState(false)
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
   const [tradeError, setTradeError] = React.useState<string | undefined>(undefined);
   
@@ -60,6 +57,7 @@ export function Trade() {
     }
   }, [currencyList, setSelectedCurrency]);
 
+  const tradeAmountUsd = (Number(tradeAmount) || 0) * (selectedCurrencyDetails?.usd_exchange_rate || 0);
 
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
@@ -119,70 +117,76 @@ export function Trade() {
             </div>
           </div>
         ) : (
-          <>
-            <div className="flex items-center text-xl font-bold">
-              <Input
-                type="test"
-                placeholder="0.00"
-                className="border-0 rounded-0 h-auto flex-1 p-0 text-xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 round-sm bg-white  "
-                value={tradeAmount}
-                onChange={(e) => setTradeAmount(e.target.value)}
-              />
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" role="combobox" aria-expanded={open} className="w-auto justify-between text-lg font-bold p-2">
-                    {selectedCurrency && (
-                      <img
-                        src={`/src/assets/icons/${selectedCurrency}.svg`}
-                        alt={`${selectedCurrency} logo`}
-                        className="mr-0 h-6 w-6"
-                      />
-                    )}
-                    {selectedCurrency}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <div className="space-y-4">
+            <ToggleGroup
+              type="single"
+              value={selectedCurrency}
+              className="grid grid-cols-3 gap-2"
+              onValueChange={(value: string) => {
+                if (value) setSelectedCurrency(value as TCurrency);
+              }}
+            >
+              {currencyList &&
+                Object.entries(currencyList).map(([currency, details]) => (
+                  <ToggleGroupItem
+                    key={currency}
+                    value={currency}
+                    aria-label={`Select ${currency}`}
+                    className="flex-col h-auto py-2 data-[state=on]:bg-muted data-[state=on]:border"
+                    disabled={!details.balance || BigInt(details.balance) === 0n}
+                  >
+                    <img
+                      src={`/src/assets/icons/${currency}.svg`}
+                      alt={`${currency} logo`}
+                      className="h-6 w-6 mb-1"
+                    />
+                    <span className="font-semibold">{currency}</span>
+                  </ToggleGroupItem>
+                ))}
+            </ToggleGroup>
+
+            <div className="space-y-2">
+              <div className="relative">
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  className="h-12 pr-28 text-2xl font-bold bg-muted"
+                  value={tradeAmount}
+                  onChange={(e) => setTradeAmount(e.target.value)}
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <span className="text-lg font-semibold text-muted-foreground">
+                    {selectedCurrencyDetails?.symbol}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setTradeAmount(
+                        tokenValueFormatter(
+                          Number(selectedCurrencyDetails?.balance || 0) /
+                            10 ** (selectedCurrencyDetails?.decimals || 1)
+                        )
+                      )
+                    }
+                    className="p-1 h-auto"
+                  >
+                    Max
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Command>
-                    <CommandList>
-                      <CommandEmpty>No token found.</CommandEmpty>
-                      <CommandGroup>
-                        {currencyList && Object.entries(currencyList).map(([currency, details]) => (
-                          <CommandItem
-                            key={currency}
-                            value={currency}
-                            onSelect={(currentValue) => {
-                              setSelectedCurrency(currentValue.toUpperCase() as TCurrency)
-                              setOpen(false)
-                            }}
-                          >
-                            <div className="flex items-center">
-                              <img
-                                src={`/src/assets/icons/${currency}.svg`}
-                                alt={`${currency} logo`}
-                                className="mr-2 h-4 w-4"
-                              />
-                              {currency}
-                            </div>
-                            <div className="ml-auto text-right text-sm">
-                              <div>{(Number(details.balance || 0) / (10 ** (details.decimals || 1))).toFixed(4)}</div>
-                              <div className="text-sm ">${(details.usd || 0).toFixed(2)}</div>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+                </div>
+              </div>
+              <div className="text-sm flex justify-between text-muted-foreground px-1">
+                <span>~ ${usdFormatter(tradeAmountUsd)}</span>
+                <span>
+                  Balance:{" "}
+                  {tokenValueFormatter(
+                    Number(selectedCurrencyDetails?.balance || 0) /
+                      10 ** (selectedCurrencyDetails?.decimals || 1)
+                  )}
+                </span>
+              </div>
             </div>
-            <div className="text-sm flex justify-between mt-1">
-              <p>$ {usdFormatter(selectedCurrencyDetails?.usd)}</p>
-              <p id="tokenAmount" className="cursor-pointer" onClick={() => setTradeAmount(tokenValueFormatter(Number(selectedCurrencyDetails?.balance || 0) / (10 ** (selectedCurrencyDetails?.decimals || 1))))}>
-                {tokenValueFormatter(Number(selectedCurrencyDetails?.balance || 0) / (10 ** (selectedCurrencyDetails?.decimals || 1)))} {selectedCurrencyDetails?.symbol.toUpperCase()}
-              </p>
-            </div>
-          </>
+          </div>
         )}
         <div className="my-4 h-px bg-gray-200" />
 
