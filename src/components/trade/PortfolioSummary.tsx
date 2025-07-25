@@ -90,14 +90,15 @@ export function PortfolioSummary() {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
+      console.log(data);
       const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
       const firstValue = chartData.length > 0 ? chartData[0].value : 0;
 
       const currentValue = data.value;
-      const currentValueUsd = (currentValue / 1e18) * mphToUsdRate;
+      const currentValueUsd = (currentValue) * mphToUsdRate;
 
       const change = currentValue - firstValue;
-      const changeUsd = (change / 1e18) * mphToUsdRate;
+      const changeUsd = (change) * mphToUsdRate;
       const changePercent = firstValue > 0 ? (change / firstValue) * 100 : 0;
       const isPositive = change >= 0;
 
@@ -106,9 +107,9 @@ export function PortfolioSummary() {
 
       return (
         <div className="p-2 bg-background border rounded-lg shadow-lg text-sm">
-          <p className="font-bold">${usdFormatter(currentValueUsd.toString())}</p>
+          <p className="font-bold">${usdFormatter(currentValueUsd)}</p>
           <p className="text-muted-foreground">
-            {tokenValueFormatter(currentValue / 1e18)} MPH
+            {tokenValueFormatter(currentValue)} MPH
           </p>
           <div
             className={cn(
