@@ -74,18 +74,11 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       }
       
            
-      // const [returnsD, returnsW, returnsM, returnsY] = await Promise.all([
-      //   morpherTradeSDK.getReturns({ eth_address, type: 'd' }),
-      //   morpherTradeSDK.getReturns({ eth_address, type: 'w' }),
-      //   morpherTradeSDK.getReturns({ eth_address, type: 'm' }),
-      //   morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
-      // ]);
-      
-      const [returnsD, returnsW]:any = await Promise.all([
+      const [returnsD, returnsW, returnsM, returnsY] = await Promise.all([
         morpherTradeSDK.getReturns({ eth_address, type: 'd' }),
         morpherTradeSDK.getReturns({ eth_address, type: 'w' }),
-        //morpherTradeSDK.getReturns({ eth_address, type: 'm' }),
-        //morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
+        morpherTradeSDK.getReturns({ eth_address, type: 'm' }),
+        morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
       ]);
       console.log("fetchPortfolioData: Fetched returns.");
 
@@ -107,8 +100,8 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         returns: {
           d: returnsD,
           w: returnsW,
-          // m: returnsM,
-          // y: returnsY,
+          m: returnsM,
+          y: returnsY,
         },
         leaderboard,
       });
