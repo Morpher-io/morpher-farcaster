@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { ChartContainer } from "@/components/ui/chart";
 import { format as formatDate } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -25,22 +26,6 @@ export function PortfolioSummary() {
   } = usePortfolioStore();
   const [isChartOpen, setIsChartOpen] = React.useState(false);
   const [timeRange, setTimeRange] = React.useState<"d" | "w" | "m" | "y">("d");
-  const [primaryColor, setPrimaryColor] = React.useState("hsl(262.1 83.3% 57.8%)");
-  const [secondaryColor, setSecondaryColor] = React.useState("hsl(350 89% 60%)");
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const style = getComputedStyle(document.documentElement);
-      const primary = style.getPropertyValue("--primary")?.trim();
-      if (primary) {
-        setPrimaryColor(`hsl(${primary})`);
-      }
-      const secondary = style.getPropertyValue("--secondary")?.trim();
-      if (secondary) {
-        setSecondaryColor(`hsl(${secondary})`);
-      }
-    }
-  }, []);
 
   const totalPortfolioValueUSD = React.useMemo(() => {
     if (!currencyList?.MPH?.usd_exchange_rate || !portfolio) return 0;
@@ -78,7 +63,15 @@ export function PortfolioSummary() {
     return chartData[chartData.length - 1].value >= chartData[0].value;
   }, [chartData]);
 
-  const chartColor = isIncreasing ? primaryColor : secondaryColor;
+  const chartConfig = React.useMemo(
+    () => ({
+      value: {
+        label: "Value",
+        color: isIncreasing ? "hsl(var(--primary))" : "hsl(var(--secondary))",
+      },
+    }),
+    [isIncreasing]
+  );
 
   if (loading) {
     return (
@@ -186,12 +179,12 @@ export function PortfolioSummary() {
               </p>
             </div>
             <div className="-mx-6 h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer config={chartConfig} className="w-full h-full">
                 <LineChart data={chartData}>
                   <Tooltip
-                    content={<CustomTooltip />}
+                    content={CustomTooltip}
                     cursor={{
-                      stroke: chartColor,
+                      stroke: "var(--color-value)",
                       strokeWidth: 1,
                       strokeDasharray: "3 3",
                     }}
@@ -211,19 +204,19 @@ export function PortfolioSummary() {
                   <Line
                     dataKey="value"
                     type="monotone"
-                    stroke={chartColor}
+                    stroke="var(--color-value)"
                     strokeWidth={2}
                     dot={false}
                     activeDot={{
                       r: 4,
                       style: {
-                        fill: chartColor,
+                        fill: "var(--color-value)",
                         stroke: "var(--background)",
                       },
                     }}
                   />
                 </LineChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
             <div className="flex justify-center gap-2 mt-4">
               <Button
