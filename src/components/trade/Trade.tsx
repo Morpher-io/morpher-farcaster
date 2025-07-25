@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
@@ -118,39 +118,36 @@ export function Trade() {
           </div>
         ) : (
           <div className="space-y-4">
-            <ToggleGroup
-              type="single"
+            <Tabs
               value={selectedCurrency}
-              className="grid grid-cols-3 gap-2"
-              onValueChange={(value: string) => {
-                if (value) setSelectedCurrency(value as TCurrency);
-              }}
+              onValueChange={(value) => setSelectedCurrency(value as TCurrency)}
+              className="w-full"
             >
-              {currencyList &&
-                Object.entries(currencyList).map(([currency, details]) => (
-                  <ToggleGroupItem
-                    key={currency}
-                    value={currency}
-                    aria-label={`Select ${currency}`}
-                    className="flex-col h-auto py-3 data-[state=on]:bg-muted data-[state=on]:border"
-                    disabled={!details.balance || BigInt(details.balance) === 0n}
-                  >
-                    <img
-                      src={`/src/assets/icons/${currency}.svg`}
-                      alt={`${currency} logo`}
-                      className="h-6 w-6 mb-1"
-                    />
-                    <span className="font-semibold">{currency}</span>
-                    <span className="text-xs font-normal text-muted-foreground">
-                      {tokenValueFormatter(
-                        Number(details.balance || 0) /
-                          10 ** (details.decimals || 1)
-                      )}
-                    </span>
-                  </ToggleGroupItem>
-                ))}
-            </ToggleGroup>
-
+              <TabsList className="grid w-full grid-cols-3">
+                {currencyList &&
+                  Object.entries(currencyList).map(([currency, details]) => (
+                    <TabsTrigger
+                      key={currency}
+                      value={currency}
+                      disabled={!details.balance || BigInt(details.balance) === 0n}
+                      className="flex-col h-auto py-2"
+                    >
+                      <img
+                        src={`/src/assets/icons/${currency}.svg`}
+                        alt={`${currency} logo`}
+                        className="h-6 w-6 mb-1"
+                      />
+                      <span className="font-semibold">{currency}</span>
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {tokenValueFormatter(
+                          Number(details.balance || 0) /
+                            10 ** (details.decimals || 1)
+                        )}
+                      </span>
+                    </TabsTrigger>
+                  ))}
+              </TabsList>
+            </Tabs>
             <div className="space-y-2">
               <div className="relative">
                 <Input
