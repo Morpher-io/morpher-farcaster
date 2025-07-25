@@ -9,7 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { ChartContainer } from "@/components/ui/chart";
 import { format as formatDate } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -83,6 +84,16 @@ export function PortfolioSummary() {
   }, [chartData]);
 
   const chartColor = isIncreasing ? primaryColor : secondaryColor;
+
+  const chartConfig = React.useMemo(
+    () => ({
+      value: {
+        label: "Value",
+        color: chartColor,
+      },
+    }),
+    [chartColor]
+  );
 
   const { displayValue, displaySubtext } = React.useMemo(() => {
     const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
@@ -188,10 +199,11 @@ export function PortfolioSummary() {
               </div>
             </div>
             <div className="-mx-6 h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
+              <ChartContainer config={chartConfig} className="w-full h-full">
+                <LineChart
                   data={chartData}
                   onMouseMove={(state) => {
+                    console.log("Chart mouse move state:", state);
                     if (
                       state.isTooltipActive &&
                       state.activePayload &&
@@ -208,26 +220,6 @@ export function PortfolioSummary() {
                     setActivePoint(null);
                   }}
                 >
-                  <defs>
-                    <linearGradient
-                      id="chart-fill"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor={chartColor}
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor={chartColor}
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                  </defs>
                   <Tooltip
                     content={<></>}
                     cursor={{
@@ -248,20 +240,22 @@ export function PortfolioSummary() {
                     }}
                     hide
                   />
-                  <Area
+                  <Line
                     dataKey="value"
-                    type="natural"
-                    fill="url(#chart-fill)"
-                    stroke={chartColor}
-                    stackId="a"
+                    type="monotone"
+                    stroke="var(--color-value)"
+                    strokeWidth={2}
                     dot={false}
                     activeDot={{
                       r: 4,
-                      style: { fill: chartColor, stroke: "#fff" },
+                      style: {
+                        fill: "var(--color-value)",
+                        stroke: "var(--background)",
+                      },
                     }}
                   />
-                </AreaChart>
-              </ResponsiveContainer>
+                </LineChart>
+              </ChartContainer>
             </div>
             <div className="flex justify-center gap-2 mt-4">
               <Button
