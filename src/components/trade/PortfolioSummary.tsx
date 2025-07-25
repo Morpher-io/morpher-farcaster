@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import { format as formatDate } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -63,6 +63,25 @@ export function PortfolioSummary() {
     return chartData[chartData.length - 1].value >= chartData[0].value;
   }, [chartData]);
 
+  const yAxisDomain = React.useMemo(() => {
+    if (!chartData || chartData.length < 2) {
+      return ["auto", "auto"];
+    }
+
+    const values = chartData.map((d) => d.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+
+    if (minValue === maxValue) {
+        const margin = Math.abs(minValue * 0.1) || 1;
+        return [minValue - margin, maxValue + margin];
+    }
+    
+    const margin = (maxValue - minValue) * 0.1;
+
+    return [minValue - margin, maxValue + margin];
+  }, [chartData]);
+
   const chartConfig = React.useMemo(
     () => ({
       value: {
@@ -95,10 +114,12 @@ export function PortfolioSummary() {
       const firstValue = chartData.length > 0 ? chartData[0].value : 0;
 
       const currentValue = data.value;
-      const currentValueUsd = (currentValue) * mphToUsdRate;
+      const currentValueMph = currentValue / 1e18;
+      const currentValueUsd = currentValueMph * mphToUsdRate;
 
       const change = currentValue - firstValue;
-      const changeUsd = (change) * mphToUsdRate;
+      const changeMph = change / 1e18;
+      const changeUsd = changeMph * mphToUsdRate;
       const changePercent = firstValue > 0 ? (change / firstValue) * 100 : 0;
       const isPositive = change >= 0;
 
@@ -109,7 +130,7 @@ export function PortfolioSummary() {
         <div className="p-2 bg-background border rounded-lg shadow-lg text-sm">
           <p className="font-bold">${usdFormatter(currentValueUsd)}</p>
           <p className="text-muted-foreground">
-            {tokenValueFormatter(currentValue)} MPH
+            {tokenValueFormatter(currentValueMph)} MPH
           </p>
           <div
             className={cn(
@@ -117,7 +138,7 @@ export function PortfolioSummary() {
               isPositive ? "text-primary" : "text-secondary"
             )}
           >
-            {isPositive ? "+" : ""}${usdFormatter(changeUsd.toString())} (
+            {isPositive ? "+" : ""}${usdFormatter(changeUsd)} (
             {isPositive ? "+" : ""}
             {changePercent.toFixed(2)}%)
           </div>
@@ -202,6 +223,7 @@ export function PortfolioSummary() {
                     }}
                     
                   />
+                  <YAxis domain={yAxisDomain} hide />
                   <Line
                     dataKey="value"
                     type="monotone"
