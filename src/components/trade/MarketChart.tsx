@@ -38,7 +38,7 @@ export const MarketChart = React.memo(function MarketChart({ data, timeRange }: 
     return {
       close: {
         label: "Price",
-        color: isIncreasing ? "var(--primary)" : "var(--secondary)",
+        color: isIncreasing ? "hsl(var(--primary))" : "hsl(var(--secondary))",
       },
     } satisfies ChartConfig;
   }, [chartData]);
