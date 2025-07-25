@@ -43,25 +43,6 @@ export const MarketChart = React.memo(function MarketChart({ data, timeRange }: 
     } satisfies ChartConfig;
   }, [chartData]);
 
-  const yAxisDomain = React.useMemo(() => {
-    if (!chartData || chartData.length < 2) {
-      return ["auto", "auto"];
-    }
-
-    const values = chartData.map((d) => d.close);
-    const minValue = Math.min(...values);
-    const maxValue = Math.max(...values);
-
-    if (minValue === maxValue) {
-        const margin = Math.abs(minValue * 0.1) || 1;
-        return [minValue - margin, maxValue + margin];
-    }
-    
-    const margin = (maxValue - minValue) * 0.1;
-
-    return [minValue - margin, maxValue + margin];
-  }, [chartData]);
-
   if (!chartData || chartData.length === 0) {
     return null;
   }
@@ -99,7 +80,7 @@ export const MarketChart = React.memo(function MarketChart({ data, timeRange }: 
               axisLine={false}
               tickMargin={8}
               fontSize={12}
-              domain={yAxisDomain}
+              domain={["dataMin", "dataMax"]}
               tickFormatter={(value) => `$${tokenValueFormatter(value)}`}
             />
             <ChartTooltip

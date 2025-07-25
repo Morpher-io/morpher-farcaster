@@ -5,7 +5,7 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { Trade } from "./Trade";
 import { Position } from "./Position";
@@ -148,6 +148,25 @@ export function TradeView() {
     [isIncreasing]
   );
 
+  const yAxisDomain = React.useMemo(() => {
+    if (!formattedChartData || formattedChartData.length < 2) {
+      return ["auto", "auto"];
+    }
+
+    const values = formattedChartData.map((d) => d.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+
+    if (minValue === maxValue) {
+        const margin = Math.abs(minValue * 0.1) || 1;
+        return [minValue - margin, maxValue + margin];
+    }
+    
+    const margin = (maxValue - minValue) * 0.1;
+
+    return [minValue - margin, maxValue + margin];
+  }, [formattedChartData]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="h-full w-full max-w-full flex flex-col bg-white p-0 gap-0">
@@ -206,6 +225,7 @@ export function TradeView() {
                         />}
                       />
                       <XAxis dataKey="timestamp" hide />
+                      <YAxis domain={yAxisDomain} hide />
                       <Line
                         dataKey="value"
                         type="monotone"
