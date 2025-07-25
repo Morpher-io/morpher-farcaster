@@ -36,7 +36,7 @@ export const PortfolioChart = React.memo(function PortfolioChart({ data, timeRan
     return {
       value: {
         label: "Value",
-        color: isIncreasing ? "hsl(var(--primary))" : "hsl(var(--secondary))",
+        color: isIncreasing ? "var(--primary)" : "var(--secondary)",
       },
     } satisfies ChartConfig;
   }, [chartData]);
