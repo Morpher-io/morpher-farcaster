@@ -30,13 +30,18 @@ export function PortfolioSummary() {
     date: number;
   } | null>(null);
   const [primaryColor, setPrimaryColor] = React.useState("hsl(262.1 83.3% 57.8%)");
+  const [secondaryColor, setSecondaryColor] = React.useState("hsl(350 89% 60%)");
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const style = getComputedStyle(document.body);
-      const primary = style.getPropertyValue('--primary').trim();
+      const primary = style.getPropertyValue('--primary')?.trim();
       if (primary) {
         setPrimaryColor(`hsl(${primary})`);
+      }
+      const secondary = style.getPropertyValue('--secondary')?.trim();
+      if (secondary) {
+        setSecondaryColor(`hsl(${secondary})`);
       }
     }
   }, []);
@@ -71,6 +76,13 @@ export function PortfolioSummary() {
       value: point.positions,
     }));
   }, [returns, timeRange]);
+
+  const isIncreasing = React.useMemo(() => {
+    if (chartData.length < 2) return true;
+    return chartData[chartData.length - 1].value >= chartData[0].value;
+  }, [chartData]);
+
+  const chartColor = isIncreasing ? primaryColor : secondaryColor;
 
   const { displayValue, displaySubtext } = React.useMemo(() => {
     const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
@@ -206,12 +218,12 @@ export function PortfolioSummary() {
                     >
                       <stop
                         offset="5%"
-                        stopColor={primaryColor}
+                        stopColor={chartColor}
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor={primaryColor}
+                        stopColor={chartColor}
                         stopOpacity={0.1}
                       />
                     </linearGradient>
@@ -219,7 +231,7 @@ export function PortfolioSummary() {
                   <Tooltip
                     content={<></>}
                     cursor={{
-                      stroke: primaryColor,
+                      stroke: chartColor,
                       strokeWidth: 1,
                       strokeDasharray: "3 3",
                     }}
@@ -240,12 +252,12 @@ export function PortfolioSummary() {
                     dataKey="value"
                     type="natural"
                     fill="url(#chart-fill)"
-                    stroke={primaryColor}
+                    stroke={chartColor}
                     stackId="a"
                     dot={false}
                     activeDot={{
                       r: 4,
-                      style: { fill: primaryColor, stroke: "#fff" },
+                      style: { fill: chartColor, stroke: "#fff" },
                     }}
                   />
                 </AreaChart>

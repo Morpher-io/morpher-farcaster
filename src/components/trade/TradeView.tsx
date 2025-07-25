@@ -5,7 +5,8 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { MarketChart } from "./MarketChart";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { ChartTooltipContent } from "@/components/ui/chart";
 import { Trade } from "./Trade";
 import { Position } from "./Position";
 import { PendingPosition } from "./PendingPosition";
@@ -31,6 +32,22 @@ export function TradeView() {
   const [timeRange, setTimeRange] = React.useState("1D");
   const [isMarketDataLoading, setIsMarketDataLoading] = React.useState(false);
   const account = useAccount();
+  const [primaryColor, setPrimaryColor] = React.useState("hsl(262.1 83.3% 57.8%)");
+  const [secondaryColor, setSecondaryColor] = React.useState("hsl(350 89% 60%)");
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const style = getComputedStyle(document.body);
+      const primary = style.getPropertyValue('--primary')?.trim();
+      if (primary) {
+        setPrimaryColor(`hsl(${primary})`);
+      }
+      const secondary = style.getPropertyValue('--secondary')?.trim();
+      if (secondary) {
+        setSecondaryColor(`hsl(${secondary})`);
+      }
+    }
+  }, []);
 
   const open = !!selectedMarketId;
 
@@ -124,6 +141,21 @@ export function TradeView() {
     }
   }, [marketData, timeRange]);
 
+  const formattedChartData = React.useMemo(() => {
+    if (!chartData) return [];
+    return chartData.map(d => ({
+      timestamp: d[0] * 1000,
+      value: d[4] // close price
+    }));
+  }, [chartData]);
+
+  const isIncreasing = React.useMemo(() => {
+    if (formattedChartData.length < 2) return true;
+    return formattedChartData[formattedChartData.length - 1].value >= formattedChartData[0].value;
+  }, [formattedChartData]);
+
+  const chartColor = isIncreasing ? primaryColor : secondaryColor;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="h-full w-full max-w-full flex flex-col bg-white p-0 gap-0">
@@ -167,7 +199,43 @@ export function TradeView() {
                     </p>
                 </div>
 
-                <MarketChart data={chartData} timeRange={timeRange} />
+                <div className="-mx-4 h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={formattedChartData}>
+                      <defs>
+                        <linearGradient id="chart-fill-market" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={chartColor} stopOpacity={0.8} />
+                          <stop offset="95%" stopColor={chartColor} stopOpacity={0.1} />
+                        </linearGradient>
+                      </defs>
+                      <Tooltip
+                        cursor={{
+                          stroke: chartColor,
+                          strokeWidth: 1,
+                          strokeDasharray: "3 3",
+                        }}
+                        content={<ChartTooltipContent
+                          indicator="dot"
+                          formatter={(value) => `$${tokenValueFormatter(value as number)}`}
+                        />}
+                      />
+                      <XAxis dataKey="timestamp" hide />
+                      <Area
+                        dataKey="value"
+                        type="natural"
+                        fill="url(#chart-fill-market)"
+                        stroke={chartColor}
+                        stackId="a"
+                        dot={false}
+                        activeDot={{
+                          r: 4,
+                          style: { fill: chartColor, stroke: "#fff" },
+                        }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+
                 <div className="flex justify-center gap-1">
                   {["1D", "1W", "1M", "3M", "6M", "1Y"].map((range) => (
                     <Button
