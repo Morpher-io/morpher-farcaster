@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -204,6 +205,7 @@ export function TradeView() {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="h-full w-full max-w-full flex flex-col bg-white p-0 gap-0">
         <DialogHeader className="p-4 border-b">
+          <DialogTitle className="sr-only">Trade {selectedMarket?.name}</DialogTitle>
           <div className="flex items-center justify-between">
             {selectedMarket ? (
               <div className="flex items-center gap-3">
