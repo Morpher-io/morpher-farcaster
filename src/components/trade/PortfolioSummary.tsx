@@ -94,6 +94,46 @@ export function PortfolioSummary() {
     return null;
   }
 
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const mphToUsdRate = currencyList?.MPH?.usd_exchange_rate || 0;
+      const firstValue = chartData.length > 0 ? chartData[0].value : 0;
+
+      const currentValue = data.value;
+      const currentValueUsd = (currentValue / 1e18) * mphToUsdRate;
+
+      const change = currentValue - firstValue;
+      const changeUsd = (change / 1e18) * mphToUsdRate;
+      const changePercent = firstValue > 0 ? (change / firstValue) * 100 : 0;
+      const isPositive = change >= 0;
+
+      const timeFormat = timeRange === "d" ? "p" : "PP";
+      const dateText = formatDate(new Date(data.timestamp), timeFormat);
+
+      return (
+        <div className="p-2 bg-background border rounded-lg shadow-lg text-sm">
+          <p className="font-bold">${usdFormatter(currentValueUsd.toString())}</p>
+          <p className="text-muted-foreground">
+            {tokenValueFormatter(currentValue / 1e18)} MPH
+          </p>
+          <div
+            className={cn(
+              "mt-1",
+              isPositive ? "text-primary" : "text-secondary"
+            )}
+          >
+            {isPositive ? "+" : ""}${usdFormatter(changeUsd.toString())} (
+            {isPositive ? "+" : ""}
+            {changePercent.toFixed(2)}%)
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">{dateText}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       <div className="flex items-center justify-between">
