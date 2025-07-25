@@ -16,6 +16,7 @@ import { usePortfolioStore } from "@/store/portfolio";
 import { useAccount } from "wagmi";
 import { StrictOHLCArray, tokenValueFormatter } from "morpher-trading-sdk";
 import { cn } from "@/lib/utils";
+import { format as formatDate } from "date-fns";
 
 export function TradeView() {
   const {
@@ -167,6 +168,38 @@ export function TradeView() {
     return [minValue - margin, maxValue + margin];
   }, [formattedChartData]);
 
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const firstValue = formattedChartData.length > 0 ? formattedChartData[0].value : 0;
+
+      const currentValue = data.value;
+      const change = currentValue - firstValue;
+      const changePercent = firstValue > 0 ? (change / firstValue) * 100 : 0;
+      const isPositive = change >= 0;
+
+      const timeFormat = timeRange === "1D" ? "p" : "PP";
+      const dateText = formatDate(new Date(data.timestamp), timeFormat);
+
+      return (
+        <div className="p-2 bg-background border rounded-lg shadow-lg text-sm">
+          <p className="font-bold">${tokenValueFormatter(currentValue)}</p>
+          <div
+            className={cn(
+              "mt-1",
+              isPositive ? "text-primary" : "text-secondary"
+            )}
+          >
+            {isPositive ? "+" : ""}
+            ${tokenValueFormatter(change)} ({isPositive ? "+" : ""}{changePercent.toFixed(2)}%)
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">{dateText}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="h-full w-full max-w-full flex flex-col bg-white p-0 gap-0">
@@ -219,10 +252,7 @@ export function TradeView() {
                           strokeWidth: 1,
                           strokeDasharray: "3 3",
                         }}
-                        content={<ChartTooltipContent
-                          indicator="dot"
-                          formatter={(value) => `$${tokenValueFormatter(value as number)}`}
-                        />}
+                        content={<CustomTooltip />}
                       />
                       <XAxis dataKey="timestamp" hide />
                       <YAxis domain={yAxisDomain} hide />
