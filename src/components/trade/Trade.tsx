@@ -60,6 +60,34 @@ export function Trade() {
 
   const tradeAmountUsd = (Number(tradeAmount) || 0) * (selectedCurrencyDetails?.usd_exchange_rate || 0);
 
+  const maxBalance = React.useMemo(() => {
+    if (!selectedCurrencyDetails) return 0;
+    return (
+      Number(selectedCurrencyDetails.balance || 0) /
+      10 ** (selectedCurrencyDetails.decimals || 18)
+    );
+  }, [selectedCurrencyDetails]);
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === "") {
+      setTradeAmount("");
+      return;
+    }
+
+    if (value.startsWith("-")) return;
+
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) return;
+
+    if (numValue > maxBalance) {
+      setTradeAmount(tokenValueFormatter(maxBalance));
+    } else {
+      setTradeAmount(value);
+    }
+  };
+
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
       setTradeError(result.err || 'An error occurred while executing the trade.')
@@ -121,7 +149,10 @@ export function Trade() {
           <div className="">
             <Tabs
               value={selectedCurrency}
-              onValueChange={(value) => setSelectedCurrency(value as TCurrency)}
+              onValueChange={(value) => {
+                setSelectedCurrency(value as TCurrency);
+                setTradeAmount("");
+              }}
               className="w-full"
             >
               <TabsList className="w-full rounded-b-none border border-b-none">
@@ -154,9 +185,10 @@ export function Trade() {
                 <Input
                   type="number"
                   placeholder="0.00"
+                  min="0"
                   className="h-12 pr-28 text-2xl font-bold bg-muted border-t-none"
                   value={tradeAmount}
-                  onChange={(e) => setTradeAmount(e.target.value)}
+                  onChange={handleAmountChange}
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                   <span className="text-lg font-semibold text-muted-foreground">
@@ -169,7 +201,7 @@ export function Trade() {
                       setTradeAmount(
                         tokenValueFormatter(
                           Number(selectedCurrencyDetails?.balance || 0) /
-                            10 ** (selectedCurrencyDetails?.decimals || 1)
+                            10 ** (selectedCurrencyDetails?.decimals || 18)
                         )
                       )
                     }
