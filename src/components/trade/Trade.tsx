@@ -137,6 +137,31 @@ export function Trade() {
     setTradeAmount(tokenAmountStr);
   };
 
+  const updateAmount = (tokenAmount: number) => {
+    setTradeAmount(tokenAmount.toString());
+    if (inputMode === "token") {
+      setInputValue(tokenAmount.toString());
+    } else {
+      setInputValue((tokenAmount * exchangeRate).toFixed(2));
+    }
+  };
+  
+  const adjustTradeAmountByUsd = (usdAdjustment: number) => {
+    const currentTokenAmount = Number(tradeAmount) || 0;
+    if (exchangeRate <= 0) return;
+    const adjustmentInTokens = usdAdjustment / exchangeRate;
+    let newTokenAmount = currentTokenAmount + adjustmentInTokens;
+
+    if (newTokenAmount < 0) newTokenAmount = 0;
+    if (newTokenAmount > maxBalance) newTokenAmount = maxBalance;
+
+    updateAmount(newTokenAmount);
+  };
+
+  const setMaxAmount = () => {
+    updateAmount(maxBalance);
+  };
+
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
       setTradeError(result.err || 'An error occurred while executing the trade.')
@@ -286,7 +311,7 @@ export function Trade() {
                   </ToggleGroupItem>
                 </ToggleGroup>
               </div>
-              <div className="text-sm flex justify-between text-muted-foreground mt-1">
+              <div className="text-sm flex justify-between text-muted-foreground mt-1 px-1">
                 <span>
                   {inputMode === "token" && selectedCurrency !== "USDC"
                     ? `~ $${usdFormatter(usdValue)}`
@@ -294,25 +319,43 @@ export function Trade() {
                     ? `~ ${tokenValueFormatter(Number(tradeAmount) || 0)} ${selectedCurrency}`
                     : ""}
                 </span>
-                <span>
-                  Balance: {tokenValueFormatter(maxBalance)}
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="p-1 h-auto text-primary"
-                    onClick={() => {
-                      setTradeAmount(maxBalance.toString());
-                      if (inputMode === 'token') {
-                        setInputValue(maxBalance.toString());
-                      } else {
-                        setInputValue((maxBalance * exchangeRate).toFixed(2));
-                      }
-                    }}
-                  >
-                    Max
-                  </Button>
-                </span>
+                <span>Balance: {tokenValueFormatter(maxBalance)}</span>
               </div>
+            </div>
+            <div className="grid grid-cols-5 gap-2 pt-2">
+              {[
+                { label: "-$100", value: -100 },
+                { label: "-$10", value: -10 },
+                { label: "+$10", value: 10 },
+                { label: "+$100", value: 100 },
+              ].map(({ label, value }) => {
+                const currentUsdValue = (Number(tradeAmount) || 0) * exchangeRate;
+                const maxUsdValue = maxBalance * exchangeRate;
+                const isDisabled =
+                  value > 0
+                    ? currentUsdValue + value > maxUsdValue
+                    : currentUsdValue + value < 0;
+                return (
+                  <Button
+                    key={label}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-8"
+                    onClick={() => adjustTradeAmountByUsd(value)}
+                    disabled={isDisabled || exchangeRate <= 0}
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs h-8"
+                onClick={setMaxAmount}
+              >
+                Max
+              </Button>
             </div>
           </div>
         </div>
