@@ -366,7 +366,10 @@ export function Trade() {
                     ? `~ ${tokenValueFormatter(Number(tradeAmount) || 0)} ${selectedCurrency}`
                     : ""}
                 </span>
-                <span>Balance: {tokenValueFormatter(maxBalance)}</span>
+                <span>
+                  Available: {tokenValueFormatter(maxBalance)} {selectedCurrency}
+                  {selectedCurrency !== 'USDC' && ` (${usdFormatter(maxBalance * exchangeRate)})`}
+                </span>
               </div>
             </div>
             
