@@ -333,22 +333,12 @@ export function TradeView() {
           ) : (
             marketData && (
               <div className="flex flex-col gap-4">
-                <div>
-                  <div className="flex justify-between items-baseline">
-                    <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
-                    <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
-                        {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
-                        {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 text-sm border-t pt-4">
-                    <StatRow label="Day's Open" value={marketData.open ? `$${tokenValueFormatter(marketData.open)}` : '–'} />
-                    <StatRow label="Day's High" value={marketData.high ? `$${tokenValueFormatter(marketData.high)}` : '–'} />
-                    <StatRow label="Day's Low" value={marketData.low ? `$${tokenValueFormatter(marketData.low)}` : '–'} />
-                    <StatRow label="Volume" value={formatStatValue(marketData.volume)} />
-                    <StatRow label="Market Cap" value={formatStatValue(marketData.market_cap, '$')} />
-                    <StatRow label="Spread" value={marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : '–'} />
-                  </div>
+                <div className="flex justify-between items-baseline">
+                  <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
+                  <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
+                      {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
+                      {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
+                  </p>
                 </div>
 
                 <div className="-mx-4 h-[200px]">
@@ -394,6 +384,17 @@ export function TradeView() {
                       {range}
                     </Button>
                   ))}
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-4 text-xs border-t pt-4">
+                  <StatRow label="Day's Open" value={marketData.open ? `$${tokenValueFormatter(marketData.open)}` : '–'} />
+                  <StatRow label="Day's High" value={marketData.high ? `$${tokenValueFormatter(marketData.high)}` : '–'} />
+                  <StatRow label="Day's Low" value={marketData.low ? `$${tokenValueFormatter(marketData.low)}` : '–'} />
+                  <StatRow label="Market Cap" value={formatStatValue(marketData.market_cap, '$')} />
+                  <StatRow label="Spread" value={marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : '–'} />
+                  <StatRow label="Status" value={<span className="capitalize">{marketData.status || '–'}</span>} />
+                  <StatRow label="Trading" value={marketData.is_paused ? 'Paused' : 'Active'} />
+                  <StatRow label="Type" value={<span className="capitalize">{marketData.type || '–'}</span>} />
                 </div>
 
                 {marketData.pending_order_id ? (
