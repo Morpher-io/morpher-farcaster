@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
-import { Loader2Icon, ArrowDownUp } from "lucide-react"
+import { Loader2Icon } from "lucide-react"
 import {
   TradeCallback,
   TCurrency,
@@ -233,28 +233,40 @@ export function Trade() {
                     onChange={handleInputChange}
                     className="h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
-                  <div
-                    className="flex items-center gap-2 bg-background p-2 rounded-full cursor-pointer"
-                    onClick={() => {
-                      if (selectedCurrency !== "USDC") {
-                        setInputMode(inputMode === "token" ? "usd" : "token");
+                  <ToggleGroup
+                    type="single"
+                    value={inputMode}
+                    onValueChange={(value) => {
+                      if (value) {
+                        setInputMode(value as "token" | "usd");
                       }
                     }}
+                    className="bg-background rounded-full p-0.5 border"
+                    disabled={selectedCurrency === "USDC"}
                   >
-                    <img
-                      src={`/src/assets/icons/${
-                        inputMode === "token" ? selectedCurrency : "USDC"
-                      }.svg`}
-                      alt="currency logo"
-                      className="h-6 w-6"
-                    />
-                    <span className="font-semibold text-lg">
-                      {inputMode === "token" ? selectedCurrency : "USD"}
-                    </span>
-                    {selectedCurrency !== "USDC" && (
-                      <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </div>
+                    <ToggleGroupItem
+                      value="token"
+                      aria-label="Toggle token input"
+                      className="rounded-full p-1.5 data-[state=on]:bg-muted"
+                    >
+                      <img
+                        src={`/src/assets/icons/${selectedCurrency}.svg`}
+                        alt={`${selectedCurrency} logo`}
+                        className="h-5 w-5"
+                      />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                      value="usd"
+                      aria-label="Toggle USD input"
+                      className="rounded-full p-1.5 data-[state=on]:bg-muted"
+                    >
+                      <img
+                        src="/src/assets/icons/USDC.svg"
+                        alt="USD logo"
+                        className="h-5 w-5"
+                      />
+                    </ToggleGroupItem>
+                  </ToggleGroup>
                 </div>
                 <div className="text-sm flex justify-between text-muted-foreground mt-1">
                   <span>
