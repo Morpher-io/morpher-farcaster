@@ -12,7 +12,7 @@ import {
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
-import { Loader2Icon, Info } from "lucide-react"
+import { Loader2Icon, Info, TrendingUp, TrendingDown } from "lucide-react"
 import {
   TradeCallback,
   TCurrency,
