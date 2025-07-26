@@ -86,47 +86,51 @@ export function Trade() {
     );
   }, [selectedCurrencyDetails]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value.startsWith("-")) return;
-    if (!/^\d*\.?\d*$/.test(value)) return;
+  const [inputValue, setInputValue] = React.useState("");
 
+  React.useEffect(() => {
+    setInputValue("");
+    setTradeAmount("");
+  }, [selectedCurrency, inputMode, setTradeAmount]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    if (value.startsWith("-") || (value && !/^\d*\.?\d*$/.test(value))) {
+      return;
+    }
+
+    setInputValue(value); // Update UI immediately
+
+    let tokenAmountStr = "";
     if (inputMode === "token") {
-      if (value === "") {
-        setTradeAmount("");
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue) && numValue > maxBalance) {
+        tokenAmountStr = maxBalance.toString();
+        setInputValue(tokenAmountStr);
       } else {
-        const numValue = parseFloat(value);
-        if (!isNaN(numValue)) {
-          if (numValue > maxBalance) {
-            setTradeAmount(maxBalance.toString());
-          } else {
-            setTradeAmount(value);
-          }
-        }
+        tokenAmountStr = value || "";
       }
     } else {
-      // USD mode
-      if (value === "") {
-        setTradeAmount("");
-      } else if (exchangeRate > 0) {
-        const tokenValue = parseFloat(value) / exchangeRate;
+      // usd mode
+      if (exchangeRate > 0) {
+        const numValue = parseFloat(value);
+        if (isNaN(numValue)) {
+          setTradeAmount("");
+          return;
+        }
+        
+        const tokenValue = numValue / exchangeRate;
         if (tokenValue > maxBalance) {
-          setTradeAmount(maxBalance.toString());
+          tokenAmountStr = maxBalance.toString();
+          setInputValue((maxBalance * exchangeRate).toFixed(2));
         } else {
-          setTradeAmount(tokenValue.toString());
+          tokenAmountStr = value ? tokenValue.toString() : "";
         }
       }
     }
+    setTradeAmount(tokenAmountStr);
   };
-
-  const displayValue = React.useMemo(() => {
-    if (!tradeAmount) return "";
-    if (inputMode === "token") {
-      return tradeAmount;
-    }
-    // usd mode
-    return (Number(tradeAmount) * exchangeRate).toFixed(2);
-  }, [tradeAmount, inputMode, exchangeRate]);
 
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
@@ -191,7 +195,6 @@ export function Trade() {
               value={selectedCurrency}
               onValueChange={(value) => {
                 setSelectedCurrency(value as TCurrency);
-                setTradeAmount("");
                 setInputMode("token");
               }}
               className="w-full"
@@ -226,7 +229,7 @@ export function Trade() {
                 <div className="flex justify-between items-start">
                   <Input
                     placeholder="0.00"
-                    value={displayValue}
+                    value={inputValue}
                     onChange={handleInputChange}
                     className="h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
@@ -235,7 +238,6 @@ export function Trade() {
                     onClick={() => {
                       if (selectedCurrency !== "USDC") {
                         setInputMode(inputMode === "token" ? "usd" : "token");
-                        setTradeAmount("");
                       }
                     }}
                   >
@@ -259,9 +261,7 @@ export function Trade() {
                     {inputMode === "token" && selectedCurrency !== "USDC"
                       ? `~ $${usdFormatter(usdValue)}`
                       : inputMode === "usd"
-                      ? `~ ${tokenValueFormatter(
-                          tradeAmount
-                        )} ${selectedCurrency}`
+                      ? `~ ${tokenValueFormatter(Number(tradeAmount) || 0)} ${selectedCurrency}`
                       : ""}
                   </span>
                   <span>
@@ -270,7 +270,14 @@ export function Trade() {
                       variant="link"
                       size="sm"
                       className="p-1 h-auto text-primary"
-                      onClick={() => setTradeAmount(maxBalance.toString())}
+                      onClick={() => {
+                        setTradeAmount(maxBalance.toString());
+                        if (inputMode === 'token') {
+                          setInputValue(maxBalance.toString());
+                        } else {
+                          setInputValue((maxBalance * exchangeRate).toFixed(2));
+                        }
+                      }}
                     >
                       Max
                     </Button>
