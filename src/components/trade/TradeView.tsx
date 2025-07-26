@@ -372,17 +372,27 @@ export function TradeView() {
           ) : (
             marketData && (
               <div className="flex flex-col gap-4">
-                <div>
-                  <div className="flex justify-between items-center">
+                <div className="flex justify-between items-start">
+                  <div>
                     <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
                     <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
                         {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
                         {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
                     </p>
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Market Cap: {formatStatValue(marketData.market_cap, "$")}</span>
-                    <span>Spread: {marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : "–"}</span>
+                  <div className="flex flex-col items-end text-xs">
+                      <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">Market Cap:</span>
+                          <span className="font-medium text-foreground">{formatStatValue(marketData.market_cap, "$")}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">Spread:</span>
+                          <span className="font-medium text-foreground">{marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : "–"}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">Type:</span>
+                          <span className="font-medium text-foreground capitalize">{marketData.type || "–"}</span>
+                      </div>
                   </div>
                 </div>
 
