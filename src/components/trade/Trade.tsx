@@ -23,6 +23,7 @@ import { Input } from "../ui/input"
 import { Skeleton } from "../ui/skeleton"
 import { sdk } from "@farcaster/frame-sdk"
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
+import { cn } from "@/lib/utils"
 
 export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
@@ -334,7 +335,12 @@ export function Trade() {
                     key={label}
                     variant="outline"
                     size="sm"
-                    className="text-xs h-8"
+                    className={cn(
+                      "text-xs h-8",
+                      value < 0
+                        ? "text-secondary hover:bg-secondary/10"
+                        : "text-primary hover:bg-primary/10"
+                    )}
                     onClick={() => adjustTradeAmountByUsd(value)}
                     disabled={isDisabled || exchangeRate <= 0}
                   >
@@ -343,9 +349,9 @@ export function Trade() {
                 );
               })}
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="text-xs h-8"
+                className="text-xs h-8 font-bold text-white bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90 transition-opacity"
                 onClick={setMaxAmount}
               >
                 Max
