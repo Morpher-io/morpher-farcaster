@@ -197,6 +197,26 @@ export function Trade() {
           </div>
         ) : (
           <div className="">
+            <div className="flex items-center mb-2">
+              <Label>Trade Amount</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="ml-1.5">
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>
+                      You always invest into {selectedMarket?.name || "this market"} with MPH.
+                      You choose the amount of MPH you want to invest and this will
+                      be placed into a position. If you invest with ETH or USDC
+                      then the amount selected will be converted using uniswap to MPH
+                      before investing transparently via our Morpher Smart Contracts.
+                      Only invest what you can afford to loose, trade responsibly.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <Tabs
               value={selectedCurrency}
               onValueChange={(value) => {
@@ -327,26 +347,7 @@ export function Trade() {
         </div>
         <div>
           <div className="flex justify-between">
-            <div className="flex items-center gap-1.5">
-              <Label>Leverage</Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info className="h-4 w-4 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p>
-                      You always invest into {selectedMarket?.name || "this market"} with MPH.
-                      You choose the amount of MPH you want to invest and this will
-                      be placed into a position. If you invest with ETH or USDC
-                      then the amount selected will be converted using uniswap to MPH
-                      before investing transparently via our Morpher Smart Contracts.
-                      Only invest what you can afford to loose, trade responsibly.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+            <Label>Leverage</Label>
             <span>{leverage[0]}x</span>
           </div>
           <Slider
