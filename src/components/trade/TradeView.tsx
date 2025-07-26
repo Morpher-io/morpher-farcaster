@@ -372,18 +372,18 @@ export function TradeView() {
           ) : (
             marketData && (
               <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-end">
-                  <div>
+                <div>
+                  <div className="flex justify-between items-center">
                     <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
-                    <div className="flex gap-4 text-xs text-muted-foreground">
-                      <span>Market Cap: {formatStatValue(marketData.market_cap, "$")}</span>
-                      <span>Spread: {marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : "–"}</span>
-                    </div>
+                    <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
+                        {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
+                        {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
+                    </p>
                   </div>
-                  <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
-                      {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
-                      {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
-                  </p>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Market Cap: {formatStatValue(marketData.market_cap, "$")}</span>
+                    <span>Spread: {marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : "–"}</span>
+                  </div>
                 </div>
 
                 <div className="-mx-4 h-[200px]">
