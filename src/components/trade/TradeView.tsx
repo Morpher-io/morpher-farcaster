@@ -375,8 +375,9 @@ export function TradeView() {
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
-                    <div className="text-xs text-muted-foreground">
-                      Market Cap: {formatStatValue(marketData.market_cap, "$")}
+                    <div className="flex gap-4 text-xs text-muted-foreground">
+                      <span>Market Cap: {formatStatValue(marketData.market_cap, "$")}</span>
+                      <span>Spread: {marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : "–"}</span>
                     </div>
                   </div>
                   <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
@@ -441,37 +442,33 @@ export function TradeView() {
                   const isUp = close >= open;
 
                   return (
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 text-xs border-t pt-4">
-                      <div className="col-span-2">
-                        <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                          <span>Low: ${tokenValueFormatter(low)}</span>
-                          <span>High: ${tokenValueFormatter(high)}</span>
-                        </div>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="relative h-1.5 bg-muted rounded-full">
-                                <div
-                                  className={`absolute h-1.5 rounded-full ${
-                                    isUp ? "bg-primary" : "bg-secondary"
-                                  }`}
-                                  style={{ width: `${positionPercent}%` }}
-                                />
-                                <div
-                                  className="absolute h-3 w-0.5 bg-foreground -top-1"
-                                  style={{ left: `${positionPercent}%` }}
-                                />
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Current: ${tokenValueFormatter(close)}</p>
-                              <p>Open: ${tokenValueFormatter(open)}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                    <div className="mt-4 text-xs border-t pt-4">
+                      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                        <span>Low: ${tokenValueFormatter(low)}</span>
+                        <span>High: ${tokenValueFormatter(high)}</span>
                       </div>
-                      <StatRow label="Spread" value={marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : "–"} />
-                      <StatRow label="Type" value={<span className="capitalize">{marketData.type || "–"}</span>} />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="relative h-1.5 bg-muted rounded-full">
+                              <div
+                                className={`absolute h-1.5 rounded-full ${
+                                  isUp ? "bg-primary" : "bg-secondary"
+                                }`}
+                                style={{ width: `${positionPercent}%` }}
+                              />
+                              <div
+                                className="absolute h-3 w-0.5 bg-foreground -top-1"
+                                style={{ left: `${positionPercent}%` }}
+                              />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Current: ${tokenValueFormatter(close)}</p>
+                            <p>Open: ${tokenValueFormatter(open)}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   );
                 })()}
