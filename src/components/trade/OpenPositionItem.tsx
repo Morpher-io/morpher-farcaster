@@ -189,32 +189,30 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            className="w-full mb-4"
-            onClick={() => setSelectedMarketId(position.market_id)}
-          >
-            View Market
-          </Button>
-
           <div className="space-y-4">
-            <div className="text-center font-semibold text-lg">
-              {closePercentage}%
-            </div>
             <Slider
               value={[closePercentage]}
               onValueChange={(value) => setClosePercentage(value[0])}
               max={100}
               step={5}
             />
-            <Button
-              onClick={handleClosePosition}
-              disabled={isClosing || closePercentage === 0}
-              className="w-full"
-            >
-              {isClosing && <Loader2Icon className="animate-spin mr-2" />}
-              Close {closePercentage}% of Position
-            </Button>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                variant="outline"
+                className="col-span-1"
+                onClick={() => setSelectedMarketId(position.market_id)}
+              >
+                View Market
+              </Button>
+              <Button
+                onClick={handleClosePosition}
+                disabled={isClosing || closePercentage === 0}
+                className="col-span-2"
+              >
+                {isClosing && <Loader2Icon className="animate-spin mr-2" />}
+                Close {closePercentage}%
+              </Button>
+            </div>
             {tradeError && (
               <p className="text-red-500 text-sm text-center">{tradeError}</p>
             )}

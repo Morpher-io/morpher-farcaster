@@ -478,9 +478,6 @@ export function TradeView() {
                       </div>
 
                       <div className="space-y-4">
-                        <div className="text-center font-semibold text-lg">
-                          {closePercentage}%
-                        </div>
                         <Slider
                           value={[closePercentage]}
                           onValueChange={(value) => setClosePercentage(value[0])}
