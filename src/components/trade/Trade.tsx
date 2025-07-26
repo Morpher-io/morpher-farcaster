@@ -271,13 +271,15 @@ export function Trade() {
             <div className="bg-muted p-4 rounded-lg rounded-t-none border border-t-0">
 
             
-              <div className="flex justify-between items-start">
-                <Input
-                  placeholder="0.00"
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  className="h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
+              <div className="flex justify-between items-start gap-2">
+                <div className="flex-1 min-w-0">
+                  <Input
+                    placeholder="0.00"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    className="w-full h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                </div>
                 <ToggleGroup
                   type="single"
                   value={inputMode}
