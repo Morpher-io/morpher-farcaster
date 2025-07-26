@@ -358,7 +358,7 @@ export function Trade() {
               </Button>
             </div>
               
-              <div className="text-sm flex justify-between text-muted-foreground mt-1 px-1">
+              <div className="text-xs flex justify-between text-muted-foreground mt-1 px-1">
                 <span>
                   {inputMode === "token" && selectedCurrency !== "USDC"
                     ? `~ $${usdFormatter(usdValue)}`
@@ -367,8 +367,8 @@ export function Trade() {
                     : ""}
                 </span>
                 <span>
-                  Available: {tokenValueFormatter(maxBalance)} {selectedCurrency}
-                  {selectedCurrency !== 'USDC' && ` (${usdFormatter(maxBalance * exchangeRate)})`}
+                  {tokenValueFormatter(maxBalance)} {selectedCurrency}
+                  {selectedCurrency !== 'USDC' && ` ($${usdFormatter(maxBalance * exchangeRate)})`}
                 </span>
               </div>
             </div>
