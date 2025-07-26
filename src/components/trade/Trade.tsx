@@ -269,6 +269,8 @@ export function Trade() {
           </Tabs>
           <div className="space-y-2">
             <div className="bg-muted p-4 rounded-lg rounded-t-none border border-t-0">
+
+            
               <div className="flex justify-between items-start">
                 <Input
                   placeholder="0.00"
@@ -310,19 +312,9 @@ export function Trade() {
                     />
                   </ToggleGroupItem>
                 </ToggleGroup>
+                
               </div>
-              <div className="text-sm flex justify-between text-muted-foreground mt-1 px-1">
-                <span>
-                  {inputMode === "token" && selectedCurrency !== "USDC"
-                    ? `~ $${usdFormatter(usdValue)}`
-                    : inputMode === "usd"
-                    ? `~ ${tokenValueFormatter(Number(tradeAmount) || 0)} ${selectedCurrency}`
-                    : ""}
-                </span>
-                <span>Balance: {tokenValueFormatter(maxBalance)}</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-5 gap-2 pt-2">
+              <div className="grid grid-cols-5 gap-2 py-2">
               {[
                 { label: "-$100", value: -100 },
                 { label: "-$10", value: -10 },
@@ -357,6 +349,19 @@ export function Trade() {
                 Max
               </Button>
             </div>
+              
+              <div className="text-sm flex justify-between text-muted-foreground mt-1 px-1">
+                <span>
+                  {inputMode === "token" && selectedCurrency !== "USDC"
+                    ? `~ $${usdFormatter(usdValue)}`
+                    : inputMode === "usd"
+                    ? `~ ${tokenValueFormatter(Number(tradeAmount) || 0)} ${selectedCurrency}`
+                    : ""}
+                </span>
+                <span>Balance: {tokenValueFormatter(maxBalance)}</span>
+              </div>
+            </div>
+            
           </div>
         </div>
       )}
