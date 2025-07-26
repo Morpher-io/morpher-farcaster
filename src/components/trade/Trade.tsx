@@ -163,6 +163,16 @@ export function Trade() {
     updateAmount(maxBalance);
   };
 
+  const getLeverageWarningClass = (leverageValue: number): string => {
+    if (leverageValue <= 4) {
+      return "bg-yellow-100 text-yellow-800";
+    }
+    if (leverageValue <= 7) {
+      return "bg-orange-100 text-orange-800";
+    }
+    return "bg-red-100 text-red-800";
+  };
+
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
       setTradeError(result.err || 'An error occurred while executing the trade.')
@@ -439,7 +449,12 @@ export function Trade() {
           className="mt-4"
         />
         {leverage[0] > 1 && (
-          <div className="text-xs text-yellow-800 bg-yellow-100 p-3 rounded-md mt-4 flex items-start gap-2">
+          <div
+            className={cn(
+              "text-xs p-3 rounded-md mt-4 flex items-start gap-2",
+              getLeverageWarningClass(leverage[0])
+            )}
+          >
             <Info className="h-4 w-4 shrink-0 mt-0.5" />
             <p>
               You've applied {leverage[0]}x leverage. This magnifies potential
