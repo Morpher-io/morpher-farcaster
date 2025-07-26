@@ -222,6 +222,38 @@ export function TradeView() {
 
   const pnl = selectedPosition ? Number(selectedPosition.total_return || 0) : 0;
   const isPositive = pnl >= 0;
+
+  const formatStatValue = (num: number | string | undefined | null, prefix = ""): string => {
+    if (num === null || num === undefined) return "–";
+    const number = Number(num);
+    if (isNaN(number)) return "–";
+    if (number === 0) return `${prefix}0`;
+
+    const tiers = [
+      { value: 1e12, symbol: "T" },
+      { value: 1e9, symbol: "B" },
+      { value: 1e6, symbol: "M" },
+      { value: 1e3, symbol: "k" },
+    ];
+
+    const tier = tiers.find((t) => Math.abs(number) >= t.value);
+
+    if (tier) {
+      return `${prefix}${(number / tier.value).toFixed(2)}${tier.symbol}`;
+    }
+
+    return `${prefix}${number.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+
+  const StatRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+    <>
+      <div className="text-muted-foreground">{label}</div>
+      <div className="text-right font-medium">{value}</div>
+    </>
+  );
   const pnlMph = pnl / 10 ** 18;
   const pnlUsd = currencyList?.MPH?.usd_exchange_rate
     ? pnlMph * currencyList.MPH.usd_exchange_rate
@@ -301,12 +333,22 @@ export function TradeView() {
           ) : (
             marketData && (
               <div className="flex flex-col gap-4">
-                <div className="flex flex-col text-center">
-                    <p className="text-2xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
-                    <p className={cn("text-sm font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
+                <div>
+                  <div className="flex justify-between items-baseline">
+                    <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
+                    <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
                         {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
                         {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
                     </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 text-sm border-t pt-4">
+                    <StatRow label="Day's Open" value={marketData.open ? `$${tokenValueFormatter(marketData.open)}` : '–'} />
+                    <StatRow label="Day's High" value={marketData.high ? `$${tokenValueFormatter(marketData.high)}` : '–'} />
+                    <StatRow label="Day's Low" value={marketData.low ? `$${tokenValueFormatter(marketData.low)}` : '–'} />
+                    <StatRow label="Volume" value={formatStatValue(marketData.volume)} />
+                    <StatRow label="Market Cap" value={formatStatValue(marketData.market_cap, '$')} />
+                    <StatRow label="Spread" value={marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : '–'} />
+                  </div>
                 </div>
 
                 <div className="-mx-4 h-[200px]">
