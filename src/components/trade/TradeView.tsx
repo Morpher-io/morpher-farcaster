@@ -5,6 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
 import { Card, CardContent } from "../ui/card";
@@ -386,16 +392,54 @@ export function TradeView() {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-4 text-xs border-t pt-4">
-                  <StatRow label="Day's Open" value={marketData.open ? `$${tokenValueFormatter(marketData.open)}` : '–'} />
-                  <StatRow label="Day's High" value={marketData.high ? `$${tokenValueFormatter(marketData.high)}` : '–'} />
-                  <StatRow label="Day's Low" value={marketData.low ? `$${tokenValueFormatter(marketData.low)}` : '–'} />
-                  <StatRow label="Market Cap" value={formatStatValue(marketData.market_cap, '$')} />
-                  <StatRow label="Spread" value={marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : '–'} />
-                  <StatRow label="Status" value={<span className="capitalize">{marketData.status || '–'}</span>} />
-                  <StatRow label="Trading" value={marketData.is_paused ? 'Paused' : 'Active'} />
-                  <StatRow label="Type" value={<span className="capitalize">{marketData.type || '–'}</span>} />
-                </div>
+                {(() => {
+                  const low = Number(marketData.low || 0);
+                  const high = Number(marketData.high || 0);
+                  const open = Number(marketData.open || 0);
+                  const close = Number(selectedMarketClose || marketData.close || 0);
+                  const range = high - low;
+                  let positionPercent = range > 0 ? ((close - low) / range) * 100 : 50;
+                  positionPercent = Math.max(0, Math.min(100, positionPercent));
+                  const isUp = close >= open;
+
+                  return (
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 text-xs border-t pt-4">
+                      <div className="col-span-2">
+                        <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                          <span>Low: ${tokenValueFormatter(low)}</span>
+                          <span>High: ${tokenValueFormatter(high)}</span>
+                        </div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="relative h-1.5 bg-muted rounded-full">
+                                <div
+                                  className={`absolute h-1.5 rounded-full ${
+                                    isUp ? "bg-primary" : "bg-secondary"
+                                  }`}
+                                  style={{ width: `${positionPercent}%` }}
+                                />
+                                <div
+                                  className="absolute h-3 w-0.5 bg-foreground -top-1"
+                                  style={{ left: `${positionPercent}%` }}
+                                />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Current: ${tokenValueFormatter(close)}</p>
+                              <p>Open: ${tokenValueFormatter(open)}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <StatRow label="Market Cap" value={formatStatValue(marketData.market_cap, "$")} />
+                      <StatRow label="Spread" value={marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : "–"} />
+                      <StatRow label="Status" value={<span className="capitalize">{marketData.status || "–"}</span>} />
+                      <StatRow label="Trading" value={marketData.is_paused ? "Paused" : "Active"} />
+                      <StatRow label="Type" value={<span className="capitalize">{marketData.type || "–"}</span>} />
+                    </div>
+                  );
+                })()}
 
                 {marketData.pending_order_id ? (
                   <PendingPosition />
