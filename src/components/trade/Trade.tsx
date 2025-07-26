@@ -7,7 +7,12 @@ import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
 import { Loader2Icon, ArrowDownUp } from "lucide-react"
-import  { TradeCallback, TCurrency, tokenValueFormatter, usdFormatter } from "morpher-trading-sdk"
+import {
+  TradeCallback,
+  TCurrency,
+  tokenValueFormatter,
+  usdFormatter,
+} from "morpher-trading-sdk"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Skeleton } from "../ui/skeleton"
@@ -16,9 +21,21 @@ import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
 
 export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
-  const [tradeError, setTradeError] = React.useState<string | undefined>(undefined);
-  
-  const { selectedMarketId, morpherTradeSDK, selectedMarket, tradeType, setTradeType, leverage, setLeverage, marketData } = useMarketStore();
+  const [tradeError, setTradeError] = React.useState<string | undefined>(
+    undefined
+  );
+  const [inputMode, setInputMode] = React.useState<"token" | "usd">("token");
+
+  const {
+    selectedMarketId,
+    morpherTradeSDK,
+    selectedMarket,
+    tradeType,
+    setTradeType,
+    leverage,
+    setLeverage,
+    marketData,
+  } = useMarketStore();
   const {
       tradeAmount,
       setTradeAmount,
@@ -58,17 +75,8 @@ export function Trade() {
     }
   }, [currencyList, setSelectedCurrency]);
 
-  const [usdTradeAmount, setUsdTradeAmount] = React.useState("");
   const exchangeRate = selectedCurrencyDetails?.usd_exchange_rate || 0;
-
-  React.useEffect(() => {
-    const numericTradeAmount = Number(tradeAmount);
-    if (numericTradeAmount > 0 && exchangeRate > 0) {
-      setUsdTradeAmount((numericTradeAmount * exchangeRate).toFixed(2));
-    } else {
-      setUsdTradeAmount("");
-    }
-  }, [tradeAmount, exchangeRate]);
+  const usdValue = (Number(tradeAmount) || 0) * exchangeRate;
 
   const maxBalance = React.useMemo(() => {
     if (!selectedCurrencyDetails) return 0;
@@ -78,52 +86,47 @@ export function Trade() {
     );
   }, [selectedCurrencyDetails]);
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
     if (value.startsWith("-")) return;
-
-    if (value === "") {
-      setTradeAmount("");
-      return;
-    }
-
     if (!/^\d*\.?\d*$/.test(value)) return;
 
-    const numValue = parseFloat(value);
-    if (isNaN(numValue)) return;
-
-    if (numValue > maxBalance) {
-      setTradeAmount(maxBalance.toString());
+    if (inputMode === "token") {
+      if (value === "") {
+        setTradeAmount("");
+      } else {
+        const numValue = parseFloat(value);
+        if (!isNaN(numValue)) {
+          if (numValue > maxBalance) {
+            setTradeAmount(maxBalance.toString());
+          } else {
+            setTradeAmount(value);
+          }
+        }
+      }
     } else {
-      setTradeAmount(value);
+      // USD mode
+      if (value === "") {
+        setTradeAmount("");
+      } else if (exchangeRate > 0) {
+        const tokenValue = parseFloat(value) / exchangeRate;
+        if (tokenValue > maxBalance) {
+          setTradeAmount(maxBalance.toString());
+        } else {
+          setTradeAmount(tokenValue.toString());
+        }
+      }
     }
   };
 
-  const handleUsdAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-    if (value.startsWith("-")) return;
-
-    if (!/^\d*\.?\d*$/.test(value)) return;
-    
-    setUsdTradeAmount(value);
-
-    if (value === "") {
-      setTradeAmount("");
-      return;
+  const displayValue = React.useMemo(() => {
+    if (!tradeAmount) return "";
+    if (inputMode === "token") {
+      return tradeAmount;
     }
-
-    const numValue = parseFloat(value);
-    if (isNaN(numValue) || exchangeRate === 0) return;
-
-    const newTradeAmount = numValue / exchangeRate;
-    
-    if (newTradeAmount > maxBalance) {
-      setTradeAmount(maxBalance.toString());
-    } else {
-      setTradeAmount(newTradeAmount.toString());
-    }
-  };
+    // usd mode
+    return (Number(tradeAmount) * exchangeRate).toFixed(2);
+  }, [tradeAmount, inputMode, exchangeRate]);
 
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
@@ -189,6 +192,7 @@ export function Trade() {
               onValueChange={(value) => {
                 setSelectedCurrency(value as TCurrency);
                 setTradeAmount("");
+                setInputMode("token");
               }}
               className="w-full"
             >
@@ -217,60 +221,62 @@ export function Trade() {
                   ))}
               </TabsList>
             </Tabs>
-            <div className="space-y-1">
+            <div className="space-y-2">
               <div className="bg-muted p-4 rounded-lg">
                 <div className="flex justify-between items-start">
                   <Input
                     placeholder="0.00"
-                    value={tradeAmount}
-                    onChange={handleAmountChange}
+                    value={displayValue}
+                    onChange={handleInputChange}
                     className="h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
-                  <div className="flex items-center gap-2 bg-background p-2 rounded-full">
-                    {selectedCurrency && <img src={`/src/assets/icons/${selectedCurrency}.svg`} alt={`${selectedCurrency} logo`} className="h-6 w-6" />}
-                    <span className="font-semibold text-lg">{selectedCurrency}</span>
+                  <div
+                    className="flex items-center gap-2 bg-background p-2 rounded-full cursor-pointer"
+                    onClick={() => {
+                      if (selectedCurrency !== "USDC") {
+                        setInputMode(inputMode === "token" ? "usd" : "token");
+                        setTradeAmount("");
+                      }
+                    }}
+                  >
+                    <img
+                      src={`/src/assets/icons/${
+                        inputMode === "token" ? selectedCurrency : "USDC"
+                      }.svg`}
+                      alt="currency logo"
+                      className="h-6 w-6"
+                    />
+                    <span className="font-semibold text-lg">
+                      {inputMode === "token" ? selectedCurrency : "USD"}
+                    </span>
+                    {selectedCurrency !== "USDC" && (
+                      <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
+                    )}
                   </div>
                 </div>
                 <div className="text-sm flex justify-between text-muted-foreground mt-1">
                   <span>
-                    {selectedCurrency !== 'USDC' && `~ $${usdFormatter(Number(tradeAmount) * exchangeRate)}`}
+                    {inputMode === "token" && selectedCurrency !== "USDC"
+                      ? `~ $${usdFormatter(usdValue)}`
+                      : inputMode === "usd"
+                      ? `~ ${tokenValueFormatter(
+                          tradeAmount
+                        )} ${selectedCurrency}`
+                      : ""}
                   </span>
                   <span>
                     Balance: {tokenValueFormatter(maxBalance)}
-                    <Button variant="link" size="sm" className="p-1 h-auto text-primary" onClick={() => setTradeAmount(maxBalance.toString())}>
-                        Max
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="p-1 h-auto text-primary"
+                      onClick={() => setTradeAmount(maxBalance.toString())}
+                    >
+                      Max
                     </Button>
                   </span>
                 </div>
               </div>
-
-              {selectedCurrency !== 'USDC' && (
-                  <>
-                      <div className="flex justify-center py-1">
-                          <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div className="bg-muted p-4 rounded-lg">
-                          <div className="flex justify-between items-start">
-                              <div className="flex items-center">
-                                  <span className="text-3xl font-bold text-muted-foreground">$</span>
-                                  <Input
-                                      placeholder="0.00"
-                                      value={usdTradeAmount}
-                                      onChange={handleUsdAmountChange}
-                                      className="h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 ml-2"
-                                  />
-                              </div>
-                              <div className="flex items-center gap-2 bg-background p-2 rounded-full">
-                                  <img src="/src/assets/icons/USDC.svg" alt="USDC logo" className="h-6 w-6" />
-                                  <span className="font-semibold text-lg">USD</span>
-                              </div>
-                          </div>
-                          <div className="text-sm text-muted-foreground mt-1 text-right">
-                              1 {selectedCurrency} ≈ ${usdFormatter(exchangeRate)}
-                          </div>
-                      </div>
-                  </>
-              )}
             </div>
           </div>
         )}
