@@ -3,10 +3,16 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
-import { Loader2Icon } from "lucide-react"
+import { Loader2Icon, Info } from "lucide-react"
 import {
   TradeCallback,
   TCurrency,
@@ -321,7 +327,26 @@ export function Trade() {
         </div>
         <div>
           <div className="flex justify-between">
-            <Label>Leverage</Label>
+            <div className="flex items-center gap-1.5">
+              <Label>Leverage</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>
+                      You always invest into {selectedMarket?.name || "this market"} with MPH.
+                      You choose the amount of MPH you want to invest and this will
+                      be placed into a position. If you invest with ETH or USDC
+                      then the amount selected will be converted using uniswap to MPH
+                      before investing transparently via our Morpher Smart Contracts.
+                      Only invest what you can afford to loose, trade responsibly.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <span>{leverage[0]}x</span>
           </div>
           <Slider
