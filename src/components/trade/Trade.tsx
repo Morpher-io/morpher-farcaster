@@ -425,11 +425,11 @@ export function Trade() {
           </div>
         )}
         <p className="pl-6">
-          High leverage increases potential profits and losses. All trades are
-          executed against the Morpher smart contract. Trade responsibly.
+          All trades are executed against the Morpher smart contract. Trade
+          responsibly.
         </p>
       </div>
-      <div>
+      <div className="mb-6">
         <div className="flex justify-between">
           <Label>Leverage</Label>
           <span>{leverage[0]}x</span>
@@ -440,8 +440,18 @@ export function Trade() {
           max={10}
           step={0.2}
           onValueChange={setLeverage}
-          className="mt-4 mb-6"
+          className="mt-4"
         />
+        {leverage[0] > 1 && (
+          <div className="text-xs text-yellow-800 bg-yellow-100 p-3 rounded-md mt-4 flex items-start gap-2">
+            <Info className="h-4 w-4 shrink-0 mt-0.5" />
+            <p>
+              You've applied {leverage[0]}x leverage. This magnifies potential
+              profits and losses. Higher leverage increases the risk of early
+              liquidation if the market moves against your position.
+            </p>
+          </div>
+        )}
       </div>
       <Button
         onClick={openPosition}
