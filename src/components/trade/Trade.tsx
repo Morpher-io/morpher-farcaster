@@ -323,19 +323,52 @@ export function Trade() {
         <Label>Trade Type</Label>
         <ToggleGroup
           type="single"
-          defaultValue="long"
+          value={tradeType}
           className="w-[100px] grid grid-cols-2 border rounded-lg"
-          onValueChange={(value: 'long' | 'short') => {
-            if (value) setTradeType(value)
+          onValueChange={(value: "long" | "short") => {
+            if (value) setTradeType(value);
           }}
         >
-          <ToggleGroupItem value="long" aria-label="Toggle long" className="data-[state=on]:bg-primary data-[state=on]:text-white">
+          <ToggleGroupItem
+            value="long"
+            aria-label="Toggle long"
+            className="data-[state=on]:bg-primary data-[state=on]:text-white"
+          >
             Long
           </ToggleGroupItem>
-          <ToggleGroupItem value="short" aria-label="Toggle short" className="data-[state=on]:bg-secondary data-[state=on]:text-white">
+          <ToggleGroupItem
+            value="short"
+            aria-label="Toggle short"
+            className="data-[state=on]:bg-secondary data-[state=on]:text-white"
+          >
             Short
           </ToggleGroupItem>
         </ToggleGroup>
+      </div>
+      <div className="text-xs text-muted-foreground bg-muted p-3 rounded-md mb-4 space-y-2">
+        {tradeType === "long" ? (
+          <div className="flex items-start gap-2">
+            <TrendingUp className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+            <p>
+              Going long is like buying an asset. You profit if the price of{" "}
+              {selectedMarket?.symbol || "the asset"} goes up. If the price
+              falls, your position value decreases.
+            </p>
+          </div>
+        ) : (
+          <div className="flex items-start gap-2">
+            <TrendingDown className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
+            <p>
+              Going short means you profit if the price of{" "}
+              {selectedMarket?.symbol || "the asset"} goes down. If the price
+              rises, your position value decreases.
+            </p>
+          </div>
+        )}
+        <p className="pl-6">
+          High leverage increases potential profits and losses. All trades are
+          executed against the Morpher smart contract. Trade responsibly.
+        </p>
       </div>
       <div>
         <div className="flex justify-between">
