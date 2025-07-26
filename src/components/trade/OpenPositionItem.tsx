@@ -27,10 +27,13 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
 
   const { currencyList, selectedCurrency, setTradeComplete } =
     usePortfolioStore();
-  const { morpherTradeSDK, setSelectedMarketId } = useMarketStore();
+  const { morpherTradeSDK, setSelectedMarketId, marketListAll } = useMarketStore();
   const account = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
+
+  const market = marketListAll?.[position.market_id];
+  const currentPrice = market?.close;
 
   const pnl = Number(position.total_return || 0);
   const pnlPercent = Number(position.total_return_percent || 0) * 100;
@@ -99,20 +102,22 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className="font-medium">
-              {positionValueUsd
-                ? `$${usdFormatter(positionValueUsd)}`
-                : `${tokenValueFormatter(positionValueMph)} MPH`}
+            <p className="font-medium text-base">
+              {currentPrice ? `$${tokenValueFormatter(currentPrice)}` : "–"}
             </p>
-            <p
-              className={cn(
-                "text-sm",
-                isPositive ? "text-primary" : "text-secondary"
-              )}
-            >
-              {isPositive ? "+" : ""}
-              {pnlPercent.toFixed(2)}%
-            </p>
+            <div className="flex items-baseline justify-end gap-1 text-sm">
+              <p>
+                {positionValueUsd
+                  ? `$${usdFormatter(positionValueUsd)}`
+                  : `${tokenValueFormatter(positionValueMph)} MPH`}
+              </p>
+              <p
+                className={cn(isPositive ? "text-primary" : "text-secondary")}
+              >
+                ({isPositive ? "+" : ""}
+                {pnlPercent.toFixed(2)}%)
+              </p>
+            </div>
           </div>
           <ChevronDown
             className={cn(
