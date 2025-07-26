@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
-import { Loader2Icon } from "lucide-react"
+import { Loader2Icon, ArrowDownUp } from "lucide-react"
 import  { TradeCallback, TCurrency, tokenValueFormatter, usdFormatter } from "morpher-trading-sdk"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
@@ -58,7 +58,17 @@ export function Trade() {
     }
   }, [currencyList, setSelectedCurrency]);
 
-  const tradeAmountUsd = (Number(tradeAmount) || 0) * (selectedCurrencyDetails?.usd_exchange_rate || 0);
+  const [usdTradeAmount, setUsdTradeAmount] = React.useState("");
+  const exchangeRate = selectedCurrencyDetails?.usd_exchange_rate || 0;
+
+  React.useEffect(() => {
+    const numericTradeAmount = Number(tradeAmount);
+    if (numericTradeAmount > 0 && exchangeRate > 0) {
+      setUsdTradeAmount((numericTradeAmount * exchangeRate).toFixed(2));
+    } else {
+      setUsdTradeAmount("");
+    }
+  }, [tradeAmount, exchangeRate]);
 
   const maxBalance = React.useMemo(() => {
     if (!selectedCurrencyDetails) return 0;
@@ -71,20 +81,47 @@ export function Trade() {
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
+    if (value.startsWith("-")) return;
+
     if (value === "") {
       setTradeAmount("");
       return;
     }
 
-    if (value.startsWith("-")) return;
+    if (!/^\d*\.?\d*$/.test(value)) return;
 
     const numValue = parseFloat(value);
     if (isNaN(numValue)) return;
 
     if (numValue > maxBalance) {
-      setTradeAmount(tokenValueFormatter(maxBalance));
+      setTradeAmount(maxBalance.toString());
     } else {
       setTradeAmount(value);
+    }
+  };
+
+  const handleUsdAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    if (value.startsWith("-")) return;
+
+    if (!/^\d*\.?\d*$/.test(value)) return;
+    
+    setUsdTradeAmount(value);
+
+    if (value === "") {
+      setTradeAmount("");
+      return;
+    }
+
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || exchangeRate === 0) return;
+
+    const newTradeAmount = numValue / exchangeRate;
+    
+    if (newTradeAmount > maxBalance) {
+      setTradeAmount(maxBalance.toString());
+    } else {
+      setTradeAmount(newTradeAmount.toString());
     }
   };
 
@@ -180,47 +217,60 @@ export function Trade() {
                   ))}
               </TabsList>
             </Tabs>
-            <div className="space-y-2">
-              <div className="relative">
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  min="0"
-                  className="h-12 pr-28 text-2xl font-bold bg-muted border-t-none"
-                  value={tradeAmount}
-                  onChange={handleAmountChange}
-                />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                  <span className="text-lg font-semibold text-muted-foreground">
-                    {selectedCurrencyDetails?.symbol}
+            <div className="space-y-1">
+              <div className="bg-muted p-4 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <Input
+                    placeholder="0.00"
+                    value={tradeAmount}
+                    onChange={handleAmountChange}
+                    className="h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                  <div className="flex items-center gap-2 bg-background p-2 rounded-full">
+                    {selectedCurrency && <img src={`/src/assets/icons/${selectedCurrency}.svg`} alt={`${selectedCurrency} logo`} className="h-6 w-6" />}
+                    <span className="font-semibold text-lg">{selectedCurrency}</span>
+                  </div>
+                </div>
+                <div className="text-sm flex justify-between text-muted-foreground mt-1">
+                  <span>
+                    {selectedCurrency !== 'USDC' && `~ $${usdFormatter(Number(tradeAmount) * exchangeRate)}`}
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      setTradeAmount(
-                        tokenValueFormatter(
-                          Number(selectedCurrencyDetails?.balance || 0) /
-                            10 ** (selectedCurrencyDetails?.decimals || 18)
-                        )
-                      )
-                    }
-                    className="p-1 h-auto"
-                  >
-                    Max
-                  </Button>
+                  <span>
+                    Balance: {tokenValueFormatter(maxBalance)}
+                    <Button variant="link" size="sm" className="p-1 h-auto text-primary" onClick={() => setTradeAmount(maxBalance.toString())}>
+                        Max
+                    </Button>
+                  </span>
                 </div>
               </div>
-              <div className="text-sm flex justify-between text-muted-foreground px-1">
-                <span>~ ${usdFormatter(tradeAmountUsd)}</span>
-                <span>
-                  Balance:{" "}
-                  {tokenValueFormatter(
-                    Number(selectedCurrencyDetails?.balance || 0) /
-                      10 ** (selectedCurrencyDetails?.decimals || 1)
-                  )}
-                </span>
-              </div>
+
+              {selectedCurrency !== 'USDC' && (
+                  <>
+                      <div className="flex justify-center py-1">
+                          <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="bg-muted p-4 rounded-lg">
+                          <div className="flex justify-between items-start">
+                              <div className="flex items-center">
+                                  <span className="text-3xl font-bold text-muted-foreground">$</span>
+                                  <Input
+                                      placeholder="0.00"
+                                      value={usdTradeAmount}
+                                      onChange={handleUsdAmountChange}
+                                      className="h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 ml-2"
+                                  />
+                              </div>
+                              <div className="flex items-center gap-2 bg-background p-2 rounded-full">
+                                  <img src="/src/assets/icons/USDC.svg" alt="USDC logo" className="h-6 w-6" />
+                                  <span className="font-semibold text-lg">USD</span>
+                              </div>
+                          </div>
+                          <div className="text-sm text-muted-foreground mt-1 text-right">
+                              1 {selectedCurrency} ≈ ${usdFormatter(exchangeRate)}
+                          </div>
+                      </div>
+                  </>
+              )}
             </div>
           </div>
         )}
