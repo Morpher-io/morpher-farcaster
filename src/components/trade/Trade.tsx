@@ -424,10 +424,6 @@ export function Trade() {
             </p>
           </div>
         )}
-        <p className="pl-6">
-          All trades are executed against the Morpher smart contract. Trade
-          responsibly.
-        </p>
       </div>
       <div className="mb-6">
         <div className="flex justify-between">
