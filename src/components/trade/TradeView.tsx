@@ -14,7 +14,7 @@ import {
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
 import { Card, CardContent } from "../ui/card";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { Trade } from "./Trade";
 import { Position } from "./Position";
@@ -350,7 +350,7 @@ export function TradeView() {
                 <div className="-mx-4 h-[200px]">
                   <ChartContainer config={chartConfig} className="w-full h-full">
                     <LineChart data={formattedChartData}>
-                      <Tooltip
+                      <RechartsTooltip
                         cursor={{
                           stroke: "var(--color-value)",
                           strokeWidth: 1,
