@@ -241,13 +241,13 @@ export function Trade() {
                         setInputMode(value as "token" | "usd");
                       }
                     }}
-                    className="bg-background rounded-full p-0.5 border"
+                    className="p-0.5 border bg-background"
                     disabled={selectedCurrency === "USDC"}
                   >
                     <ToggleGroupItem
                       value="token"
                       aria-label="Toggle token input"
-                      className="rounded-full p-1.5 data-[state=on]:bg-muted"
+                      className="p-1.5 data-[state=on]:bg-primary/20"
                     >
                       <img
                         src={`/src/assets/icons/${selectedCurrency}.svg`}
@@ -258,7 +258,7 @@ export function Trade() {
                     <ToggleGroupItem
                       value="usd"
                       aria-label="Toggle USD input"
-                      className="rounded-full p-1.5 data-[state=on]:bg-muted"
+                      className="p-1.5 data-[state=on]:bg-primary/20"
                     >
                       <img
                         src="/src/assets/icons/USDC.svg"
