@@ -217,7 +217,7 @@ export function Trade() {
             }}
             className="w-full"
           >
-            <TabsList className="w-full rounded-b-none border border-b-none">
+            <TabsList className="w-full rounded-b-none border">
               {currencyList &&
                 Object.entries(currencyList).map(([currency, details]) => (
                   <TabsTrigger
@@ -243,7 +243,7 @@ export function Trade() {
             </TabsList>
           </Tabs>
           <div className="space-y-2">
-            <div className="bg-muted p-4 rounded-lg">
+            <div className="bg-muted p-4 rounded-lg rounded-t-none border border-t-0">
               <div className="flex justify-between items-start">
                 <Input
                   placeholder="0.00"
