@@ -260,6 +260,33 @@ export function TradeView() {
       <div className="text-right font-medium">{value}</div>
     </>
   );
+
+  const StatusBadge = ({ status }: { status: string }) => {
+    const statusColors: { [key: string]: string } = {
+      open: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+      pre: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+      after: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+      closed: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+      "trade halt": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+    };
+    return (
+      <span
+        className={cn(
+          "text-xs font-semibold px-2 py-0.5 rounded-full capitalize",
+          statusColors[status.toLowerCase()] ||
+            "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+        )}
+      >
+        {status}
+      </span>
+    );
+  };
+
+  const PausedBadge = () => (
+    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+      Paused
+    </span>
+  );
   const pnlMph = pnl / 10 ** 18;
   const pnlUsd = currencyList?.MPH?.usd_exchange_rate
     ? pnlMph * currencyList.MPH.usd_exchange_rate
@@ -319,7 +346,13 @@ export function TradeView() {
                   />
                 )}
                 <div className="text-left">
-                  <p className="font-semibold">{selectedMarket.symbol}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold">{selectedMarket.symbol}</p>
+                    {marketData?.status && (
+                      <StatusBadge status={marketData.status} />
+                    )}
+                    {marketData?.is_paused && <PausedBadge />}
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     {selectedMarket.name}
                   </p>
@@ -339,8 +372,13 @@ export function TradeView() {
           ) : (
             marketData && (
               <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-baseline">
-                  <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
+                    <div className="text-xs text-muted-foreground">
+                      Market Cap: {formatStatValue(marketData.market_cap, "$")}
+                    </div>
+                  </div>
                   <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
                       {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
                       {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
@@ -432,10 +470,7 @@ export function TradeView() {
                           </Tooltip>
                         </TooltipProvider>
                       </div>
-                      <StatRow label="Market Cap" value={formatStatValue(marketData.market_cap, "$")} />
                       <StatRow label="Spread" value={marketData.spread ? `${(Number(marketData.spread) * 100).toFixed(2)}%` : "–"} />
-                      <StatRow label="Status" value={<span className="capitalize">{marketData.status || "–"}</span>} />
-                      <StatRow label="Trading" value={marketData.is_paused ? "Paused" : "Active"} />
                       <StatRow label="Type" value={<span className="capitalize">{marketData.type || "–"}</span>} />
                     </div>
                   );
