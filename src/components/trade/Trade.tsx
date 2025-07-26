@@ -12,7 +12,7 @@ import {
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
-import { Loader2Icon, Info, TrendingUp, TrendingDown } from "lucide-react"
+import { Loader2Icon, Info, TrendingUp, TrendingDown, Rocket } from "lucide-react"
 import {
   TradeCallback,
   TCurrency,
@@ -257,28 +257,28 @@ export function Trade() {
                       alt={`${currency} logo`}
                       className="h-6 w-6 mb-1"
                     />
+                    <div className="flex flex-col">
                     <span className="font-semibold">{currency}</span>
                     <span className="text-xs font-normal text-muted-foreground">
-                      {tokenValueFormatter(
+                      {Number(details.balance || 0) > 0 ? tokenValueFormatter(
                         Number(details.balance || 0) /
                           10 ** (details.decimals || 1)
-                      )}
+                      ) : "N/A"}
                     </span>
+                    </div>
                   </TabsTrigger>
                 ))}
             </TabsList>
           </Tabs>
           <div className="space-y-2">
-            <div className="bg-muted p-4 rounded-lg rounded-t-none border border-t-0">
-
-            
-              <div className="flex justify-between items-start gap-2">
+            <div className="bg-muted p-3 rounded-lg rounded-t-none border border-t-0">
+              <div className="flex justify-between items-center gap-2">
                 <div className="flex-1 min-w-0">
                   <Input
                     placeholder="0.00"
                     value={inputValue}
                     onChange={handleInputChange}
-                    className="w-full h-auto border-none bg-transparent p-0 text-3xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="w-full h-auto border-none bg-transparent p-0 text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                 </div>
                 <ToggleGroup
@@ -351,10 +351,10 @@ export function Trade() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs h-8 font-bold text-white bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90 transition-opacity"
+                className="text-xs h-8 font-bold text-white bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90 transition-opacity hover:text-white"
                 onClick={setMaxAmount}
               >
-                Max
+                Max <Rocket />
               </Button>
             </div>
               
