@@ -197,13 +197,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               step={5}
             />
             <div className="grid grid-cols-3 gap-2">
-              <Button
-                variant="outline"
-                className="col-span-1"
-                onClick={() => setSelectedMarketId(position.market_id)}
-              >
-                View Market
-              </Button>
+              
               <Button
                 onClick={handleClosePosition}
                 disabled={isClosing || closePercentage === 0}
@@ -211,6 +205,13 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               >
                 {isClosing && <Loader2Icon className="animate-spin mr-2" />}
                 Close {closePercentage}%
+              </Button>
+              <Button
+                variant="outline"
+                className="col-span-1"
+                onClick={() => setSelectedMarketId(position.market_id)}
+              >
+                View Market
               </Button>
             </div>
             {tradeError && (
