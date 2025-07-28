@@ -55,6 +55,13 @@ export function LeverageImpactVisualizer({
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     if (minPrice === Infinity || maxPrice === -Infinity) return [0, 0];
+
+    if (minPrice === maxPrice) {
+      const price = minPrice;
+      const padding = price > 0 ? price * 0.1 : 1;
+      return [price - padding, price + padding];
+    }
+
     const padding = (maxPrice - minPrice) * 0.2; // 20% padding
     return [minPrice - padding, maxPrice + padding];
   }, [liquidationPrice, profitTargetPrice, entryPrice, marketPrice]);
@@ -63,18 +70,18 @@ export function LeverageImpactVisualizer({
     {
       price: marketPrice,
       name: "Market",
-      fill: "hsl(var(--muted-foreground))",
+      fill: "var(--muted-foreground)",
     },
-    { price: entryPrice, name: "Entry", fill: "hsl(var(--foreground))" },
+    { price: entryPrice, name: "Entry", fill: "var(--foreground)" },
     {
       price: liquidationPrice,
       name: "Liquidation",
-      fill: "hsl(var(--secondary))",
+      fill: "var(--secondary)",
     },
     {
       price: profitTargetPrice,
       name: "100% Profit",
-      fill: "hsl(var(--primary))",
+      fill: "var(--primary)",
     },
   ];
 
@@ -99,7 +106,7 @@ export function LeverageImpactVisualizer({
           y={15}
           dy={0}
           textAnchor="middle"
-          fill="hsl(var(--muted-foreground))"
+          fill="var(--muted-foreground)"
           fontSize={10}
         >
           ${tokenValueFormatter(point.price)}
@@ -135,7 +142,7 @@ export function LeverageImpactVisualizer({
             <YAxis hide domain={[0, 10]} />
             <Line
               dataKey="y"
-              stroke="hsl(var(--border))"
+              stroke="var(--border)"
               dot={false}
               strokeWidth={2}
             />
@@ -147,7 +154,7 @@ export function LeverageImpactVisualizer({
                 y={5}
                 r={5}
                 fill={p.fill}
-                stroke="hsl(var(--background))"
+                stroke="var(--background)"
                 strokeWidth={2}
                 ifOverflow="visible"
                 label={<CustomDotLabel point={p} />}
