@@ -24,6 +24,7 @@ import { Skeleton } from "../ui/skeleton"
 import { sdk } from "@farcaster/frame-sdk"
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
 import { cn } from "@/lib/utils"
+import { LeverageImpactVisualizer } from "./LeverageImpactVisualizer"
 
 export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
@@ -41,6 +42,7 @@ export function Trade() {
     leverage,
     setLeverage,
     marketData,
+    selectedMarketClose,
   } = useMarketStore();
   const {
       tradeAmount,
@@ -448,20 +450,13 @@ export function Trade() {
           onValueChange={setLeverage}
           className="mt-4"
         />
-        {leverage[0] > 1 && (
-          <div
-            className={cn(
-              "text-xs p-3 rounded-md mt-4 flex items-start gap-2",
-              getLeverageWarningClass(leverage[0])
-            )}
-          >
-            <Info className="h-4 w-4 shrink-0 mt-0.5" />
-            <p>
-              You've applied {leverage[0]}x leverage. This magnifies potential
-              profits and losses. Higher leverage increases the risk of early
-              liquidation if the market moves against your position.
-            </p>
-          </div>
+        {leverage[0] > 1 && marketData && (
+          <LeverageImpactVisualizer
+            leverage={leverage[0]}
+            tradeType={tradeType}
+            marketPrice={selectedMarketClose || Number(marketData.close) || 0}
+            spread={Number(marketData.spread) || 0}
+          />
         )}
       </div>
       <Button
