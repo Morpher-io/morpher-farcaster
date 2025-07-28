@@ -135,7 +135,7 @@ export function LeverageImpactVisualizer({
       <h4 className="font-semibold text-sm mb-2 text-center">
         Leverage Impact
       </h4>
-      <div className="h-12 w-full">
+      <div className="h-14 w-full">
         <ChartContainer config={{}} className="w-full h-full">
           <LineChart
             data={[{ price: domain[0], y: 5 }, { price: domain[1], y: 5 }]}
@@ -150,7 +150,7 @@ export function LeverageImpactVisualizer({
               ticks={[domain[0], domain[1]]}
               tickFormatter={(value) => `$${tokenValueFormatter(value)}`}
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-              dy={10}
+              dy={5}
             />
             <YAxis hide domain={[0, 10]} />
             <Line
