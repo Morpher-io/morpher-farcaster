@@ -79,7 +79,8 @@ export function LeverageImpactVisualizer({
   ];
 
   const CustomDotLabel = (props: any) => {
-    const { cx, cy, payload } = props;
+    const { cx, cy, point } = props;
+    if (!point) return null;
     return (
       <g transform={`translate(${cx},${cy})`}>
         <text
@@ -87,11 +88,11 @@ export function LeverageImpactVisualizer({
           y={-10}
           dy={0}
           textAnchor="middle"
-          fill={payload.fill}
+          fill={point.fill}
           fontSize={10}
           fontWeight="bold"
         >
-          {payload.name}
+          {point.name}
         </text>
         <text
           x={0}
@@ -101,7 +102,7 @@ export function LeverageImpactVisualizer({
           fill="hsl(var(--muted-foreground))"
           fontSize={10}
         >
-          ${tokenValueFormatter(payload.price)}
+          ${tokenValueFormatter(point.price)}
         </text>
       </g>
     );
@@ -149,7 +150,7 @@ export function LeverageImpactVisualizer({
                 stroke="hsl(var(--background))"
                 strokeWidth={2}
                 ifOverflow="visible"
-                label={<CustomDotLabel />}
+                label={<CustomDotLabel point={p} />}
               />
             ))}
           </LineChart>
