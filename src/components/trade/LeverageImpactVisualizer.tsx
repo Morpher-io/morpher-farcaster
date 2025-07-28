@@ -87,13 +87,12 @@ export function LeverageImpactVisualizer({
 
   const CustomDotLabel = (props: any) => {
     const { cx, cy, point } = props;
-    if (!point) return null;
+    if (!point || typeof cx !== "number" || typeof cy !== "number") return null;
     return (
-      <g transform={`translate(${cx},${cy})`}>
+      <>
         <text
-          x={0}
-          y={-10}
-          dy={0}
+          x={cx}
+          y={cy - 10}
           textAnchor="middle"
           fill={point.fill}
           fontSize={10}
@@ -102,16 +101,15 @@ export function LeverageImpactVisualizer({
           {point.name}
         </text>
         <text
-          x={0}
-          y={15}
-          dy={0}
+          x={cx}
+          y={cy + 15}
           textAnchor="middle"
           fill="var(--muted-foreground)"
           fontSize={10}
         >
           ${tokenValueFormatter(point.price)}
         </text>
-      </g>
+      </>
     );
   };
 
