@@ -155,11 +155,22 @@ export function LeverageImpactVisualizer({
                 stroke="var(--background)"
                 strokeWidth={2}
                 ifOverflow="visible"
-                label={<CustomDotLabel point={p} />}
               />
             ))}
           </LineChart>
         </ChartContainer>
+      </div>
+      <div className="flex justify-around mt-4 text-xs">
+        {plotPoints.map((p) => (
+          <div key={p.name} className="flex flex-col items-center text-center">
+            <span style={{ color: p.fill }} className="font-bold">
+              {p.name}
+            </span>
+            <span className="text-muted-foreground">
+              ${tokenValueFormatter(p.price)}
+            </span>
+          </div>
+        ))}
       </div>
       <p className="text-center text-muted-foreground pt-2 text-xs">
         A daily interest fee of ~{((leverage - 1) * 0.03).toFixed(4)}% applies
