@@ -20,10 +20,11 @@ export function LeverageImpactVisualizer({
       return { entryPrice: 0, liquidationPrice: 0, profitTargetPrice: 0 };
     }
 
+    const effectiveSpread = spread * leverage;
     const entryPrice =
       tradeType === "long"
-        ? marketPrice * (1 + spread)
-        : marketPrice * (1 - spread);
+        ? marketPrice * (1 + effectiveSpread)
+        : marketPrice * (1 - effectiveSpread);
 
     const liquidationPrice =
       tradeType === "long"
