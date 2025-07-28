@@ -75,7 +75,7 @@ export function LeverageImpactVisualizer({
         className="text-secondary"
       />
       <p className="text-center text-muted-foreground pt-2 text-xs">
-        A daily interest fee of ~0.03% applies to the total position value when using leverage.
+        A daily interest fee of ~{((leverage - 1) * 0.03).toFixed(4)}% applies to the total position value when using leverage.
       </p>
     </div>
   );
