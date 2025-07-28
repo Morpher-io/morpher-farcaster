@@ -43,28 +43,37 @@ export function LeverageImpactVisualizer({
   const { entryPrice, liquidationPrice, profitTargetPrice } = calculations;
 
   const domain = React.useMemo(() => {
-    const prices = [
-      liquidationPrice,
-      profitTargetPrice,
-      entryPrice,
-      marketPrice,
-    ];
-    if (prices.some((p) => p === undefined || isNaN(p))) {
+    // Calculate the domain based on a 1x leverage scenario to keep the axis stable.
+    const effectiveSpread1x = spread * 1;
+    const entryPrice1x =
+      tradeType === "long"
+        ? marketPrice * (1 + effectiveSpread1x)
+        : marketPrice * (1 - effectiveSpread1x);
+
+    const liquidationPrice1x =
+      tradeType === "long" ? 0 : entryPrice1x * 2;
+    const profitTargetPrice1x =
+      tradeType === "long" ? entryPrice1x * 2 : 0;
+
+    const prices = [liquidationPrice1x, profitTargetPrice1x, marketPrice];
+    
+    if (prices.some((p) => p === undefined || !isFinite(p))) {
       return [0, 0];
     }
+
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
-    if (minPrice === Infinity || maxPrice === -Infinity) return [0, 0];
 
     if (minPrice === maxPrice) {
       const price = minPrice;
-      const padding = price > 0 ? price * 0.1 : 1;
+      const padding = price > 0 ? price * 0.2 : 1;
       return [price - padding, price + padding];
     }
 
-    const padding = (maxPrice - minPrice) * 0.2; // 20% padding
-    return [minPrice - padding, maxPrice + padding];
-  }, [liquidationPrice, profitTargetPrice, entryPrice, marketPrice]);
+    const padding = (maxPrice - minPrice) * 0.1; // 10% padding
+    const finalMin = Math.max(0, minPrice - padding);
+    return [finalMin, maxPrice + padding];
+  }, [tradeType, marketPrice, spread]);
 
   const plotPoints = [
     {
