@@ -117,16 +117,20 @@ export function LeverageImpactVisualizer({
     return null;
   }
 
+  const sortedPlotPoints = React.useMemo(() => {
+    return [...plotPoints].sort((a, b) => a.price - b.price);
+  }, [plotPoints]);
+
   return (
     <div className="bg-muted p-3 rounded-md mt-4">
       <h4 className="font-semibold text-sm mb-2 text-center">
         Leverage Impact
       </h4>
-      <div className="h-28 w-full">
+      <div className="h-16 w-full">
         <ChartContainer config={{}} className="w-full h-full">
           <LineChart
             data={[{ price: domain[0], y: 5 }, { price: domain[1], y: 5 }]}
-            margin={{ top: 30, right: 10, left: 10, bottom: 20 }}
+            margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
           >
             <XAxis
               type="number"
@@ -161,7 +165,7 @@ export function LeverageImpactVisualizer({
         </ChartContainer>
       </div>
       <div className="flex justify-around mt-4 text-xs">
-        {plotPoints.map((p) => (
+        {sortedPlotPoints.map((p) => (
           <div key={p.name} className="flex flex-col items-center text-center">
             <span style={{ color: p.fill }} className="font-bold">
               {p.name}
