@@ -69,8 +69,8 @@ function App() {
   
 
   return (
-    <Layout>
-      <Router>
+    <Router>
+      <Layout>
         { (isConnected && !tradeComplete) && (
           <Header />
         )}
@@ -94,8 +94,8 @@ function App() {
           
           
         </main>
-      </Router>
-    </Layout>
+      </Layout>
+    </Router>
   );
 }
 

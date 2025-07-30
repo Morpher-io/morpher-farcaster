@@ -16,15 +16,12 @@ export function TradeTerminal() {
   const publicClient = usePublicClient();
 
   React.useEffect(() => {
-    console.log("TradeTerminal: address from useAccount:", address);
     setEthAddress(address);
   }, [address, setEthAddress]);
 
   const fetchCurrencyList = async () => {
     if (address && publicClient && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
-      console.log("TradeTerminal: Fetching currency list for", address);
       const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
-      console.log("TradeTerminal: Fetched currency list:", fetchedCurrencyList);
       setCurrencyList(fetchedCurrencyList);
     }
   }

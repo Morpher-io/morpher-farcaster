@@ -55,7 +55,7 @@ export function PositionSelector() {
     selectedMarketId,
     setSelectedMarketId,
     selectedMarket,
-    selectedMarketClose,
+    livePrice,
     setSelectedMarket,
     marketData,
     setMarketData,

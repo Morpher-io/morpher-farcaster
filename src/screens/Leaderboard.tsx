@@ -68,9 +68,9 @@ export function LeaderboardScreen() {
       <div className="flex w-full items-center justify-between border-b mb-1 pb-1">
         <div className="flex items-center">
           <div className="w-8 text-left text-muted-foreground">{rank}.</div>
-          {entry.profile_image ? (
+          {entry.profile_base64 ? (
             <img
-              src={entry.profile_image}
+              src={entry.profile_base64}
               alt={displayName}
               className="w-10 h-10 rounded-full mr-3"
             />
@@ -135,9 +135,9 @@ export function LeaderboardScreen() {
           </Button>
           {selectedEntry && (
           <div className="flex items-center">
-          {selectedEntry.profile_image ? (
+          {selectedEntry.profile_base64 ? (
             <img
-              src={selectedEntry.profile_image}
+              src={selectedEntry.profile_base64}
               alt={selectedEntry.display_name}
               className="w-10 h-10 rounded-full mr-3"
             />
@@ -243,7 +243,8 @@ export function LeaderboardScreen() {
 
       <div id="leaderboard-list" className="mt-4">
         {leaderboard &&
-          leaderboard
+        leaderboard[type] && 
+          leaderboard[type]
             .filter((entry) =>
               (entry.display_name || "")
                 .toLowerCase()
@@ -258,11 +259,11 @@ export function LeaderboardScreen() {
 
        <Button
               variant="default"
-              className="w-[calc(100vw-30px)]  rounded-full fixed bottom-4 "
+              className="w-[calc(100vw-30px)]  rounded-full fixed bottom-19 "
               onClick={() => navigate('/')}
             >
               Think you can beat them?  Trade now
-            </Button>
+          </Button>
     </div>
   );
 }

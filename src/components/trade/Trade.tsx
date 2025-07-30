@@ -42,7 +42,7 @@ export function Trade() {
     leverage,
     setLeverage,
     marketData,
-    selectedMarketClose,
+    livePrice,
   } = useMarketStore();
   const {
       tradeAmount,
@@ -178,6 +178,7 @@ export function Trade() {
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
       setTradeError(result.err || 'An error occurred while executing the trade.')
+      setTradeComplete(true);
       return
     }
 
@@ -454,7 +455,7 @@ export function Trade() {
           <LeverageImpactVisualizer
             leverage={leverage[0]}
             tradeType={tradeType}
-            marketPrice={selectedMarketClose || Number(marketData.close) || 0}
+            marketPrice={livePrice && livePrice[marketData.market_id] ? livePrice[marketData.market_id] : Number(marketData.close) || 0}
             spread={Number(marketData.spread) || 0}
           />
         )}

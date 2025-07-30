@@ -1,7 +1,7 @@
 import * as React from "react";
 import { usePortfolioStore } from "@/store/portfolio";
 import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
-import { LineChart as LineChartIcon } from "lucide-react";
+import { LineChart as LineChartIcon, PieChartIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import {
@@ -14,8 +14,14 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { ChartContainer } from "@/components/ui/chart";
 import { format as formatDate } from "date-fns";
 import { cn } from "@/lib/utils";
+import sdk from "@farcaster/frame-sdk";
+import { useNavigate } from "react-router-dom";
+import { useAccount } from "wagmi";
+import { useMarketStore } from "@/store/market";
 
 export function PortfolioSummary() {
+  const account = useAccount();
+  const {  morpherTradeSDK } = useMarketStore();
   const {
     portfolio,
     loading,
@@ -24,14 +30,15 @@ export function PortfolioSummary() {
     positionValue,
     currencyList,
     returns,
+    setReturns
   } = usePortfolioStore();
   const [isChartOpen, setIsChartOpen] = React.useState(false);
   const [timeRange, setTimeRange] = React.useState<"d" | "w" | "m" | "y">("d");
-
+  const navigate = useNavigate();
   const totalPortfolioValueUSD = React.useMemo(() => {
     if (!currencyList?.MPH?.usd_exchange_rate || !portfolio) return 0;
 
-    const freeCashInMphWei = BigInt(portfolio.total_portfolio_value || "0");
+    const freeCashInMphWei = BigInt("0");
     const positionsValueInMphWei = BigInt(positionValue || 0);
 
     const totalMphWei = freeCashInMphWei + positionsValueInMphWei;
@@ -39,17 +46,37 @@ export function PortfolioSummary() {
     return (Number(totalMphWei) / 1e18) * currencyList.MPH.usd_exchange_rate;
   }, [portfolio, positionValue, currencyList]);
 
-  const userLeaderboardEntry = React.useMemo(() => {
-    if (!leaderboard || !eth_address) return null;
-    return leaderboard.find(
-      (entry) => entry.eth_address.toLowerCase() === eth_address.toLowerCase()
-    );
-  }, [leaderboard, eth_address]);
 
-  const profileImage =
-    userLeaderboardEntry?.profile_image ||
-    `https://source.boringavatars.com/beam/40/${eth_address || "default"}`;
-  const rank = userLeaderboardEntry?.rank;
+
+  let profileImage = portfolio?.profile_base64
+  if (!profileImage) {
+      sdk.context.then(context => {
+            
+        profileImage = context.user.pfpUrl
+      })
+            
+  }
+
+  const getReturns = async (type: "d" | "w" | "m" | "y") => {
+      if (account?.address && morpherTradeSDK) {
+          if (returns && returns[type] && returns[type].length > 0) return;
+          try {
+              const returnsData = await morpherTradeSDK.getReturns({ eth_address: account.address, type })
+              setReturns(type, returnsData || [])
+              
+          } catch (err) {
+              console.log('Error fetching returns')
+          }
+      }
+
+  }
+
+    React.useEffect(() => {
+
+        if (account?.address && morpherTradeSDK && isChartOpen) {
+            getReturns(timeRange);
+        }
+    }, [timeRange, account?.address, morpherTradeSDK, isChartOpen]);
 
   const chartData = React.useMemo(() => {
     if (!returns || !returns[timeRange]) return [];
@@ -57,7 +84,7 @@ export function PortfolioSummary() {
       timestamp: point.timestamp,
       value: point.positions,
     }));
-  }, [returns, timeRange]);
+  }, [returns, timeRange, returns[timeRange]]);
 
   const isIncreasing = React.useMemo(() => {
     if (chartData.length < 2) return true;
@@ -93,7 +120,7 @@ export function PortfolioSummary() {
     [isIncreasing]
   );
 
-  if (loading) {
+  if (loading || !currencyList?.MPH?.usd_exchange_rate) {
     return (
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -130,9 +157,10 @@ export function PortfolioSummary() {
       const changeUsd = changeMph * mphToUsdRate;
       const changePercent = firstValue > 0 ? (change / firstValue) * 100 : 0;
       const isPositive = change >= 0;
-
       const timeFormat = timeRange === "d" ? "p" : "PP";
       const dateText = formatDate(new Date(data.timestamp), timeFormat);
+      
+
 
       return (
         <div className="p-2 bg-background border rounded-lg shadow-lg text-sm">
@@ -175,7 +203,7 @@ export function PortfolioSummary() {
                 className="h-6 w-6"
                 onClick={() => setIsChartOpen(true)}
               >
-                <LineChartIcon className="h-4 w-4" />
+                <PieChartIcon className="h-4 w-4" />
               </Button>
             </div>
             <p className="text-2xl font-bold">
@@ -183,10 +211,10 @@ export function PortfolioSummary() {
             </p>
           </div>
         </div>
-        {rank && (
+        {portfolio?.returns_rank && (
           <div className="text-right">
-            <p className="text-sm font-semibold text-muted-foreground">Rank</p>
-            <p className="text-xl font-bold text-primary">#{rank}</p>
+            <p className="text-sm font-semibold text-muted-foreground">🏆Rank</p>
+            <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>#{portfolio?.returns_rank}</p>
           </div>
         )}
       </div>

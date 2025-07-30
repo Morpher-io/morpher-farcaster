@@ -25,15 +25,49 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
     undefined
   );
 
+  React.useEffect(() => {
+    if (position?.market_id) {
+      // subscribe to market
+      morpherTradeSDK.subscribeToMarket(position.market_id, (update: any) => {
+        setLivePrice(position.market_id, update.close)
+      });
+    }
+
+    return () => {
+      // subscription cleanup
+      morpherTradeSDK.unsubscribeFromMarket(position.market_id);
+    };
+  }, [position]);
+
   const { currencyList, selectedCurrency, setTradeComplete } =
     usePortfolioStore();
-  const { morpherTradeSDK, setSelectedMarketId, marketListAll } = useMarketStore();
+  const { morpherTradeSDK, setSelectedMarketId, marketListAll, setLivePrice, livePrice } =
+    useMarketStore();
   const account = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
 
   const market = marketListAll?.[position.market_id];
-  const currentPrice = market?.close;
+  const [currentPrice, setCurrentPrice] = React.useState(0);
+
+
+  React.useEffect(() => {
+
+    if (!market) {
+      setCurrentPrice(0)
+      return
+    }
+    
+
+    
+    if (livePrice && livePrice[market.market_id]) {
+      setCurrentPrice(livePrice[market.market_id])
+    } else {
+      setCurrentPrice(market.close || 0)
+    }
+
+
+  }, [livePrice, market])
 
   const pnl = Number(position.total_return || 0);
   const pnlPercent = Number(position.total_return_percent || 0) * 100;
@@ -111,9 +145,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
                   ? `$${usdFormatter(positionValueUsd)}`
                   : `${tokenValueFormatter(positionValueMph)} MPH`}
               </p>
-              <p
-                className={cn(isPositive ? "text-primary" : "text-secondary")}
-              >
+              <p className={cn(isPositive ? "text-primary" : "text-secondary")}>
                 ({isPositive ? "+" : ""}
                 {pnlPercent.toFixed(2)}%)
               </p>
@@ -134,7 +166,9 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
             <div
               className={cn(
                 "text-right font-medium capitalize",
-                position.direction === "long" ? "text-primary" : "text-secondary"
+                position.direction === "long"
+                  ? "text-primary"
+                  : "text-secondary"
               )}
             >
               {position.direction}
@@ -173,7 +207,8 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
                 </>
               ) : (
                 <span>
-                  {isPositive ? "+" : ""}{tokenValueFormatter(pnlMph)} MPH
+                  {isPositive ? "+" : ""}
+                  {tokenValueFormatter(pnlMph)} MPH
                 </span>
               )}
             </div>

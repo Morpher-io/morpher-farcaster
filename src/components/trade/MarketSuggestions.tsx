@@ -19,9 +19,12 @@ export function MarketSuggestions() {
 
   React.useEffect(() => {
     if (morpherTradeSDK.ready) {
-      getTrendingMarkets();
+      if (!trendingMarkets) {
+        getTrendingMarkets();
+      }
+      
     }
-  }, [morpherTradeSDK.ready, getTrendingMarkets]);
+  }, [morpherTradeSDK.ready, getTrendingMarkets, trendingMarkets]);
 
   const loading = trendingMarkets === undefined;
 

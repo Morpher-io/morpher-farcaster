@@ -84,8 +84,8 @@ export function TradeSuccessScreen() {
     return (
       <>
         <div
-          className=" flex flex-col items-center mt-8 p-4"
-          style={{ minHeight: "calc(100vh" }}
+          className=" flex flex-col items-center mt-4 p-4"
+          
         >
           <div>
             <img
@@ -107,7 +107,7 @@ export function TradeSuccessScreen() {
             
           </p>
 
-          <div className="mt-auto mb-8 w-full">
+          <div className="mt-10 w-full">
             <Button
               variant="default"
               className="w-full hover:bg-white/90 rounded-full "
@@ -122,7 +122,7 @@ export function TradeSuccessScreen() {
             >
               Try another Trade
             </Button>
-          </div>
+          </div> 
         </div>
       </>
     );

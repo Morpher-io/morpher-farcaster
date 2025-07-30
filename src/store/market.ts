@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 import { TMarketType } from "morpher-trading-sdk"
 import { TMarket, TMarketData, TOrder } from "morpher-trading-sdk"
-import { MorpherTradeSDK, MarketDetail } from "morpher-trading-sdk"
-//import { MorpherTradeSDK, MarketDetail } from "../../../morpher-trading-sdk/src/index"
+//import { MorpherTradeSDK, MarketDetail } from "morpher-trading-sdk"
+import { MorpherTradeSDK, MarketDetail } from "../../../morpher-trading-sdk/src/index"
 
 
 
@@ -20,8 +20,8 @@ interface MarketState {
   setSelectedMarketId: (marketId: string) => void;
   selectedMarket?: TMarket;
   setSelectedMarket: (market?: TMarket) => void;
-  selectedMarketClose?: number;
-  setSelectedMarketClose: (close?: number) => void;
+  livePrice?: {[market_id:string]: number};
+  setLivePrice: (market_id: string, close?: number) => void;
   marketData?: MarketDetail;
   setMarketData: (marketData?: MarketDetail) => void;
   order?: TOrder;
@@ -34,7 +34,7 @@ interface MarketState {
   trendingMarkets?: TMarketData[];
 }
 
-export const useMarketStore = create<MarketState>((set) => ({
+export const useMarketStore = create<MarketState>((set, get) => ({
   marketType: undefined,
   morpherTradeSDK: morpherTradeSDK,
   setMarketType: (marketType) => set({ marketType, selectedMarketId: "", marketList: undefined, marketData: undefined, selectedMarket: undefined }),
@@ -46,19 +46,43 @@ export const useMarketStore = create<MarketState>((set) => ({
   selectedMarket: undefined,
     setSelectedMarket: (market) => {
     set({ selectedMarket: market });
-    set({ selectedMarketClose: market?.close })
+    if (market?.market_id) {
+      let livePrice = get().livePrice || {}
+    
+      livePrice[market.market_id] = market?.close;
+      set({ livePrice })
+    }
+    
     if (market) {
       morpherTradeSDK.subscribeToMarket(market.market_id, (update: any) => {
+        console.log('update market', market.market_id, update.close)
 
-        set({ selectedMarketClose: update?.close })
+         set((state) => ({
+          livePrice: {
+            ...state.livePrice,
+            [market.market_id]: update.close
+          }
 
-      });
+          }));
+            
+
+
+      })
     } else {
       morpherTradeSDK.subscribeToMarket("", () => {});
     }
   },
-  selectedMarketClose: undefined,
-  setSelectedMarketClose: (close) => set({ selectedMarketClose: close }),
+  livePrice: {},
+  setLivePrice: (market_id, close) => {
+    if (market_id && close) {
+      let livePrice = get().livePrice || {}
+  
+      
+      livePrice[market_id] = close;
+      set({ livePrice })
+    }
+
+  }, 
 
   trendingMarkets: undefined,
   marketData: undefined,

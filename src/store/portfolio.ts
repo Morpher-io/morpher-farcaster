@@ -3,7 +3,7 @@ import { create } from 'zustand'
 // import { MorpherTradeSDK } from '../../../morpher-trading-sdk/src/index'
 // import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from '../../../morpher-trading-sdk/src/v2.router';
 
-import { TAddress, TCurrency, TCurrencyDetails } from 'morpher-trading-sdk'
+import { TAddress, TCurrency, TCurrencyDetails, TPortfolio } from 'morpher-trading-sdk'
 import { MorpherTradeSDK } from 'morpher-trading-sdk';
 import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from 'morpher-trading-sdk';
 import { sdk } from "@farcaster/frame-sdk";
@@ -34,14 +34,14 @@ interface PortfolioState {
   selectedPosition?: TPosition;
   setSelectedPosition: (position?: TPosition) => void;
   
-  portfolio?: any;
+  portfolio?: TPortfolio;
   setPortfolio: (portfolio?: any) => void;
   positionValue?: number;
   tradeComplete: boolean;
   setTradeComplete: (complete?: boolean) => void;
   returns: {[type: string ]: TPortfolioDataPoint[]}
   setReturns: (type: "d" | "w" | "m" | "y", returns?: TPortfolioDataPoint[]) => void;
-  leaderboard?: TLeaderBoard[];
+  leaderboard: {[type: string ]: TLeaderBoard[]};
   getLeaderboard: (parameters: {app: string, type: "order" | "returns", eth_address: TAddress} ) => void;
   context?: TContext;
   setContext: (context?: {
@@ -57,16 +57,14 @@ interface PortfolioState {
 export const usePortfolioStore = create<PortfolioState>((set, get) => {
   const fetchPortfolioData = async () => {
     const { eth_address } = get();
+
     if (!eth_address) {
-      console.log("fetchPortfolioData: No eth_address, skipping fetch.");
       set({ loading: false });
       return;
     }
-    console.log("fetchPortfolioData: Starting for address:", eth_address);
     set({ loading: true });
     try {
       const portfolio:any = await morpherTradeSDK.getPortfolio({ eth_address });
-      console.log("fetchPortfolioData: Fetched portfolio:", portfolio);
 
       const positionList = await morpherTradeSDK.getPositions({ eth_address });
       if (portfolio) {
@@ -74,19 +72,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       }
       
            
-      const [returnsD, returnsW, returnsM, returnsY] = await Promise.all([
-        morpherTradeSDK.getReturns({ eth_address, type: 'd' }),
-        morpherTradeSDK.getReturns({ eth_address, type: 'w' }),
-        morpherTradeSDK.getReturns({ eth_address, type: 'm' }),
-        morpherTradeSDK.getReturns({ eth_address, type: 'y' }),
-      ]);
-      console.log("fetchPortfolioData: Fetched returns.");
-
-      const leaderboard = await morpherTradeSDK.getLeaderboard({
-        app: import.meta.env.VITE_MORPHER_APP_NAME,
-        type: 'returns',
-        eth_address,
-      });
+      const returnsW = await morpherTradeSDK.getReturns({ eth_address, type: 'w' })
       
       let positionValue = 0;
       positionList?.forEach((position) => {
@@ -98,24 +84,14 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         positionList,
         positionValue,
         returns: {
-          d: returnsD,
-          w: returnsW,
-          m: returnsM,
-          y: returnsY,
+          w: returnsW || [],
         },
-        leaderboard,
       });
     } catch (error: any) {
       console.error("Failed to fetch portfolio data:", error);
       if (error.message && error.message.includes("No portfolio was found")) {
-        console.log("fetchPortfolioData: No portfolio exists for this user. Setting default state.");
         set({
-          portfolio: {
-            total_portfolio_value: "0",
-            positions_count: 0,
-            total_portfolio_value_unrealized_pnl: '0',
-            total_open_position_value: '0',
-          },
+
           positionList: [],
           returns: { d: [], w: [], m: [], y: [] },
         });
@@ -124,13 +100,13 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         set({ portfolio: undefined, returns: {}, positionList: undefined, leaderboard: undefined });
       }
     } finally {
-      console.log("fetchPortfolioData: Finished, setting loading to false.");
       set({ loading: false });
     }
   };
 
   return {
     tradeAmount: '',
+    leaderboard: {},
     returns: {},
     setTradeAmount: (tradeAmount) => set({ tradeAmount }),
     selectedCurrency: undefined,
@@ -151,10 +127,15 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     },
     getLeaderboard: (parameters) => {
 
+      let leaderboard = get().leaderboard;
+      if (leaderboard && leaderboard[parameters.type]) {
+        return
+      }
       if (parameters) {
         morpherTradeSDK.getLeaderboard({type: parameters.type, app: parameters.app, eth_address: parameters.eth_address}).then(data => {
-        console.log('lederboard data', data)
-        set({ leaderboard: data })
+          
+          leaderboard[parameters.type] = data
+          set({ leaderboard })
 
         })
         
@@ -162,7 +143,6 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     
     },
     setEthAddress: (eth_address) => {
-      console.log("Setting eth_address:", eth_address);
       const current_eth_address = get().eth_address;
       if (eth_address === current_eth_address) return;
 
@@ -170,7 +150,6 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       if (eth_address) {
         fetchPortfolioData();
         morpherTradeSDK.subscribeToOrder(eth_address, (update: any) => {
-          console.log("Order update received:", update);
           set({ orderUpdate: update });
           fetchPortfolioData(); // Refetch on order update
         });
@@ -192,6 +171,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       })
       
       set({ positionList, positionValue })
+
     },
 
     selectedPosition: undefined,

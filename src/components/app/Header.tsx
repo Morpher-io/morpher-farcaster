@@ -9,7 +9,7 @@ import {
 
 export function Header() {
   return (
-    <header className="flex items-center justify-between border-b  bg-[var(--primary)] px-4 py-3 items-center ">
+    <header className="flex items-center justify-between  px-4 py-3 items-center ">
       <div>
           <img
             src={`/src/assets/logos/morpher-header.svg`}
@@ -17,7 +17,15 @@ export function Header() {
             className=""
         />
       </div>
-      <nav>
+      <div className="cursor-pointer">
+       <img
+            src={`/src/assets/icons/info.svg`}
+            alt={`info icon`}
+            className=""
+        />
+        </div>
+      {/* <nav>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild className="">
             <div>
@@ -44,7 +52,7 @@ export function Header() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </nav>
+      </nav> */}
     </header>
   );
 }

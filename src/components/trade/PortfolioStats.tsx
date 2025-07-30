@@ -5,9 +5,7 @@ import { Loader2Icon } from "lucide-react";
 import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
 
 export function PortfolioStats() {
-  const { portfolio, returns, loading, currencyList } = usePortfolioStore();
-
-  console.log("PortfolioStats state:", { loading, portfolio, returns, currencyList });
+  const { portfolio, returns, loading, currencyList, positionList } = usePortfolioStore();
 
   const availableToTrade = React.useMemo(() => {
     if (!currencyList) return 0;
@@ -69,7 +67,7 @@ export function PortfolioStats() {
     },
     {
       title: "Open Positions",
-      value: portfolio.positions_count,
+      value: positionList?.length || 0,
     },
   ];
 
@@ -77,16 +75,16 @@ export function PortfolioStats() {
     <div className="grid grid-cols-3 gap-2">
       {stats.map((stat) => (
         <Card key={stat.title} className="p-2">
-          <CardContent className="flex flex-col items-center justify-center p-1 text-center h-full">
+          <CardContent className="flex flex-col items-center  p-1 text-center h-full justify-between">
             <p className="font-semibold text-muted-foreground text-xs leading-tight mb-1">{stat.title}</p>
-            <div className="flex-grow flex flex-col justify-center">
+            <div className="">
               {stat.data ? (
                 <>
-                  <p className={`font-semibold text-sm ${stat.data.isPositive === false ? "text-secondary" : "text-primary"}`}>
-                    {stat.data.isPositive ? "+" : ""}${usdFormatter(stat.data.valueUsd)}
+                  <p className={`font-semibold text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-primary"}`}>
+                    {stat.data.isPositive ? "+" : ""}$ {usdFormatter(stat.data.valueUsd)}
                     {isFinite(stat.data.percent) && (
                       <span className="text-xs ml-1">
-                        ({stat.data.percent.toFixed(2)}%)
+                        <br />({stat.data.percent.toFixed(2)}%)
                       </span>
                     )}
                   </p>
@@ -95,7 +93,7 @@ export function PortfolioStats() {
                   </p>
                 </>
               ) : (
-                <p className="font-semibold text-sm">{stat.value}</p>
+                <p className="font-bold text-baseline">{stat.value}</p>
               )}
             </div>
           </CardContent>

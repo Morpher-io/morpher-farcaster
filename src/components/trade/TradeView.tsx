@@ -37,7 +37,7 @@ export function TradeView() {
     selectedMarketId,
     setSelectedMarketId,
     selectedMarket,
-    selectedMarketClose,
+    livePrice,
     marketData,
     setMarketData,
     morpherTradeSDK,
@@ -55,12 +55,31 @@ export function TradeView() {
   const account = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
-
+  
+  const [marketPrice, setMarketPrice] = React.useState(0);
   const [closePercentage, setClosePercentage] = React.useState(100);
   const [isClosing, setIsClosing] = React.useState(false);
   const [tradeError, setTradeError] = React.useState<string | undefined>(
     undefined
   );
+
+  React.useEffect(() => {
+
+    if (!marketData) {
+      setMarketPrice(0)
+      return
+    }
+    
+
+    
+    if (livePrice && livePrice[marketData.market_id]) {
+      setMarketPrice(livePrice[marketData.market_id])
+    } else {
+      setMarketPrice(marketData.close)
+    }
+
+
+  }, [livePrice, marketData])
 
   const open = !!selectedMarketId;
 
@@ -298,7 +317,7 @@ export function TradeView() {
     ? positionValueMph * currencyList.MPH.usd_exchange_rate
     : null;
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = React.useCallback(({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const firstValue = formattedChartData.length > 0 ? formattedChartData[0].value : 0;
@@ -328,7 +347,40 @@ export function TradeView() {
       );
     }
     return null;
-  };
+  }, [formattedChartData, timeRange]);
+
+  const chartComponent = React.useMemo(() => (
+    <div className="-mx-4 h-[200px]">
+      <ChartContainer config={chartConfig} className="w-full h-full">
+        <LineChart data={formattedChartData}>
+          <RechartsTooltip
+            cursor={{
+              stroke: "var(--color-value)",
+              strokeWidth: 1,
+              strokeDasharray: "3 3",
+            }}
+            content={<CustomTooltip />}
+          />
+          <XAxis dataKey="timestamp" hide />
+          <YAxis domain={yAxisDomain} hide />
+          <Line
+            dataKey="value"
+            type="monotone"
+            stroke="var(--color-value)"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{
+              r: 4,
+              style: {
+                fill: "var(--color-value)",
+                stroke: "var(--background)",
+              },
+            }}
+          />
+        </LineChart>
+      </ChartContainer>
+    </div>
+  ), [chartConfig, formattedChartData, yAxisDomain, CustomTooltip]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -374,7 +426,8 @@ export function TradeView() {
               <div className="flex flex-col gap-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-3xl font-bold">${tokenValueFormatter(selectedMarketClose || marketData.close)}</p>
+                    
+                    <p className="text-3xl font-bold">${tokenValueFormatter(marketPrice)}</p>
                     <p className={cn("text-lg font-semibold", (Number(marketData.change_percent) || 0) >= 0 ? "text-primary" : "text-secondary")}>
                         {(Number(marketData.change_percent) || 0) >= 0 ? "+" : ""}
                         {tokenValueFormatter(marketData.change)} ({(Number(marketData.change_percent) || 0).toFixed(2)}%)
@@ -396,36 +449,7 @@ export function TradeView() {
                   </div>
                 </div>
 
-                <div className="-mx-4 h-[200px]">
-                  <ChartContainer config={chartConfig} className="w-full h-full">
-                    <LineChart data={formattedChartData}>
-                      <RechartsTooltip
-                        cursor={{
-                          stroke: "var(--color-value)",
-                          strokeWidth: 1,
-                          strokeDasharray: "3 3",
-                        }}
-                        content={<CustomTooltip />}
-                      />
-                      <XAxis dataKey="timestamp" hide />
-                      <YAxis domain={yAxisDomain} hide />
-                      <Line
-                        dataKey="value"
-                        type="monotone"
-                        stroke="var(--color-value)"
-                        strokeWidth={2}
-                        dot={false}
-                        activeDot={{
-                          r: 4,
-                          style: {
-                            fill: "var(--color-value)",
-                            stroke: "var(--background)",
-                          },
-                        }}
-                      />
-                    </LineChart>
-                  </ChartContainer>
-                </div>
+                {chartComponent}
 
                 <div className="flex justify-center gap-1">
                   {["1D", "1W", "1M", "3M", "6M", "1Y"].map((range) => (
@@ -445,7 +469,7 @@ export function TradeView() {
                   const low = Number(marketData.low || 0);
                   const high = Number(marketData.high || 0);
                   const open = Number(marketData.open || 0);
-                  const close = Number(selectedMarketClose || marketData.close || 0);
+                  const close = Number(marketPrice);
                   const range = high - low;
                   let positionPercent = range > 0 ? ((close - low) / range) * 100 : 50;
                   positionPercent = Math.max(0, Math.min(100, positionPercent));

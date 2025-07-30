@@ -41,7 +41,7 @@ export function MarketSelector() {
     selectedMarketId,
     setSelectedMarketId,
     selectedMarket,
-    selectedMarketClose,
+    livePrice,
     setSelectedMarket,
     marketListAll,
     setMarketListAll
@@ -332,7 +332,7 @@ export function MarketSelector() {
               className="w-full justify-between h-[60px]"
             >
               {selectedMarket ? (
-                outputMarket(selectedMarket, selectedMarketClose)
+                outputMarket(selectedMarket, livePrice ? livePrice[selectedMarket.market_id] : undefined )
               ) : (
                 <span className="text-muted-foreground flex items-center">
                   <Search className="mr-2 h-4 w-4" />
