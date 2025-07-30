@@ -13,40 +13,34 @@ export function TradeSuccessScreen() {
 
    const account: any = useAccount();
     
-    const { selectedMarket, order, setOrder, morpherTradeSDK, marketListAll, setSelectedMarket, setTradeType, setLeverage } = useMarketStore();
+    const { selectedMarket,  morpherTradeSDK, marketListAll, setSelectedMarket, setTradeType, setLeverage } = useMarketStore();
     const { setTradeComplete, selectedCurrency, tradeAmount, orderUpdate, tradeComplete, setTradeAmount, setClosePercentage } = usePortfolioStore();
 
       const getOrder = async () => {
     if (account.address === undefined) {
       return;
     }
-    let orders = await morpherTradeSDK.getOrders({
-      eth_address: account.address,
-      order_id: orderUpdate?.data.orderId,
-    });
-    if (orders && orders.length > 0) {
-      setOrder(orders[0]);
-    }
+ 
   };
 
   useEffect(() => {
 
-    if (marketListAll && order && order.market_id && selectedMarket?.market_id !== order.market_id ) {
-      let market = marketListAll[order.market_id]
+    if (marketListAll && orderUpdate && orderUpdate.market_id && selectedMarket?.market_id !== orderUpdate.market_id ) {
+      let market = marketListAll[orderUpdate.market_id]
       setSelectedMarket(market)
     }
-  }, [marketListAll, order, selectedMarket ])
+  }, [marketListAll, orderUpdate, selectedMarket ])
     const share = async () => {
 
         let text = `I just ${
-          order?.direction == "long" ? "traded" : "shorted"
+          orderUpdate?.direction == "long" ? "traded" : "shorted"
         } ${
-          selectedMarket?.name || order?.market_id
+          selectedMarket?.name || orderUpdate?.market_id
         } with ${tradeAmount} ${selectedCurrency} on Morpher!`;
 
-        if (Number(order?.close_shares_amount || 0) > 0) {
+        if (Number(orderUpdate?.close_shares_amount || 0) > 0) {
           text = `I just made +1.12% profit trading ${
-          selectedMarket?.name || order?.market_id
+          selectedMarket?.name || orderUpdate?.market_id
         } on Morpher!`;
         }
 
@@ -79,8 +73,8 @@ export function TradeSuccessScreen() {
     }, [orderUpdate])
 
     useEffect(() => {
-        console.log('order', order)
-    }, [order])
+        console.log('order', orderUpdate)
+    }, [orderUpdate])
     return (
       <>
         <div
@@ -97,12 +91,12 @@ export function TradeSuccessScreen() {
 
           <p className="text-4xl mt-4">Trade Complete</p>
           <p className="text-lg mt-4 text-center">
-            {(Number(order?.close_shares_amount || 0) > 0) ? <>
+            {(Number(orderUpdate?.close_shares_amount || 0) > 0) ? <>
               You just closed your {" "}
-            {selectedMarket?.name || order?.market_id} position and made <span className="text-primary">+ 1.12% ($ {usdFormatter(Number(order?.close_shares_amount || 0) * Number(order?.price || 0) / 10**18)})</span>
+            {selectedMarket?.name || orderUpdate?.market_id} position and made <span className="text-primary">+ 1.12% ($ {usdFormatter(Number(orderUpdate?.close_shares_amount || 0) * Number(orderUpdate?.price || 0) / 10**18)})</span>
             </> : <>
-              You just {order?.direction == "long" ? "traded" : "shorted"}{" "}
-              {selectedMarket?.name || order?.market_id} with {tradeAmount} {selectedCurrency}
+              You just {orderUpdate?.direction == "long" ? "traded" : "shorted"}{" "}
+              {selectedMarket?.name || orderUpdate?.market_id} with {tradeAmount} {selectedCurrency}
             </>}
             
           </p>

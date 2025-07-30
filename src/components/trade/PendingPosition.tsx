@@ -11,12 +11,20 @@ import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { Button } from "../ui/button";
 import { Loader2Icon } from "lucide-react";
 import {
+  TMarketDetail,
   tokenValueFormatter,
   TradeCallback,
 } from "morpher-trading-sdk";
+import { useTranslation } from "react-i18next";
 
-export function PendingPosition() {
-  const { marketData, morpherTradeSDK, order, setOrder } = useMarketStore();
+interface PendingPositionProps {
+  marketData: TMarketDetail;
+}
+
+export function PendingPosition({ marketData }: PendingPositionProps) {
+  const { t } = useTranslation();
+  
+  const { morpherTradeSDK, order, setOrder } = useMarketStore();
 
   const account: any = useAccount();
   const [closeExecuting, setCloseExecuting] = useState(false);
@@ -89,21 +97,23 @@ export function PendingPosition() {
     <div className="mt-4">
       <Card>
         <CardHeader>
-          <CardTitle>Pending Position</CardTitle>
+          <CardTitle>{t('PENDING_ORDER')}</CardTitle>
           <CardDescription>
-            Your trade is currently being processed.
+            {t('ORDER_EXECUTION')}
+            
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm font-medium">
-            Your order will be executed shortly.
+       
+        {!marketData?.market_id?.includes('CRYPTO_') && (
+          <p className="text-sm font-normal">
+            {t('ORDER_MARKET_HOURS')}
           </p>
-          <p className="text-xs text-muted-foreground truncate mt-2">
-            Order ID: {marketData?.pending_order_id}
-          </p>
+          )}
+          
           <Button className="w-full mt-4" onClick={executeClose} variant={"default"}>
             {closeExecuting && <Loader2Icon className="animate-spin" />}
-            <span className="text-white">Cancel Order</span>
+            <span className="text-white">{t('CANCEL_ORDER_BUTTON')}</span>
           </Button>
 
           {tradeError && (
@@ -111,19 +121,31 @@ export function PendingPosition() {
           )}
           {order && (
             <div className="mt-2">
-              <p className="text-sm">Order Details:</p>
+              <p className="text-sm">{t('ORDER_DETAILS')}:</p>
+              <p className="text-xs text-muted-foreground truncate mt-2">
+                <b>{t('ORDER_ID')}:</b> {marketData?.pending_order_id}
+              </p>
+
+              {
+                (Number(order?.close_shares_amount || 0 ) > 0) ? (
+                <p className="text-xs text-muted-foreground">
+                  <b>{t('CLOSING')}</b>
+                </p>) : (
+                <p className="text-xs text-muted-foreground">
+                  <b>{t('AMOUNT')}</b>:{" "}
+                  {tokenValueFormatter(
+                    Number(order.open_mph_token_amount || 0) / 10 ** 18
+                  )}{" "}
+                    MPH
+                  </p>)
+                }
+              
+      
               <p className="text-xs text-muted-foreground">
-                Type: {order.type}
+                <b>{t('PRICE')}</b>: $ {tokenValueFormatter(Number(order.price || 0) / 10**8)}
               </p>
               <p className="text-xs text-muted-foreground">
-                Amount:{" "}
-                {tokenValueFormatter(
-                  Number(order.open_mph_token_amount || 0) / 10 ** 18
-                )}{" "}
-                MPH
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Price: {order.price}
+                <b>{t('DATE_ENTERED')}</b>: {(order.created_at) ? new Date(Number(order.created_at)).toDateString() : ''}
               </p>
             </div>
           )}

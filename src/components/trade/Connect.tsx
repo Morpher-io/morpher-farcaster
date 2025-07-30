@@ -1,8 +1,11 @@
 import { useConnect } from "wagmi";
 import { useEffect } from "react";
 import { sdk } from "@farcaster/frame-sdk";
+import { useTranslation } from "react-i18next";
 
 export function Connect() {
+  const { t } = useTranslation();
+  
   const { connect, connectors } = useConnect();
 
   useEffect(() => {
@@ -20,7 +23,7 @@ export function Connect() {
             alt={`Morpher Logo`}
             className="h-25 w-25 animate-spin [animation-duration:20s]"
           />
-          <p className="text-white mt-4 text-xl">Connecting wallet...</p>
+          <p className="text-white mt-4 text-xl">{t('CONNECTING_WALLET')}...</p>
         </div>
       </div>
     </div>

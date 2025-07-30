@@ -33,8 +33,10 @@ import { Trade } from "./Trade";
 import { Position } from "./Position";
 import { PendingPosition } from "./PendingPosition";
 import { usePortfolioStore } from "@/store/portfolio"
+import { useTranslation } from "react-i18next"
 
 export function PositionSelector() {
+  const { t } = useTranslation();  
   const {setPositionList, positionList,
     orderUpdate,
     tradeDirection,
@@ -191,7 +193,7 @@ export function PositionSelector() {
           </PopoverTrigger>
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
             <Command>
-              <CommandInput placeholder="Search market..." />
+              <CommandInput placeholder={t('SEARCH_MARKETS') + "..."} />
               <CommandList>
                 <CommandEmpty>No market found.</CommandEmpty>
                 <CommandGroup>

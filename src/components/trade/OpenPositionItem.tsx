@@ -4,6 +4,8 @@ import {
   usdFormatter,
   tokenValueFormatter,
   TradeCallback,
+  TMarket,
+  TMarketDetail,
 } from "morpher-trading-sdk";
 import { cn } from "@/lib/utils";
 import { usePortfolioStore } from "@/store/portfolio";
@@ -13,6 +15,7 @@ import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
 import { Loader2Icon, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { PendingPosition } from "./PendingPosition";
 
 interface OpenPositionItemProps {
   position: TPosition;
@@ -24,9 +27,13 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [closePercentage, setClosePercentage] = React.useState(100);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [marketData, setMarketData] = React.useState<TMarketDetail | undefined>(undefined);
   const [tradeError, setTradeError] = React.useState<string | undefined>(
     undefined
   );
+
+
+
 
   React.useEffect(() => {
     if (position?.market_id) {
@@ -42,7 +49,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
     };
   }, [position]);
 
-  const { currencyList, selectedCurrency, setTradeComplete } =
+  const { currencyList, selectedCurrency, orderUpdate } =
     usePortfolioStore();
   const { morpherTradeSDK, setSelectedMarketId, marketListAll, setLivePrice, livePrice } =
     useMarketStore();
@@ -53,6 +60,25 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
   const market = marketListAll?.[position.market_id];
   const [currentPrice, setCurrentPrice] = React.useState(0);
 
+  
+  const openMarket = async () => {
+    if (isExpanded) {
+      setIsExpanded(false)
+    } else {
+
+      if (market?.market_id) {
+        
+        if (!marketData || marketData.market_id !== market?.market_id ) {
+          await refreshMarketData() 
+
+        }
+      }
+
+
+      setIsExpanded(true)
+    }
+    
+  }
 
   React.useEffect(() => {
 
@@ -97,7 +123,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
         }
       }
       
-      setTradeError(error || 'An error occurred while executing the trade.')
+      setTradeError(error || t('ERROR_EXECUTING_TRADE'))
     } else {
       setIsExpanded(false);
     }
@@ -105,9 +131,29 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
     setIsClosing(false);
   };
 
+  
+  const refreshMarketData = async () => {
+    console.log('refreshMarketData')
+    if (market?.market_id) {
+      const sdkMarketData = await morpherTradeSDK.getMarketData({eth_address:account.address, market_id: market.market_id})
+      setMarketData(sdkMarketData);
+    } else {
+      setMarketData(undefined);
+    }
+  }
+  React.useEffect(() => {
+    if (orderUpdate?.status == 'cancelled' && marketData) {
+      refreshMarketData()
+    } else if (marketData && orderUpdate?.market_id && orderUpdate?.market_id === marketData.market_id) {
+      refreshMarketData()
+    }
+    
+    
+  }, [orderUpdate])
+
   const handleClosePosition = () => {
     if (!walletClient) {
-      setTradeError("Wallet client not available.");
+      setTradeError(t('WALLET_CLIENT_NOT_AVAILABLE'));
       return;
     }
     setTradeError(undefined);
@@ -124,10 +170,12 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
   };
 
   return (
+    
     <div className="border-b">
+      
       <div
         className="flex items-center justify-between py-4 cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => openMarket()}
       >
         <div className="flex items-center gap-3">
           {position.logo_image && (
@@ -170,9 +218,13 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
         </div>
       </div>
       {isExpanded && (
+        <>
+        {marketData?.pending_order_id ? (<>
+          <PendingPosition marketData={marketData} />
+        </>) : (
         <div className="pb-4 px-2">
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-4">
-            <div className="text-muted-foreground">Direction</div>
+            <div className="text-muted-foreground">{t('DIRECTION')}</div>
             <div
               className={cn(
                 "text-right font-medium capitalize",
@@ -184,7 +236,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               {position.direction}
             </div>
 
-            <div className="text-muted-foreground">Value</div>
+            <div className="text-muted-foreground">{t('VALUE')}</div>
             <div className="text-right font-medium">
               {positionValueUsd ? (
                 <>
@@ -198,7 +250,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               )}
             </div>
 
-            <div className="text-muted-foreground">Unrealized P/L</div>
+            <div className="text-muted-foreground">{t('UNREALIZED_PL')}</div>
             <div
               className={cn(
                 "text-right font-medium",
@@ -223,12 +275,12 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               )}
             </div>
 
-            <div className="text-muted-foreground">Avg. Entry</div>
+            <div className="text-muted-foreground">{t('AVG_ENTRY')}</div>
             <div className="text-right font-medium">
               ${usdFormatter(Number(position.average_price) / 10 ** 8)}
             </div>
 
-            <div className="text-muted-foreground">Leverage</div>
+            <div className="text-muted-foreground">{t('LEVERAGE')}</div>
             <div className="text-right font-medium">
               {(Number(position.average_leverage) / 10 ** 8).toFixed(1)}x
             </div>
@@ -247,7 +299,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
                 className="col-span-1"
                 onClick={() => setSelectedMarketId(position.market_id)}
               >
-                View Market
+                {t('VIEW_MARKET')}
               </Button>
               <Button
                 onClick={handleClosePosition}
@@ -255,7 +307,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
                 className="col-span-2"
               >
                 {isClosing && <Loader2Icon className="animate-spin mr-2" />}
-                Close {closePercentage}%
+                {t('CLOSE_PERCENTAGE', { closePercentage })}
               </Button>
             </div>
             {tradeError && (
@@ -263,6 +315,8 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
             )}
           </div>
         </div>
+        )}
+        </>
       )}
     </div>
   );

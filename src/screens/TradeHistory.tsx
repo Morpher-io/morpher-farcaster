@@ -24,8 +24,10 @@ import { usePortfolioStore } from "@/store/portfolio";
 import { Input } from "@/components/ui/input";
 import { Filter, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export function TradeHistoryScreen() {
+  const { t } = useTranslation();
   const account = useAccount();
   const { morpherTradeSDK } = useMarketStore();
   const { currencyList } = usePortfolioStore();
@@ -92,7 +94,7 @@ export function TradeHistoryScreen() {
               id="marketPercent"
               className={`flex items-center text-sm justify-st\rt ${order.direction == "long" ? "text-primary" : "text-secondary"}`}
             >
-              {order.direction == "long" ? "Long" : "Short"}
+              {order.direction == "long" ? t("LONG") : t("SHORT")}
             </div>
           </div>
         </div>
@@ -119,12 +121,12 @@ export function TradeHistoryScreen() {
 
   return (
     <div className="mx-4">
-      <h2 className="text-lg font-bold mt-4">Trade History</h2>
+      <h2 className="text-lg font-bold mt-4">{t('TRADE_HISTORY')}</h2>
 
       <div className="relative mt-4">
         <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Filter by symbol..."
+          placeholder={t("FILTER_BY_SYMBOL")}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="pl-10"
@@ -164,13 +166,17 @@ export function TradeHistoryScreen() {
             <DialogHeader>
               <DialogTitle>{getSymbol(selectedOrder.market_id)}</DialogTitle>
               <DialogDescription>
-                {selectedOrder.direction === "long" ? "Long" : "Short"} Trade
-                Details
+                {t("TRADE_DETAILS_DESCRIPTION", {
+                  direction:
+                    selectedOrder.direction === "long"
+                      ? t("LONG")
+                      : t("SHORT"),
+                })}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-2 py-4">
               <div className="grid grid-cols-2 items-center">
-                <p>Amount</p>
+                <p>{t("AMOUNT")}</p>
                 <p className="font-semibold text-right">
                   {currencyList?.MPH?.usd_exchange_rate
                     ? "$ " +
@@ -184,19 +190,19 @@ export function TradeHistoryScreen() {
                 </p>
               </div>
               <div className="grid grid-cols-2 items-center">
-                <p>Date</p>
+                <p>{t("DATE_ENTERED")}</p>
                 <p className="font-semibold text-right">
                   {formatDate(Number(selectedOrder.oracle_called_at))}
                 </p>
               </div>
               <div className="grid grid-cols-2 items-center">
-                <p>Status</p>
+                <p>{t("STATUS")}</p>
                 <p className="font-semibold text-right">
                   {selectedOrder.status}
                 </p>
               </div>
               <div className="grid grid-cols-2 items-center">
-                <p>Order ID</p>
+                <p>{t("ORDER_ID")}</p>
                 <div className="flex items-center justify-end gap-2">
                   <p className="font-semibold text-right break-all">
                     {selectedOrder.id && selectedOrder.id.length > 10
@@ -216,7 +222,7 @@ export function TradeHistoryScreen() {
               </div>
               {selectedOrder.tx_hash && (
                 <div className="grid grid-cols-2 items-center">
-                  <p>Transaction Hash</p>
+                  <p>{t("TRANSACTION_HASH")}</p>
                   <div className="flex items-center justify-end gap-2">
                     <p className="font-semibold text-right break-all">
                       {selectedOrder.tx_hash &&
@@ -240,7 +246,7 @@ export function TradeHistoryScreen() {
               )}
               {selectedOrder.callback_hash && (
                 <div className="grid grid-cols-2 items-center">
-                  <p>Callback Hash</p>
+                  <p>{t("CALLBACK_HASH")}</p>
                   <div className="flex items-center justify-end gap-2">
                     <p className="font-semibold text-right break-all">
                       {selectedOrder.callback_hash &&

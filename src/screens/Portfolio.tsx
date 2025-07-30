@@ -15,11 +15,14 @@ import { usePortfolioStore } from "@/store/portfolio";
 import { useNavigate } from "react-router-dom";
 import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
 import { useTranslation } from "react-i18next";
+import { Trade } from "@/components/trade/Trade";
+import { TradeView } from "@/components/trade/TradeView";
 
 export function PortfolioScreen() {
+    const { address } = useAccount();
 
     const account = useAccount();
-    const {  morpherTradeSDK, setSelectedMarketId } = useMarketStore();
+    const {  morpherTradeSDK, setSelectedMarketId, selectedMarketId, marketListAll, setSelectedMarket, setMarketData } = useMarketStore();
     const { positionList, setPositionList, setPortfolio, positionValue, currencyList, setReturns, returns } = usePortfolioStore();
     const [timeRange, setTimeRange] = useState<"d" | "w" | "m" | "y">("d");
     const [chartData, setChartData] = useState<[number, number][]>([]);
@@ -30,6 +33,27 @@ export function PortfolioScreen() {
         setSelectedMarketId("CRYPTO_BTC");
         navigate("/");
     };
+
+    
+    const fetchMarketData = async ({eth_address, market_id}: {eth_address: `0x${string}`, market_id: string}) => {
+        const sdkMarketData = await morpherTradeSDK.getMarketData({eth_address, market_id})
+        console.log('sdkMarketData', sdkMarketData)
+        setSelectedMarket(sdkMarketData);
+
+    }
+
+
+    
+    useEffect(() => {
+        console.log('selectedMarketId', selectedMarketId)
+        if (selectedMarketId && marketListAll) {
+            console.log('marketListAll')
+          setSelectedMarket(marketListAll[selectedMarketId])
+        } else {
+            fetchMarketData({eth_address: address || '0x', market_id: selectedMarketId})
+        }
+      }, [selectedMarketId, marketListAll, setSelectedMarket])
+    
 
     const getProtfolio = async () => {
         if (account?.address && morpherTradeSDK) {
@@ -90,7 +114,11 @@ export function PortfolioScreen() {
 
     }, [returns[timeRange], timeRange])
     return (
-        <div className="mx-4">
+        <>
+        <TradeView />
+        
+            <div className="mx-4">
+            
             <Card className="mt-4">
                 <CardHeader>
                     <CardTitle className="text-lg font-bold">{t('menu.PORTFOLIO')}</CardTitle>
@@ -138,6 +166,11 @@ export function PortfolioScreen() {
             </Card>
             <h2 className="text-lg font-bold mt-6 mb-2">{t('POSITIONS')}</h2>
 
+
+            {/* {marketData.pending_order_id ? (
+                              <PendingPosition marketData={marketData} />
+                            ) : */}
+
             {positionList && positionList.length > 0 ? (
                 positionList.map((position) => (
                     <OpenPositionItem key={position.id} position={position} />
@@ -181,6 +214,7 @@ export function PortfolioScreen() {
             ) : (
                 ''
             )} */}
-        </div>
+            </div>
+        </>
     );
 }

@@ -150,21 +150,28 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       if (eth_address) {
         fetchPortfolioData();
         morpherTradeSDK.subscribeToOrder(eth_address, (update: any) => {
-          if (update.data.orderId) {
-             morpherTradeSDK.getOrders({
-              eth_address: eth_address,
-              order_id: update.data.orderId
-            }).then(orders => {
-              if (orders && orders.length > 0) {
-                let order = orders[0]
-                set({ orderUpdate: order });
-                if (order.status == 'success') {
-                  set({ tradeComplete: true });
-                }
+          if (update.data.status == 'cancelled' ) {
+            const eth_address = get().eth_address || ''
 
-              }
-            })
+            set({ orderUpdate: {id: update.data.id, status: 'cancelled', eth_address, direction:'', type: '', created_at: 0  } });
+          } else {
+            if (update.data.orderId) {
+              morpherTradeSDK.getOrders({
+                eth_address: eth_address,
+                order_id: update.data.orderId
+              }).then(orders => {
+                if (orders && orders.length > 0) {
+                  let order = orders[0]
+                  set({ orderUpdate: order });
+                  if (order.status == 'success') {
+                    set({ tradeComplete: true });
+                  }
+
+                }
+              })
+            }
           }
+   
                 
           fetchPortfolioData(); // Refetch on order update
         });

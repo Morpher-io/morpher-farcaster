@@ -1,8 +1,8 @@
-import * as React from "react"
-import { ChevronsUpDown, Loader2Icon, Search, SearchIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useDebouncedCallback } from 'use-debounce';
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { ChevronsUpDown, Loader2Icon, Search, SearchIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useDebouncedCallback } from "use-debounce";
+import { Button } from "@/components/ui/button";
 
 import {
   Command,
@@ -11,30 +11,33 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import { tokenValueFormatter } from "morpher-trading-sdk";
-import { TMarketType } from "morpher-trading-sdk"
-import { TMarket, StrictOHLCArray } from "morpher-trading-sdk"
-import { useAccount } from "wagmi"
+import { TMarketType } from "morpher-trading-sdk";
+import { TMarket, StrictOHLCArray } from "morpher-trading-sdk";
+import { useAccount } from "wagmi";
 import { useMarketStore } from "../../store/market";
 import { usePortfolioStore } from "@/store/portfolio";
-import { Input } from "../ui/input"
+import { Input } from "../ui/input";
 import { useTranslation } from "react-i18next";
 
 export function MarketSelector() {
   const { t } = useTranslation();
-  
-  const {morpherTradeSDK} = useMarketStore();
-  const [open, setOpen] = React.useState(false)
-  const [filter, setFilter] = React.useState('')
+
+  const { morpherTradeSDK } = useMarketStore();
+  const [open, setOpen] = React.useState(false);
+  const [filter, setFilter] = React.useState("");
   const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
-  const [displayCategory, setDisplayCategory] = React.useState<TMarketType | 'all'>('all');
+  const [displayCategory, setDisplayCategory] = React.useState<
+    TMarketType | "all"
+  >("all");
   const inputRef = React.useRef<HTMLInputElement>(null);
+  
   const {
     marketType,
     setMarketType,
@@ -46,16 +49,16 @@ export function MarketSelector() {
     livePrice,
     setSelectedMarket,
     marketListAll,
-    setMarketListAll
+    setMarketListAll,
   } = useMarketStore();
-  
+
   const { address } = useAccount();
 
   React.useEffect(() => {
     if (marketType && marketType !== displayCategory) {
       setDisplayCategory(marketType);
-    } else if (!marketType && displayCategory !== 'all') {
-      setDisplayCategory('all');
+    } else if (!marketType && displayCategory !== "all") {
+      setDisplayCategory("all");
     }
   }, [marketType, displayCategory]);
 
@@ -83,26 +86,22 @@ export function MarketSelector() {
     }
 
     setIsMarketListLoading(false);
-  }
+  };
   React.useEffect(() => {
-    
-    
     if (!marketListAll) {
-      fetchMarketsAll()
+      fetchMarketsAll();
     }
-
-
-  }, [marketListAll])
-
+  }, [marketListAll]);
 
   React.useEffect(() => {
     if (open) {
       setTimeout(() => {
+        console.log('inputRef', inputRef)
         inputRef.current?.focus();
       }, 100);
     }
-  }, [open]);
-  
+  }, [open, marketType]);
+
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = React.useState(false);
   const [startX, setStartX] = React.useState(0);
@@ -129,7 +128,7 @@ export function MarketSelector() {
     const el = scrollContainerRef.current;
     if (el) {
       checkFades();
-      
+
       const handleEvents = () => checkFades();
       el.addEventListener("scroll", handleEvents);
       window.addEventListener("resize", handleEvents);
@@ -144,9 +143,6 @@ export function MarketSelector() {
       };
     }
   }, [checkFades, marketList]);
-
-
-
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (scrollContainerRef.current) {
@@ -201,22 +197,25 @@ export function MarketSelector() {
       const statusColors: { [key: string]: string } = {
         open: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
         pre: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-        after: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+        after:
+          "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
         closed: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
-        "trade halt": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+        "trade halt":
+          "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
       };
       return (
         <span
           className={cn(
             "text-xs font-semibold px-2 py-0.5 rounded-full capitalize",
-            statusColors[status.toLowerCase()] || "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+            statusColors[status.toLowerCase()] ||
+              "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
           )}
         >
           {status}
         </span>
       );
     };
-    
+
     return (
       <div className="flex w-full items-start justify-between py-1">
         <div className="flex items-center gap-3">
@@ -245,8 +244,7 @@ export function MarketSelector() {
 
         <div className="flex flex-col text-right gap-1 items-end">
           <p className="text-base font-bold">
-            ${" "}
-            {tokenValueFormatter(closeOverride || market?.close)}
+            $ {tokenValueFormatter(closeOverride || market?.close)}
           </p>
           <div className="flex items-center gap-1 text-xs">
             <span
@@ -258,7 +256,6 @@ export function MarketSelector() {
             >
               {(market?.change_percent || 0) > 0 ? "+" : ""}
               {Number(market?.change_percent || 0).toFixed(2)}%
-
             </span>
           </div>
         </div>
@@ -269,51 +266,49 @@ export function MarketSelector() {
   const account = useAccount();
 
   React.useEffect(() => {
-
     if (selectedMarketId && marketListAll) {
-      setSelectedMarket(marketListAll[selectedMarketId])
+      setSelectedMarket(marketListAll[selectedMarketId]);
     } else {
-      setSelectedMarket(undefined)
+      setSelectedMarket(undefined);
     }
-  }, [selectedMarketId, marketListAll, setSelectedMarket])
+  }, [selectedMarketId, marketListAll, setSelectedMarket]);
 
   const fetchMarkets = async (category: TMarketType | "all") => {
-    
     setMarketList(undefined);
 
-    let merkets: TMarket[] = []
+    let merkets: TMarket[] = [];
     if (category === "all") {
       Object.values(marketListAll as any).forEach((market: any) => {
-        merkets.push(market)
-      })
-         
-
+        merkets.push(market);
+      });
     } else {
       Object.values(marketListAll as any).forEach((market: any) => {
         if (market.type == category) {
-          merkets.push(market)
+          merkets.push(market);
         }
-        
-      })
+      });
     }
 
     if (filter) {
-      let merkets_symbol = merkets.filter(mark => mark.symbol?.toUpperCase().includes(filter.toUpperCase()))
-      let merkets_name = merkets.filter(mark => mark.name?.toUpperCase().includes(filter.toUpperCase()) && !mark.symbol?.toUpperCase().includes(filter.toUpperCase()))
+      let merkets_symbol = merkets.filter((mark) =>
+        mark.symbol?.toUpperCase().includes(filter.toUpperCase())
+      );
+      let merkets_name = merkets.filter(
+        (mark) =>
+          mark.name?.toUpperCase().includes(filter.toUpperCase()) &&
+          !mark.symbol?.toUpperCase().includes(filter.toUpperCase())
+      );
 
-      merkets = merkets_symbol.concat(merkets_name)
+      merkets = merkets_symbol.concat(merkets_name);
     }
 
-    merkets = merkets.sort((a, b) => a.symbol < b.symbol ? -1 : 1)
+    merkets = merkets.sort((a, b) => (a.symbol < b.symbol ? -1 : 1));
 
-    
     setMarketList(merkets);
-
-    
   };
 
   const handleSearch = useDebouncedCallback((term) => {
-    setFilter(term)
+    setFilter(term);
   }, 200);
 
   React.useEffect(() => {
@@ -322,144 +317,141 @@ export function MarketSelector() {
     }
   }, [displayCategory, morpherTradeSDK.ready, marketListAll, filter]);
 
-
   return (
     <div className="flex flex-col gap-4">
       <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="w-full justify-between h-[60px]"
-            >
-              {selectedMarket ? (
-                outputMarket(selectedMarket, livePrice ? livePrice[selectedMarket.market_id] : undefined )
-              ) : (
-                <span className="text-muted-foreground flex items-center">
-                  <Search className="mr-2 h-4 w-4" />
-                  {t('SEARCH_MARKETS')}...
-                </span>
-              )}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-90" align="center">
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between h-[60px]"
+          >
+            {selectedMarket ? (
+              outputMarket(
+                selectedMarket,
+                livePrice ? livePrice[selectedMarket.market_id] : undefined
+              )
+            ) : (
+              <span className="text-muted-foreground flex items-center">
+                <Search className="mr-2 h-4 w-4" />
+                {t("SEARCH_MARKETS")}...
+              </span>
+            )}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-90" align="center">
 
-
-    
-  
-            {/* <CommandInput ref={inputRef} placeholder="Search market..." /> */}
-
-            <Command
-              className="w-full"
-              filter={(value, search) => {
-                try {
-                  const market = JSON.parse(value) as TMarket;
-                  if (
-                    market.name.toLowerCase().includes(search.toLowerCase()) ||
-                    market.symbol.toLowerCase().includes(search.toLowerCase())
-                  ) {
-                    return 1;
-                  }
-                } catch (e) {
-                  // ignore
+          <Command
+            className="w-full"
+            filter={(value, search) => {
+              try {
+                const market = JSON.parse(value) as TMarket;
+                if (
+                  market.name.toLowerCase().includes(search.toLowerCase()) ||
+                  market.symbol.toLowerCase().includes(search.toLowerCase())
+                ) {
+                  return 1;
                 }
-                return 0;
-              }}
-            >
-              <div className="relative">
-                {showScrollFades.left && (
-                  <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
-                )}
-                <div
-                  ref={scrollContainerRef}
-                  onMouseDown={handleMouseDown}
-                  onMouseLeave={handleMouseLeave}
-                  onMouseUp={handleMouseUp}
-                  onMouseMove={handleMouseMove}
-                  className={`flex select-none gap-1 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-                >
-                  {(
-                    ["all", "stock", "forex", "index", "commodity", "crypto"] as (TMarketType | "all")[]
-                  ).map((type) => {
-                    const iconMap: Partial<Record<TMarketType, string>> = {
-                      stock: "/src/assets/types/stock.svg",
-                      forex: "/src/assets/types/forex.svg",
-                      index: "/src/assets/types/index.svg",
-                      commodity: "/src/assets/types/commodity.svg",
-                      crypto: "/src/assets/types/crypto.svg",
-                    };
-                    const iconSrc = iconMap[type as TMarketType];
-
-                    return (
-                      <Button
-                        key={type}
-                        variant={displayCategory === type ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => {
-                          if (hasDraggedRef.current) return;
-                          setDisplayCategory(type);
-                          if (type !== "all") {
-                            setMarketType(type as TMarketType);
-                          } else {
-                            setMarketType(undefined);
-                          }
-                        }}
-                        className="capitalize rounded-full flex-shrink-0"
-                      >
-                        {iconSrc && (
-                          <img
-                            src={iconSrc}
-                            alt={`${type} icon`}
-                            className="mr-0 h-4 w-4"
-                          />
-                        )}
-                        <span className="font-normal">{type}</span>
-                      </Button>
-                    );
-                  })}
-                </div>
-                {showScrollFades.right && (
-                  <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
-                )}
-              </div>
-
+              } catch (e) {
+                // ignore
+              }
+              return 0;
+            }}
+          >
+            <div className="relative">
+              {showScrollFades.left && (
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
+              )}
               <div
-      data-slot="command-input-wrapper"
-      className="flex h-9 items-center gap-2 border-b px-3"
-    >
-      <SearchIcon className="size-4 shrink-0 opacity-50" />
-      <Input
-        data-slot="command-input"
-        onChange={(e) => handleSearch(e.target.value)} 
+                ref={scrollContainerRef}
+                onMouseDown={handleMouseDown}
+                onMouseLeave={handleMouseLeave}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+                className={`flex select-none gap-1 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+              >
+                {(
+                  ["all", "stock", "forex", "index", "commodity", "crypto"] as (
+                    | TMarketType
+                    | "all"
+                  )[]
+                ).map((type) => {
+                  const iconMap: Partial<Record<TMarketType, string>> = {
+                    stock: "/src/assets/types/stock.svg",
+                    forex: "/src/assets/types/forex.svg",
+                    index: "/src/assets/types/index.svg",
+                    commodity: "/src/assets/types/commodity.svg",
+                    crypto: "/src/assets/types/crypto.svg",
+                  };
+                  const iconSrc = iconMap[type as TMarketType];
 
-        placeholder="Search market..."
-        className={cn(
-          "placeholder:text-muted-foreground flex h-10 w-full rounded-0 bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border-0 outline-0 border-transparent focus:border-transparent focus:ring-0 !outline-none focus:outline-none" ,
-          
-        )}
-        
-      />
-    </div>
-              
-              <CommandList>
-                <CommandEmpty>
-                  {isMarketListLoading ? (
-                    <div className="flex items-center justify-center p-2">
-                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                      <span>Loading...</span>
-                    </div>
-                  ) : (
-                    "No market found."
-                  )}
-                </CommandEmpty>
-                <CommandGroup>
-                  {!isMarketListLoading &&
-                    marketList &&
-                    marketList.map((market, index) => (
-                      
-                     <>
+                  return (
+                    <Button
+                      key={type}
+                      variant={displayCategory === type ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (hasDraggedRef.current) return;
+                        setDisplayCategory(type);
+                        if (type !== "all") {
+                          setMarketType(type as TMarketType);
+                        } else {
+                          setMarketType(undefined);
+                        }
+                      }}
+                      className="capitalize rounded-full flex-shrink-0"
+                    >
+                      {iconSrc && (
+                        <img
+                          src={iconSrc}
+                          alt={`${type} icon`}
+                          className="mr-0 h-4 w-4"
+                        />
+                      )}
+                      <span className="font-normal">{type}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+              {showScrollFades.right && (
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
+              )}
+            </div>
+
+            <div
+              data-slot="command-input-wrapper"
+              className="flex h-9 items-center gap-2 border-b px-3"
+            >
+              <SearchIcon className="size-4 shrink-0 opacity-50" />
+              <Input
+                ref={inputRef}
+                data-slot="command-input"
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder={t('SEARCH_MARKETS') + "..."}
+                className={cn(
+                  "placeholder:text-muted-foreground flex h-10 w-full rounded-0 bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border-0 outline-0 border-transparent  !outline-none focus-visible:shadow-none  focus-visible:ring-0 focus-visible:ring-offset-0"
+                )}
+              />
+            </div>
+
+            <CommandList>
+              <CommandEmpty>
+                {isMarketListLoading ? (
+                  <div className="flex items-center justify-center p-2">
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                    <span>Loading...</span>
+                  </div>
+                ) : (
+                  "No market found."
+                )}
+              </CommandEmpty>
+              <CommandGroup>
+                {!isMarketListLoading &&
+                  marketList &&
+                  marketList.map((market, index) => (
+                    <>
                       {index < 80 && (
                         <CommandItem
                           key={market.market_id}
@@ -478,13 +470,13 @@ export function MarketSelector() {
                           {outputMarket(market)}
                         </CommandItem>
                       )}
-                     </>
-                    ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
+                    </>
+                  ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
-  )
+  );
 }

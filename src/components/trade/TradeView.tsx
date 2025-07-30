@@ -516,7 +516,7 @@ export function TradeView() {
                 })()}
 
                 {marketData.pending_order_id ? (
-                  <PendingPosition />
+                  <PendingPosition marketData={marketData} />
                 ) : marketData.position_id && selectedPosition ? (
                   <Card className="bg-white">
                     <CardContent className="p-4">

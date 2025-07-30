@@ -62,8 +62,7 @@ export function ClosePosition() {
   
       }
   
-      console.log('tradeComplete', result)
-        setTimeout(() => {
+      setTimeout(() => {
         setTradeExecuting(false)
   
       }, 2000)
