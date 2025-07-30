@@ -18,11 +18,16 @@ import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
 export function PortfolioScreen() {
 
     const account = useAccount();
-    const {  morpherTradeSDK } = useMarketStore();
+    const {  morpherTradeSDK, setSelectedMarketId } = useMarketStore();
     const { positionList, setPositionList, setPortfolio, positionValue, currencyList, setReturns, returns } = usePortfolioStore();
     const [timeRange, setTimeRange] = useState<"d" | "w" | "m" | "y">("d");
     const [chartData, setChartData] = useState<[number, number][]>([]);
     let navigate = useNavigate();
+
+    const handleTradeBtc = () => {
+        setSelectedMarketId("CRYPTO_BTC");
+        navigate("/");
+    };
 
     const getProtfolio = async () => {
         if (account?.address && morpherTradeSDK) {
@@ -131,9 +136,18 @@ export function PortfolioScreen() {
             </Card>
             <h2 className="text-lg font-bold mt-6 mb-2">Positions</h2>
 
-            {positionList && positionList.map((position) => (
-                <OpenPositionItem key={position.id} position={position} />
-            ))}
+            {positionList && positionList.length > 0 ? (
+                positionList.map((position) => (
+                    <OpenPositionItem key={position.id} position={position} />
+                ))
+            ) : positionList && positionList.length === 0 ? (
+                <Card className="mt-2 text-center">
+                    <CardContent className="p-6 flex flex-col items-center">
+                        <p className="font-semibold mb-4">Your first trade is just a click away!</p>
+                        <Button onClick={handleTradeBtc}>Trade Bitcoin</Button>
+                    </CardContent>
+                </Card>
+            ) : null}
 {/*             
             {positionList && positionList.length > 0 ? (
                 <div className="mt-4">
