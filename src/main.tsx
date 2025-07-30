@@ -8,6 +8,9 @@ import { config } from "./wagmi.ts";
 
 import "./index.css";
 
+import './i18n.ts'
+
+
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

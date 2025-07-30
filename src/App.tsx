@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { TradeScreen } from "./screens/Trade";
@@ -12,18 +12,28 @@ import { Header } from "./components/app/Header";
 import { usePortfolioStore } from "./store/portfolio";
 import { useMarketStore } from "./store/market";
 import { sdk } from "@farcaster/frame-sdk";
+import { useTranslation } from "react-i18next";
 
 
 
 function App() {
-
-  
 
   const { morpherTradeSDK  } = useMarketStore();
   const { setEthAddress, tradeComplete, setContext  } = usePortfolioStore();
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
   const { address, isConnected } = useAccount();
+
+  const { t, i18n: {changeLanguage, language} } = useTranslation();
+  
+
+  useEffect(() => {
+    if (language && language  !== 'en') {
+      changeLanguage('en')
+    }
+    
+  }, [language])
+
   
 
   useEffect(() => {

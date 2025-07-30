@@ -3,9 +3,11 @@ import { usePortfolioStore } from "@/store/portfolio";
 import { Card, CardContent } from "../ui/card";
 import { Loader2Icon } from "lucide-react";
 import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
+import { useTranslation } from "react-i18next";
 
 export function PortfolioStats() {
   const { portfolio, returns, loading, currencyList, positionList } = usePortfolioStore();
+  const { t } = useTranslation();
 
   const availableToTrade = React.useMemo(() => {
     if (!currencyList) return 0;
@@ -58,15 +60,15 @@ export function PortfolioStats() {
 
   const stats = [
     {
-      title: "Available to Trade",
+      title: t('AVAILABLE_TO_TRADE'),
       value: `$${usdFormatter(availableToTrade)}`,
     },
     {
-      title: "Weekly P/L",
+      title: t('WEEKLY_P_L'),
       data: weeklyPnl,
     },
     {
-      title: "Open Positions",
+      title: t('OPEN_POSITIONS'),
       value: positionList?.length || 0,
     },
   ];

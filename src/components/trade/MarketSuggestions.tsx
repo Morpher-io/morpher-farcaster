@@ -3,9 +3,11 @@ import { useMarketStore } from "@/store/market";
 import { TMarket, TMarketType } from "morpher-trading-sdk";
 import { Card, CardContent } from "../ui/card";
 import { Loader2Icon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function MarketSuggestions() {
   const { morpherTradeSDK, setSelectedMarketId, setMarketType, marketType, trendingMarkets, getTrendingMarkets, setSelectedMarket } = useMarketStore();
+  const { t } = useTranslation();
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -104,7 +106,7 @@ export function MarketSuggestions() {
   if (loading) {
     return (
         <div className="flex flex-col gap-2">
-            <h2 className="text-lg font-bold">Trending</h2>
+            <h2 className="text-lg font-bold">{t('TRENDING')}</h2>
             <div className="flex justify-center items-center h-[100px]">
                 <Loader2Icon className="h-8 w-8 animate-spin" />
             </div>
@@ -118,7 +120,7 @@ export function MarketSuggestions() {
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-lg font-bold">Trending</h2>
+      <h2 className="text-lg font-bold">{t('TRENDING')}</h2>
       <div className="relative">
         {showScrollFades.left && (
           <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />

@@ -1,0 +1,36 @@
+{
+    "translation": {
+        "PORTFOLIO_VALUE": "Portfoliowert",
+        "AVAILABLE_TO_TRADE": "Zum Handeln verfügbar",
+        "WEEKLY_P_L": "Wöchentlicher G/V",
+        "OPEN_POSITIONS": "Offene Positionen",
+        "RANK": "Rang",
+        "TRENDING": "Im Trend",
+        "SEARCH_MARKETS": "Märkte suchen",
+        "NO_DATA_AVAILABLE": "Für diesen Zeitraum sind keine Daten verfügbar",
+        "POSITIONS": "Positionen",
+        "menu": {
+            "HOME": "Startseite",
+            "PORTFOLIO": "Portfolio",
+            "LEADERBOARD": "Bestenliste",
+            "HISTORY": "Verlauf"
+        },
+        "errors": {
+            "SDK_NOT_READY": "SDK-Initialisierung nicht abgeschlossen oder Backend-API nicht erreichbar",
+            "INVALID_TRADE_AMOUNT": "Handelsbetrag ist ungültig. Stellen Sie sicher, dass der Handelsbetrag angegeben wurde und ein positiver Wert ist.",
+            "INVALID_LIMIT_PRICE": "Es wurde kein Limit-Order-Preis angegeben",
+            "INVALID_CLOSE_PERCENTAGE": "Der Schlussprozentsatz ist ungültig. Stellen Sie sicher, dass der Prozentsatz angegeben wurde und eine Zahl zwischen 1 und 100 ist",
+            "BAD_REQUEST": "Ungültige Parameter für die API-Anfrage. Stellen Sie sicher, dass die ETH-Adresse und andere Parameter gültig sind.",
+            "UNPROCESSED_DELAYED_ORDER": "Für diesen Markt gibt es bereits eine ausstehende Order. Warten Sie, bis diese Order bearbeitet wird, oder stornieren Sie sie, bevor Sie eine neue ausführen.",
+            "MARKET_DISABLED": "Dieser Markt ist derzeit deaktiviert oder wurde von der Liste genommen.",
+            "MARKET_PAUSED": "Dieser Markt ist derzeit pausiert. Warten Sie, bis der Markt wieder tickt, bevor Sie eine Order bearbeiten.",
+            "POSITION_CONTRACT_MISMATCH": "Die Backend-Position ist nicht mit den Vertragswerten synchron. Bitte aktualisieren Sie und versuchen Sie es später erneut.",
+            "POSITION_LOCKED": "Diese Position ist derzeit gesperrt und kann nicht geschlossen oder aktualisiert werden.",
+            "BALANCE_TOO_LOW": "Ihr Guthaben in der ausgewählten Währung ist zu niedrig, um diese Order zu bearbeiten. Bitte prüfen Sie, ob Sie über genügend Guthaben in der ausgewählten Währung verfügen.",
+            "TRADE_DIRECTION_ERROR": "Sie können keine Order in die entgegengesetzte Richtung bearbeiten. Bitte schließen Sie zuerst die aktuelle Position.",
+            "MARKET_SPLIT": "Bei der Verarbeitung der Markt-Split-Informationen für diese Order ist ein Fehler aufgetreten. Bitte überprüfen Sie den Markt und versuchen Sie es später erneut.",
+            "ORDER_TIMEOUT": "Zeitüberschreitung bei der Ordererstellung. Die Order wurde nicht rechtzeitig erstellt. Bitte versuchen Sie es später erneut.",
+            "EXECUTION_ERROR": "Ordererstellung fehlgeschlagen. Bitte versuchen Sie es später erneut."
+        }
+    }
+}

@@ -8,6 +8,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { tokenValueFormatter } from "morpher-trading-sdk"
+import { useTranslation } from "react-i18next";
 
 interface PortfolioChartProps {
   data: [number, number][] | undefined;
@@ -15,6 +16,8 @@ interface PortfolioChartProps {
 }
 
 export const PortfolioChart = React.memo(function PortfolioChart({ data, timeRange }: PortfolioChartProps) {
+    const { t } = useTranslation();
+  
   const chartData = React.useMemo(() => {
     if (timeRange === 'd') {
       return data?.map((d) => {
@@ -42,7 +45,7 @@ export const PortfolioChart = React.memo(function PortfolioChart({ data, timeRan
   }, [chartData]);
 
   if (!chartData || chartData.length === 0) {
-    return <div className="h-[200px] w-full mt-4 flex items-center justify-center"><p>No data available for this period.</p></div>;
+    return <div className="h-[200px] w-full mt-4 flex items-center justify-center"><p>{t('NO_DATA_AVAILABLE')}.</p></div>;
   }
 
   return (

@@ -12,12 +12,15 @@ import { useAccount, useWalletClient, usePublicClient } from "wagmi";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
 import { Loader2Icon, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface OpenPositionItemProps {
   position: TPosition;
 }
 
 export function OpenPositionItem({ position }: OpenPositionItemProps) {
+  const { t } = useTranslation();
+  
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [closePercentage, setClosePercentage] = React.useState(100);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -84,14 +87,21 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
     : null;
 
   const tradeCompleteCallback = (result: TradeCallback) => {
-    if (result.result === "error") {
-      setTradeError(
-        result.err || "An error occurred while executing the trade."
-      );
+
+    if (result.result === 'error') {
+      let error = result.err
+      if (result.error_code) {
+        const err_message = t('errors.' + result.error_code.toUpperCase());
+        if (err_message !== 'errors.' + result.error_code.toUpperCase()) {
+          error = err_message
+        }
+      }
+      
+      setTradeError(error || 'An error occurred while executing the trade.')
     } else {
-      setTradeComplete(true);
       setIsExpanded(false);
     }
+
     setIsClosing(false);
   };
 

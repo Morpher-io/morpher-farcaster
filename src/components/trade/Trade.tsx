@@ -25,6 +25,7 @@ import { sdk } from "@farcaster/frame-sdk"
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
 import { cn } from "@/lib/utils"
 import { LeverageImpactVisualizer } from "./LeverageImpactVisualizer"
+import { useTranslation } from "react-i18next";
 
 export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
@@ -59,6 +60,11 @@ export function Trade() {
   const account: any = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient:any = usePublicClient()
+
+  const { t } = useTranslation();
+
+   
+
     
   React.useEffect(() => {
     if (selectedCurrency && currencyList) {
@@ -158,11 +164,12 @@ export function Trade() {
     if (newTokenAmount < 0) newTokenAmount = 0;
     if (newTokenAmount > maxBalance) newTokenAmount = maxBalance;
 
-    updateAmount(newTokenAmount);
+    
+    updateAmount(Number(tokenValueFormatter(newTokenAmount)));
   };
 
   const setMaxAmount = () => {
-    updateAmount(maxBalance);
+    updateAmount(Number(tokenValueFormatter(maxBalance)));
   };
 
   const getLeverageWarningClass = (leverageValue: number): string => {
@@ -177,14 +184,20 @@ export function Trade() {
 
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
-      setTradeError(result.err || 'An error occurred while executing the trade.')
-      setTradeComplete(true);
+      let error = result.err
+      if (result.error_code) {
+        const err_message = t('errors.' + result.error_code.toUpperCase());
+        if (err_message !== 'errors.' + result.error_code.toUpperCase()) {
+          error = err_message
+        }
+      }
+      
+      setTradeError(error || 'An error occurred while executing the trade.')
+      setTradeComplete(false);
+      setTradeExecuting(false)
       return
     }
 
-    console.log('tradeComplete', result)
-
-    setTradeComplete(true);
     setTimeout(() => {
       setTradeExecuting(false)
     }, 2000)
@@ -229,7 +242,7 @@ export function Trade() {
       ) : (
         <div className="">
           <div className="flex items-center mb-2">
-            <Label>Trade Amount</Label>
+            <Label>{t('TRADE_AMOUNT')}</Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="ml-1.5">
@@ -237,12 +250,7 @@ export function Trade() {
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p>
-                    You always invest into {selectedMarket?.name || "this market"} with MPH.
-                    You choose the amount of MPH you want to invest and this will
-                    be placed into a position. If you invest with ETH or USDC
-                    then the amount selected will be converted using uniswap to MPH
-                    before investing transparently via our Morpher Smart Contracts.
-                    Only invest what you can afford to loose, trade responsibly.
+                    {t('TRADE_AMOUNT_DESCRIPTION', {market: selectedMarket?.name || "this market" })}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -392,7 +400,7 @@ export function Trade() {
       <div className="my-4 h-px bg-gray-200" />
 
       <div className="flex items-center justify-between mb-2">
-        <Label>Trade Type</Label>
+        <Label>{t('TRADE_TYPE')}</Label>
         <ToggleGroup
           type="single"
           value={tradeType}
@@ -406,14 +414,14 @@ export function Trade() {
             aria-label="Toggle long"
             className="data-[state=on]:bg-primary data-[state=on]:text-white"
           >
-            Long
+            {t('LONG')}
           </ToggleGroupItem>
           <ToggleGroupItem
             value="short"
             aria-label="Toggle short"
             className="data-[state=on]:bg-secondary data-[state=on]:text-white"
           >
-            Short
+            {t('SHORT')}
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
@@ -422,25 +430,21 @@ export function Trade() {
           <div className="flex items-start gap-2">
             <TrendingUp className="h-4 w-4 text-primary shrink-0 mt-0.5" />
             <p>
-              Going long is like buying an asset. You profit if the price of{" "}
-              {selectedMarket?.symbol || "the asset"} goes up. If the price
-              falls, your position value decreases.
+              {t('LONG_DESCRIPTION', {market: selectedMarket?.symbol || "the asset" })}
             </p>
           </div>
         ) : (
           <div className="flex items-start gap-2">
             <TrendingDown className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
             <p>
-              Going short means you profit if the price of{" "}
-              {selectedMarket?.symbol || "the asset"} goes down. If the price
-              rises, your position value decreases.
+              {t('SHORT_DESCRIPTION', {market: selectedMarket?.symbol || "the asset" })}
             </p>
           </div>
         )}
       </div>
       <div className="mb-6">
         <div className="flex justify-between">
-          <Label>Leverage</Label>
+          <Label>{t('LEVERAGE')}</Label>
           <span>{leverage[0]}x</span>
         </div>
         <Slider
@@ -484,7 +488,7 @@ export function Trade() {
         </p>
       )}
       {tradeError && (
-        <div className="text-red-500 text-sm mt-2">
+        <div className="text-red-500 text-sm mt-2 text-center">
           {tradeError}
         </div>
       )}

@@ -24,8 +24,10 @@ import { useAccount } from "wagmi"
 import { useMarketStore } from "../../store/market";
 import { usePortfolioStore } from "@/store/portfolio";
 import { Input } from "../ui/input"
+import { useTranslation } from "react-i18next";
 
 export function MarketSelector() {
+  const { t } = useTranslation();
   
   const {morpherTradeSDK} = useMarketStore();
   const [open, setOpen] = React.useState(false)
@@ -336,7 +338,7 @@ export function MarketSelector() {
               ) : (
                 <span className="text-muted-foreground flex items-center">
                   <Search className="mr-2 h-4 w-4" />
-                  Search Markets...
+                  {t('SEARCH_MARKETS')}...
                 </span>
               )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

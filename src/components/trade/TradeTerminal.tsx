@@ -8,12 +8,14 @@ import { usePortfolioStore } from "@/store/portfolio";
 import { useMarketStore } from "@/store/market";
 import { OpenPositionItem } from "./OpenPositionItem";
 import { TradeView } from "./TradeView";
+import { useTranslation } from "react-i18next";
 
 export function TradeTerminal() {
   const { address } = useAccount();
   const { setEthAddress, setCurrencyList, currencyList, positionList } = usePortfolioStore();
   const { morpherTradeSDK } = useMarketStore();
   const publicClient = usePublicClient();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     setEthAddress(address);
@@ -43,7 +45,7 @@ export function TradeTerminal() {
       <MarketSelector />
       {positionList && positionList.length > 0 && (
         <>
-          <h2 className="text-lg font-bold mt-2">Open Positions</h2>
+          <h2 className="text-lg font-bold mt-2">{t('OPEN_POSITIONS')}</h2>
           {positionList.map((position) => (
             <OpenPositionItem key={position.id} position={position} />
           ))}

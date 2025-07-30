@@ -3,7 +3,7 @@ import { create } from 'zustand'
 // import { MorpherTradeSDK } from '../../../morpher-trading-sdk/src/index'
 // import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from '../../../morpher-trading-sdk/src/v2.router';
 
-import { TAddress, TCurrency, TCurrencyDetails, TPortfolio } from 'morpher-trading-sdk'
+import { TAddress, TCurrency, TCurrencyDetails, TOrder, TPortfolio } from 'morpher-trading-sdk'
 import { MorpherTradeSDK } from 'morpher-trading-sdk';
 import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from 'morpher-trading-sdk';
 import { sdk } from "@farcaster/frame-sdk";
@@ -23,7 +23,7 @@ interface PortfolioState {
   setLoading: (loading: boolean) => void
   eth_address?: TAddress
   setEthAddress: (eth_address?: TAddress) => void
-  orderUpdate?: any
+  orderUpdate?: TOrder
   closePercentage?: number
   setClosePercentage: (closePercentage: number | undefined) => void
   tradeDirection: 'open' | 'close'
@@ -150,7 +150,22 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       if (eth_address) {
         fetchPortfolioData();
         morpherTradeSDK.subscribeToOrder(eth_address, (update: any) => {
-          set({ orderUpdate: update });
+          if (update.data.orderId) {
+             morpherTradeSDK.getOrders({
+              eth_address: eth_address,
+              order_id: update.data.orderId
+            }).then(orders => {
+              if (orders && orders.length > 0) {
+                let order = orders[0]
+                set({ orderUpdate: order });
+                if (order.status == 'success') {
+                  set({ tradeComplete: true });
+                }
+
+              }
+            })
+          }
+                
           fetchPortfolioData(); // Refetch on order update
         });
       } else {

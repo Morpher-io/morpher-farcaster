@@ -3,23 +3,27 @@ import { useAccount } from 'wagmi';
 import { Link, useLocation } from 'react-router-dom';
 import { usePortfolioStore } from '../../store/portfolio';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-const menuItems = [
-  { path: '/', label: 'Home' },
-  { path: '/portfolio', label: 'Portfolio' },
-  { path: '/leaderboard', label: 'Leaderboard' },
-  { path: '/history', label: 'History' },
 
-];
 
 export function Layout({ children }: LayoutProps) {
   const { isConnected } = useAccount();
   const { tradeComplete } = usePortfolioStore();
   const location = useLocation();
+  const { t } = useTranslation();
+
+  const menuItems = [
+  { path: '/', label: t('menu.HOME'), image: 'home' },
+  { path: '/portfolio', label: t('menu.PORTFOLIO'), image: 'portfolio' },
+  { path: '/leaderboard', label: t('menu.LEADERBOARD'), image: 'leaderboard' },
+  { path: '/history', label: t('menu.HISTORY'), image: 'history' },
+
+];
 
   return (
     <div className="mx-auto flex h-screen max-w-[400px] flex-col">
@@ -42,8 +46,8 @@ export function Layout({ children }: LayoutProps) {
                     location.pathname === item.path && 'bg-primary',
                   )}
                   style={{
-                    mask: `url(/src/assets/icons/${item.label.toLowerCase()}.svg) no-repeat center / contain`,
-                    WebkitMask: `url(/src/assets/icons/${item.label.toLowerCase()}.svg) no-repeat center / contain`,
+                    mask: `url(/src/assets/icons/${item.image.toLowerCase()}.svg) no-repeat center / contain`,
+                    WebkitMask: `url(/src/assets/icons/${item.image.toLowerCase()}.svg) no-repeat center / contain`,
                   }}
                 />
                 <span className='mt-0 font-semibold'>{item.label}</span>

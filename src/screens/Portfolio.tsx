@@ -14,6 +14,7 @@ import { TPosition, usdFormatter, tokenValueFormatter } from "morpher-trading-sd
 import { usePortfolioStore } from "@/store/portfolio";
 import { useNavigate } from "react-router-dom";
 import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
+import { useTranslation } from "react-i18next";
 
 export function PortfolioScreen() {
 
@@ -23,6 +24,7 @@ export function PortfolioScreen() {
     const [timeRange, setTimeRange] = useState<"d" | "w" | "m" | "y">("d");
     const [chartData, setChartData] = useState<[number, number][]>([]);
     let navigate = useNavigate();
+    const { t } = useTranslation();
 
     const handleTradeBtc = () => {
         setSelectedMarketId("CRYPTO_BTC");
@@ -91,7 +93,7 @@ export function PortfolioScreen() {
         <div className="mx-4">
             <Card className="mt-4">
                 <CardHeader>
-                    <CardTitle className="text-lg font-bold">Portfolio</CardTitle>
+                    <CardTitle className="text-lg font-bold">{t('menu.PORTFOLIO')}</CardTitle>
                     
                     <CardTitle className="flex justify-between">
                         <div>
@@ -134,7 +136,7 @@ export function PortfolioScreen() {
                     )} */}
                 </CardContent>
             </Card>
-            <h2 className="text-lg font-bold mt-6 mb-2">Positions</h2>
+            <h2 className="text-lg font-bold mt-6 mb-2">{t('POSITIONS')}</h2>
 
             {positionList && positionList.length > 0 ? (
                 positionList.map((position) => (

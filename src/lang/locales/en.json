@@ -1,0 +1,47 @@
+{
+    "translation": {
+        "PORTFOLIO_VALUE": "Portfolio Value",
+        "AVAILABLE_TO_TRADE": "Available to Trade",
+        "WEEKLY_P_L": "Weekly P/L",
+        "OPEN_POSITIONS": "Open Positions",
+        "RANK": "Rank",
+        "TRENDING": "Trending",
+        "SEARCH_MARKETS": "Search Markets",
+        "NO_DATA_AVAILABLE": "No data available for this period",
+        "POSITIONS": "Positions",
+        "TRADE_AMOUNT": "Trade Amount",
+        "TRADE_TYPE": "Trade Type",
+        "LONG": "Long",
+        "LONG_DESCRIPTION": "Going long is like buying an asset. You profit if the price of {{market}} goes up. If the price falls, your position value decreases.",
+        "SHORT": "Short",
+        "LEVERAGE": "Leverage",
+        "SHORT_DESCRIPTION": " Going short means you profit if the price of {{market}} goes down. If the price rises, your position value decreases.",
+        "TRADE_AMOUNT_DESCRIPTION": "You always invest into {{market}} with MPH. You choose the amount of MPH you want to invest and this will be placed into a position. If you invest with ETH or USDC then the amount selected will be converted using uniswap to MPH before investing transparently via our Morpher Smart Contracts. Only invest what you can afford to loose, trade responsibly.",
+        "menu": {
+            "HOME": "Home",
+            "PORTFOLIO": "Portfolio",
+            "LEADERBOARD": "Leaderboard",
+            "HISTORY": "History"
+        },
+
+
+
+        "errors": {
+            "SDK_NOT_READY": "SDK initialisation not complete or backend API not reachable",
+            "INVALID_TRADE_AMOUNT": "Trade amount is invalid. Make sure trade amount was specified and is a positive value.",
+            "INVALID_LIMIT_PRICE": "No limit order price was specified",
+            "INVALID_CLOSE_PERCENTAGE": "The close percentage is invalid. Make sure the percentage was specified and is a number between 1 and 100",
+            "BAD_REQUEST": "Invalid parameters supplied to API request. Make sure the eth address and other parameters are valid.",
+            "UNPROCESSED_DELAYED_ORDER": "There is a pending order for this market already. Wait for this order to process or cancel this order before executing a new one.",
+            "MARKET_DISABLED": "This market is currently disabled or has been delisted.",
+            "MARKET_PAUSED": "This market is currently paused. Wait for the market to start ticking again before processing an order.",
+            "POSITION_CONTRACT_MISMATCH": "The backend position is out of sync with the contract values. Please refresh and try again later.",
+            "POSITION_LOCKED": "This position is currently locked and cannot be closed or updated.",
+            "BALANCE_TOO_LOW": "Your balance is too low for the selected currency to process this order. Please check you have enough of the selected currency available.",
+            "TRADE_DIRECTION_ERROR": "You cannot process an order in the opposite direction. Please close the current position first.",
+            "MARKET_SPLIT": "There was an error processing the market split information for this order. Please check the market and try again later.",
+            "ORDER_TIMEOUT": "Order creation timed out. Order was not created in time. Please try again later.",
+            "EXECUTION_ERROR": "Order creation failed. Please try again later"
+        }
+    }
+}

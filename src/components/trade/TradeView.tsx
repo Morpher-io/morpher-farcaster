@@ -31,8 +31,11 @@ import {
 } from "morpher-trading-sdk";
 import { cn } from "@/lib/utils";
 import { format as formatDate } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 export function TradeView() {
+  const { t } = useTranslation();
+  
   const {
     selectedMarketId,
     setSelectedMarketId,
@@ -216,12 +219,17 @@ export function TradeView() {
   }, [formattedChartData]);
 
   const tradeCompleteCallback = (result: TradeCallback) => {
-    if (result.result === "error") {
-      setTradeError(
-        result.err || "An error occurred while executing the trade."
-      );
+     if (result.result === 'error') {
+      let error = result.err
+      if (result.error_code) {
+        const err_message = t('errors.' + result.error_code.toUpperCase());
+        if (err_message !== 'errors.' + result.error_code.toUpperCase()) {
+          error = err_message
+        }
+      }
+      
+      setTradeError(error || 'An error occurred while executing the trade.')
     } else {
-      setTradeComplete(true);
       setSelectedMarketId("");
     }
     setIsClosing(false);

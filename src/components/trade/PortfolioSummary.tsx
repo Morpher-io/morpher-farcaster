@@ -18,8 +18,11 @@ import sdk from "@farcaster/frame-sdk";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { useMarketStore } from "@/store/market";
+import { useTranslation } from "react-i18next";
 
 export function PortfolioSummary() {
+  const { t } = useTranslation();
+  
   const account = useAccount();
   const {  morpherTradeSDK } = useMarketStore();
   const {
@@ -196,7 +199,7 @@ export function PortfolioSummary() {
           />
           <div>
             <div className="flex items-center gap-1">
-              <p className="text-muted-foreground text-sm">Portfolio Value</p>
+              <p className="text-muted-foreground text-sm">{t('PORTFOLIO_VALUE')}</p>
               <Button
                 variant="ghost"
                 size="icon"
@@ -213,7 +216,7 @@ export function PortfolioSummary() {
         </div>
         {portfolio?.returns_rank && (
           <div className="text-right">
-            <p className="text-sm font-semibold text-muted-foreground">🏆Rank</p>
+            <p className="text-sm font-semibold text-muted-foreground">🏆{t('RANK')}</p>
             <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>#{portfolio?.returns_rank}</p>
           </div>
         )}
