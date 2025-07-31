@@ -149,6 +149,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       set({ eth_address });
       if (eth_address) {
         fetchPortfolioData();
+
         morpherTradeSDK.subscribeToOrder(eth_address, (update: any) => {
           if (update.data.status == 'cancelled' ) {
             const eth_address = get().eth_address || ''

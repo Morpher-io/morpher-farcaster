@@ -34,6 +34,7 @@ export function Trade() {
   );
   const [inputMode, setInputMode] = React.useState<"token" | "usd">("token");
 
+  const [timeoutTimer, setTimeoutTimer]  = React.useState<NodeJS.Timeout>();
   const {
     selectedMarketId,
     morpherTradeSDK,
@@ -54,7 +55,9 @@ export function Trade() {
       setSelectedCurrencyDetails,
       currencyList,
       loading,
-      setTradeComplete
+      setTradeComplete,
+      orderUpdate,
+      setClosePercentage
   } = usePortfolioStore()
 
   const account: any = useAccount();
@@ -182,6 +185,13 @@ export function Trade() {
     return "bg-red-100 text-red-800";
   };
 
+  const clearTrade = () => {
+    setTradeAmount('')
+            setClosePercentage(undefined)
+            setTradeType('long')
+            setLeverage([1])
+  }
+
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
       let error = result.err
@@ -198,10 +208,27 @@ export function Trade() {
       return
     }
 
-    setTimeout(() => {
+    let timer = setTimeout(() => {
+      clearTrade()
       setTradeExecuting(false)
-    }, 2000)
+    }, 20000)
+
+    setTimeoutTimer(timer)
   }
+
+    React.useEffect(() => {
+      if (tradeExecuting) {
+        if (timeoutTimer) {
+          clearTimeout(timeoutTimer)
+          setTimeoutTimer(undefined)
+        }
+        setTimeout(() => {
+          clearTrade();
+          setTradeExecuting(false)
+        }, 1000)
+      }
+      
+    }, [orderUpdate])
   
   const openPosition = () => {
     try {

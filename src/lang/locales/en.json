@@ -49,7 +49,22 @@
         "CLOSE_PERCENTAGE": "Close {{closePercentage}}%",
         "ERROR_EXECUTING_TRADE": "An error occurred while executing the trade.",
         "WALLET_CLIENT_NOT_AVAILABLE": "Wallet client not available.",
-        
+        "TRADE_COMPLETE": "Trade Complete",
+        "SHARE": "Share",
+        "TRADE_AGAIN_BUTTON": "Try another Trade",
+        "TRADE_LONG": "bought",
+        "TRADE_SHORT": "shorted",
+        "MESSAGE_LONG": "trade",
+        "MESSAGE_SHORT": "short",
+        "TRADE_OPEN_MESSAGE": "You just {{type}} {{market}} with {{amount}} {{currency}}",
+        "TRADE_OPEN_SHARE": "I just used Morpher to {{type}} {{market}} {{leverage}} on-chain using {{currency}}",
+        "TRADE_OPEN_LEVERAGE": "with {{leverage}}x leverage",
+        "TRADE_CLOSE_MESSAGE": "You just closed your {{market}} position and made {{returnPercentage}} {{PorL}}.",
+        "MESSAGE_PROFIT": "profit",
+        "MESSAGE_LOSS": "loss",
+        "TRADE_CLOSE_SHARE": "Just crushed it with a {{returnPercentage}} profit trading {{market}} on-chain using Morpher! 🚀",
+
+
         "NO_DATA_AVAILABLE": "No data available for this period",
         "POSITIONS": "Positions",
         "TRADE_AMOUNT": "Trade Amount",

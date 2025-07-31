@@ -1,20 +1,23 @@
 
 import { useMarketStore } from "@/store/market";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { usePortfolioStore } from "@/store/portfolio";
 import { Button } from "@/components/ui/button";
 import { sdk } from "@farcaster/frame-sdk";
-import { usdFormatter } from "morpher-trading-sdk";
+import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export function TradeSuccessScreen() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  
 
    const account: any = useAccount();
     
-    const { selectedMarket,  morpherTradeSDK, marketListAll, setSelectedMarket, setTradeType, setLeverage } = useMarketStore();
-    const { setTradeComplete, selectedCurrency, tradeAmount, orderUpdate, tradeComplete, setTradeAmount, setClosePercentage } = usePortfolioStore();
+    const { selectedMarket,  morpherTradeSDK, marketListAll, setSelectedMarket, setSelectedMarketId, setTradeType, setLeverage } = useMarketStore();
+    const { setTradeComplete, selectedCurrency, orderUpdate, tradeComplete, setClosePercentage } = usePortfolioStore();
 
       const getOrder = async () => {
     if (account.address === undefined) {
@@ -22,6 +25,8 @@ export function TradeSuccessScreen() {
     }
  
   };
+
+  
 
   useEffect(() => {
 
@@ -32,41 +37,60 @@ export function TradeSuccessScreen() {
   }, [marketListAll, orderUpdate, selectedMarket ])
     const share = async () => {
 
-        let text = `I just ${
-          orderUpdate?.direction == "long" ? "traded" : "shorted"
-        } ${
-          selectedMarket?.name || orderUpdate?.market_id
-        } with ${tradeAmount} ${selectedCurrency} on Morpher!`;
+      let leverage = ''
+      if (orderUpdate?.leverage && Number(orderUpdate.leverage) / 10**8 > 1) {
+        leverage += t('TRADE_OPEN_LEVERAGE', {leverage:  Number(orderUpdate.leverage)/ 10**8 })
+      }
 
-        if (Number(orderUpdate?.close_shares_amount || 0) > 0) {
-          text = `I just made +1.12% profit trading ${
-          selectedMarket?.name || orderUpdate?.market_id
-        } on Morpher!`;
-        }
+      let text = t('TRADE_OPEN_SHARE', {leverage: leverage, type: orderUpdate?.direction == "long" ? t("MESSAGE_LONG") : t("MESSAGE_SHORT"), market: selectedMarket?.name || orderUpdate?.market_id, currency:orderUpdate?.order_currency})
+      
+      text += '!'
 
-        const embeds:[string] = [`https://www.morpher.com/`];
 
-        await sdk.actions.composeCast({
-          text,
-          embeds,
-        });
+      if (Number(orderUpdate?.close_shares_amount || 0) > 0) {
+        text = t('TRADE_CLOSE_SHARE', {market: selectedMarket?.name || orderUpdate?.market_id, returnPercentage})
+      }
+
+      const embeds:[string] = [`https://www.morpher.com/`];
+
+      await sdk.actions.composeCast({
+        text,
+        embeds,
+      });
     }
 
     const closeTradeComplete = () => {
      setTradeComplete(false)   
+     setSelectedMarket(undefined)
+     setSelectedMarketId('')
      navigate('/')
     }
 
-    useEffect(() => {
-      if (tradeComplete) {
-        setTradeAmount('')
-        setClosePercentage(undefined)
-        setTradeType('long')
-        setLeverage([1])
-        console.log('trade reset')
-
+    const returnPercentage  = useMemo(() => {
+      if (!orderUpdate?.return_percentage || Number(orderUpdate?.return_percentage) === 0) {
+        return '0%'
       }
-    }, [tradeComplete])
+      
+      let returnPercentage = orderUpdate.return_percentage > 0 ? '+ ' : '- ';
+      
+      returnPercentage += Math.round(orderUpdate.return_percentage * 100) / 100      
+      returnPercentage += '%'
+      return returnPercentage
+
+    }, [orderUpdate])
+
+    const orderAmount = useMemo(() => {
+      if (orderUpdate?.order_amount && orderUpdate?.order_decimals) {
+        return tokenValueFormatter(Number(orderUpdate?.order_amount) / 10**Number(orderUpdate?.order_decimals))
+      }
+
+      return tokenValueFormatter(0);
+
+    }, [orderUpdate])
+    
+
+    
+
 
     useEffect(() => {
         getOrder()
@@ -88,33 +112,36 @@ export function TradeSuccessScreen() {
               className="mt-2"
             />
           </div>
+          
 
-          <p className="text-4xl mt-4">Trade Complete</p>
-          <p className="text-lg mt-4 text-center">
-            {(Number(orderUpdate?.close_shares_amount || 0) > 0) ? <>
-              You just closed your {" "}
-            {selectedMarket?.name || orderUpdate?.market_id} position and made <span className="text-primary">+ 1.12% ($ {usdFormatter(Number(orderUpdate?.close_shares_amount || 0) * Number(orderUpdate?.price || 0) / 10**18)})</span>
-            </> : <>
-              You just {orderUpdate?.direction == "long" ? "traded" : "shorted"}{" "}
-              {selectedMarket?.name || orderUpdate?.market_id} with {tradeAmount} {selectedCurrency}
-            </>}
+          <p className="text-4xl mt-4">{t('TRADE_COMPLETE')}</p>
+          
+
+            {(Number(orderUpdate?.close_shares_amount || 0) > 0) ? <p className="text-lg mt-4 text-center" dangerouslySetInnerHTML={{ __html: t('TRADE_CLOSE_MESSAGE', {PorL: Number(orderUpdate?.return_percentage || 0) >= 0 ? t("MESSAGE_PROFIT") : t("MESSAGE_LOSS"), market: selectedMarket?.name || orderUpdate?.market_id, returnPercentage: `<span class="${(Number(orderUpdate?.return_percentage || 0) >= 0 ? 'text-primary' : 'text-secondary')}">` + returnPercentage + "</span>"  }) }} /> 
+            : <p className="text-lg mt-4 text-center">
+              {t('TRADE_OPEN_MESSAGE', {type: orderUpdate?.direction == "long" ? t("TRADE_LONG") : t("TRADE_SHORT"), market: selectedMarket?.name || orderUpdate?.market_id, amount: orderAmount, currency:orderUpdate?.order_currency  })}
+            </p>}
             
-          </p>
+          
 
           <div className="mt-10 w-full">
+
+            {((Number(orderUpdate?.close_shares_amount || 0) > 0) || (Number(orderUpdate?.return_percentage || 0) > 0)) && (
             <Button
               variant="default"
-              className="w-full hover:bg-white/90 rounded-full "
+              className="w-full rounded-full "
               onClick={() => share()}
             >
-              Share
+              {t('SHARE')}
             </Button>
+            )}
             <Button
               variant="outline"
               className="w-full text-[var(--primary)] border-[var(--primary)] mt-4 mb-4 rounded-full "
               onClick={() => closeTradeComplete()}
             >
-              Try another Trade
+              {t('TRADE_AGAIN_BUTTON')}
+              
             </Button>
           </div> 
         </div>
