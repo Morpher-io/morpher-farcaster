@@ -14,10 +14,9 @@ import {
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
 import { Card, CardContent } from "../ui/card";
-import { Line, LineChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from "recharts";
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { Line, LineChart,  Tooltip as RechartsTooltip, XAxis, YAxis } from "recharts";
+import { ChartContainer } from "@/components/ui/chart";
 import { Trade } from "./Trade";
-import { Position } from "./Position";
 import { PendingPosition } from "./PendingPosition";
 import { Loader2Icon } from "lucide-react";
 import { useMarketStore } from "@/store/market";
@@ -49,7 +48,6 @@ export function TradeView() {
     orderUpdate,
     setSelectedPosition,
     selectedPosition,
-    setTradeComplete,
     currencyList,
   } = usePortfolioStore();
 
@@ -281,12 +279,12 @@ export function TradeView() {
     })}`;
   };
 
-  const StatRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <>
-      <div className="text-muted-foreground">{label}</div>
-      <div className="text-right font-medium">{value}</div>
-    </>
-  );
+  // const StatRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+  //   <>
+  //     <div className="text-muted-foreground">{label}</div>
+  //     <div className="text-right font-medium">{value}</div>
+  //   </>
+  // );
 
   const StatusBadge = ({ status }: { status: string }) => {
     const statusColors: { [key: string]: string } = {

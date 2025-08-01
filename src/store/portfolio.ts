@@ -6,7 +6,6 @@ import { create } from 'zustand'
 import { TAddress, TCurrency, TCurrencyDetails, TOrder, TPortfolio } from 'morpher-trading-sdk'
 import { MorpherTradeSDK } from 'morpher-trading-sdk';
 import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from 'morpher-trading-sdk';
-import { sdk } from "@farcaster/frame-sdk";
 export type TCurrencyList = Partial<Record<TCurrency, TCurrencyDetails>>;
 const morpherTradeSDK = new MorpherTradeSDK(import.meta.env.VITE_MORPHER_API_ENDPOINT);
 
@@ -65,6 +64,8 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     set({ loading: true });
     try {
       const portfolio:any = await morpherTradeSDK.getPortfolio({ eth_address });
+
+      console.log({portfolio})
 
       const positionList = await morpherTradeSDK.getPositions({ eth_address });
       if (portfolio) {

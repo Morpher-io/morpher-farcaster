@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -24,14 +23,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
-import { TMarketType } from "morpher-trading-sdk"
-import { TMarket, StrictOHLCArray, TPosition } from "morpher-trading-sdk"
+import { TPosition } from "morpher-trading-sdk"
 import { useAccount } from "wagmi"
-import { MarketChart } from "./MarketChart";
 import { useMarketStore } from "../../store/market";
-import { Trade } from "./Trade";
-import { Position } from "./Position";
-import { PendingPosition } from "./PendingPosition";
 import { usePortfolioStore } from "@/store/portfolio"
 import { useTranslation } from "react-i18next"
 
@@ -39,27 +33,19 @@ export function PositionSelector() {
   const { t } = useTranslation();  
   const {setPositionList, positionList,
     orderUpdate,
-    tradeDirection,
     selectedPosition,
     setSelectedPosition,
     currencyList
-
-
   } = usePortfolioStore();
 
   const {morpherTradeSDK} = useMarketStore();
   const [open, setOpen] = React.useState(false)
-  const [timeRange, setTimeRange] = React.useState('1D');
   const {
 
     marketListAll,
-    setMarketList,
     selectedMarketId,
     setSelectedMarketId,
-    selectedMarket,
-    livePrice,
     setSelectedMarket,
-    marketData,
     setMarketData,
   } = useMarketStore();
 
@@ -67,7 +53,7 @@ export function PositionSelector() {
   const { address } = useAccount();
  
 
-  const outputPosition = (position: TPosition, closeOverride?: number) => {
+  const outputPosition = (position: TPosition) => {
     return (
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center">

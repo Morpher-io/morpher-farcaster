@@ -75,6 +75,7 @@
         "LEVERAGE": "Leverage",
         "SHORT_DESCRIPTION": " Going short means you profit if the price of {{market}} goes down. If the price rises, your position value decreases.",
         "TRADE_AMOUNT_DESCRIPTION": "You always invest into {{market}} with MPH. You choose the amount of MPH you want to invest and this will be placed into a position. If you invest with ETH or USDC then the amount selected will be converted using uniswap to MPH before investing transparently via our Morpher Smart Contracts. Only invest what you can afford to loose, trade responsibly.",
+        "CONNECTING_WALLET": "Connecting Wallet",
         "menu": {
             "HOME": "Home",
             "PORTFOLIO": "Portfolio",

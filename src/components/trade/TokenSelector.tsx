@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { ChevronsUpDown } from "lucide-react"
 import { usePortfolioStore } from "@/store/portfolio";
-import { sdk } from "@farcaster/frame-sdk";
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -15,7 +14,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
@@ -24,11 +22,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { MorpherTradeSDK, tokenValueFormatter, usdFormatter  } from "morpher-trading-sdk";
-import { TCurrency, TCurrencyDetails } from "morpher-trading-sdk";
-import { useAccount, usePublicClient } from "wagmi";
-import { PublicClient } from "viem";
-import { useMarketStore } from "@/store/market";
+import {  tokenValueFormatter, usdFormatter  } from "morpher-trading-sdk";
+import { TCurrency } from "morpher-trading-sdk";
 
 export function TokenSelector() {
   const [open, setOpen] = useState(false)
@@ -40,14 +35,7 @@ export function TokenSelector() {
     selectedCurrencyDetails, 
     setSelectedCurrencyDetails,
     currencyList,
-    setCurrencyList
   } = usePortfolioStore();
-  const { address } = useAccount();
-
-  const publicClient = usePublicClient()
-
-  const { morpherTradeSDK } = useMarketStore()
-
 
 
 

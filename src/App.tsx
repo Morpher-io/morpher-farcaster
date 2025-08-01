@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { TradeScreen } from "./screens/Trade";
@@ -24,7 +24,7 @@ function App() {
   const { switchChain } = useSwitchChain()
   const { address, isConnected } = useAccount();
 
-  const { t, i18n: {changeLanguage, language} } = useTranslation();
+  const { i18n: {changeLanguage, language} } = useTranslation();
   
 
   useEffect(() => {

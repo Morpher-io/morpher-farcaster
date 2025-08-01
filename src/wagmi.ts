@@ -1,13 +1,15 @@
 import { farcasterFrame } from "@farcaster/frame-wagmi-connector";
 import { http, createConfig } from "wagmi";
-import {  baseSepolia } from "wagmi/chains"; //base,
+import {  baseSepolia, base } from "wagmi/chains"; 
+
+const chain = import.meta.env.VITE_NODE_ENV == 'development' ? baseSepolia : base
 
 export const config = createConfig({
-  chains: [baseSepolia], // base, 
+  chains: [chain], // base, 
   connectors: [farcasterFrame()],
   transports: {
-    //[base.id]: http(),
     [baseSepolia.id]: http(),
+    [base.id]: http(),
   },
 });
 

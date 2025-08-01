@@ -1,7 +1,7 @@
 import * as React from "react";
 import { usePortfolioStore } from "@/store/portfolio";
 import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
-import { LineChart as LineChartIcon, PieChartIcon } from "lucide-react";
+import { PieChartIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import {
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import { format as formatDate } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -28,13 +28,14 @@ export function PortfolioSummary() {
   const {
     portfolio,
     loading,
-    eth_address,
-    leaderboard,
     positionValue,
     currencyList,
     returns,
-    setReturns
+    setReturns,
+    context: portfolioContext
   } = usePortfolioStore();
+  const [profileImage, setProfileImage] = React.useState<string>('');
+  
   const [isChartOpen, setIsChartOpen] = React.useState(false);
   const [timeRange, setTimeRange] = React.useState<"d" | "w" | "m" | "y">("d");
   const navigate = useNavigate();
@@ -50,15 +51,35 @@ export function PortfolioSummary() {
   }, [portfolio, positionValue, currencyList]);
 
 
-
-  let profileImage = portfolio?.profile_base64
-  if (!profileImage) {
+  React.useEffect(() => {
+    let profileImage = portfolio?.profile_base64 || portfolioContext?.profile_base64
+    if (!profileImage) {
       sdk.context.then(context => {
             
+        console.log('context', context)
         profileImage = context.user.pfpUrl
+        console.log('profileImage', profileImage)
+        if (profileImage)
+        setProfileImage(profileImage)
+
       })
+    } else {
+      setProfileImage(profileImage)
+    }
+  
+  }, [portfolioContext, portfolio])
+
+  // let profileImage = portfolio?.profile_base64 || portfolioContext?.profile_base64
+  // console.log('portfolioContext', portfolioContext)
+  // if (!profileImage) {
+  //     sdk.context.then(context => {
             
-  }
+  //       console.log('context', context)
+  //       profileImage = context.user.pfpUrl
+
+  //     })
+            
+  // }
 
   const getReturns = async (type: "d" | "w" | "m" | "y") => {
       if (account?.address && morpherTradeSDK) {
@@ -141,9 +162,7 @@ export function PortfolioSummary() {
     );
   }
 
-  if (!portfolio) {
-    return null;
-  }
+
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -214,10 +233,15 @@ export function PortfolioSummary() {
             </p>
           </div>
         </div>
-        {portfolio?.returns_rank && (
+        {portfolio?.returns_rank ? (
           <div className="text-right">
             <p className="text-sm font-semibold text-muted-foreground">🏆{t('RANK')}</p>
             <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>#{portfolio?.returns_rank}</p>
+          </div>
+        ) :  (
+          <div className="text-right">
+            <p className="text-sm font-semibold text-muted-foreground">🏆{t('RANK')}</p>
+            <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>?</p>
           </div>
         )}
       </div>

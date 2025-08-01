@@ -21,7 +21,6 @@ import {
 } from "morpher-trading-sdk"
 import { Input } from "../ui/input"
 import { Skeleton } from "../ui/skeleton"
-import { sdk } from "@farcaster/frame-sdk"
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
 import { cn } from "@/lib/utils"
 import { LeverageImpactVisualizer } from "./LeverageImpactVisualizer"
@@ -175,15 +174,15 @@ export function Trade() {
     updateAmount(Number(tokenValueFormatter(maxBalance)));
   };
 
-  const getLeverageWarningClass = (leverageValue: number): string => {
-    if (leverageValue <= 4) {
-      return "bg-yellow-100 text-yellow-800";
-    }
-    if (leverageValue <= 7) {
-      return "bg-orange-100 text-orange-800";
-    }
-    return "bg-red-100 text-red-800";
-  };
+  // const getLeverageWarningClass = (leverageValue: number): string => {
+  //   if (leverageValue <= 4) {
+  //     return "bg-yellow-100 text-yellow-800";
+  //   }
+  //   if (leverageValue <= 7) {
+  //     return "bg-orange-100 text-orange-800";
+  //   }
+  //   return "bg-red-100 text-red-800";
+  // };
 
   const clearTrade = () => {
     setTradeAmount('')

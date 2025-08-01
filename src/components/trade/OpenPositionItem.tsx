@@ -4,7 +4,6 @@ import {
   usdFormatter,
   tokenValueFormatter,
   TradeCallback,
-  TMarket,
   TMarketDetail,
 } from "morpher-trading-sdk";
 import { cn } from "@/lib/utils";
@@ -49,7 +48,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
     };
   }, [position]);
 
-  const { currencyList, selectedCurrency, orderUpdate } =
+  const { currencyList, orderUpdate } =
     usePortfolioStore();
   const { morpherTradeSDK, setSelectedMarketId, marketListAll, setLivePrice, livePrice } =
     useMarketStore();

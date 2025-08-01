@@ -1,9 +1,7 @@
 import { usePortfolioStore } from "@/store/portfolio";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import {  usdFormatter, TLeaderBoard, TAddress, TOrder, TPortfolio, tokenValueFormatter } from "morpher-trading-sdk";
-import { Input } from "@/components/ui/input";
-import { Filter } from "lucide-react";
+import {  usdFormatter, TLeaderBoard, TAddress, TOrder, tokenValueFormatter } from "morpher-trading-sdk";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,7 +10,6 @@ import { sdk } from "@farcaster/frame-sdk";
 import {
   ChartContainer,
   ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
@@ -25,7 +22,7 @@ export function LeaderboardScreen() {
   const { t } = useTranslation();
   const account = useAccount();
   const { getLeaderboard, leaderboard,  } = usePortfolioStore();
-  const [filter, setFilter] = useState("");
+  const [filter] = useState("");
   const [type, setType]= useState<'returns' | 'order'>('order');
   let navigate = useNavigate();
   const { morpherTradeSDK } = useMarketStore();
@@ -239,7 +236,7 @@ export function LeaderboardScreen() {
                   cursor={false}
                   content={
                     <ChartTooltipContent
-                      formatter={(value) =>
+                      formatter={(value: any) =>
                         `${tokenValueFormatter(value as number)} MPH`
                       }
                     />

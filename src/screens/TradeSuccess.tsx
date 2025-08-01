@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { usePortfolioStore } from "@/store/portfolio";
 import { Button } from "@/components/ui/button";
 import { sdk } from "@farcaster/frame-sdk";
-import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
+import { tokenValueFormatter } from "morpher-trading-sdk";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -16,8 +16,8 @@ export function TradeSuccessScreen() {
 
    const account: any = useAccount();
     
-    const { selectedMarket,  morpherTradeSDK, marketListAll, setSelectedMarket, setSelectedMarketId, setTradeType, setLeverage } = useMarketStore();
-    const { setTradeComplete, selectedCurrency, orderUpdate, tradeComplete, setClosePercentage } = usePortfolioStore();
+    const { selectedMarket,  marketListAll, setSelectedMarket, setSelectedMarketId } = useMarketStore();
+    const { setTradeComplete, orderUpdate } = usePortfolioStore();
 
       const getOrder = async () => {
     if (account.address === undefined) {

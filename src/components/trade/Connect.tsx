@@ -1,6 +1,5 @@
 import { useConnect } from "wagmi";
 import { useEffect } from "react";
-import { sdk } from "@farcaster/frame-sdk";
 import { useTranslation } from "react-i18next";
 
 export function Connect() {

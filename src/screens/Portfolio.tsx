@@ -10,19 +10,18 @@ import { PortfolioChart } from "@/components/trade/PortfolioChart";
 import { useMarketStore } from "@/store/market";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { TPosition, usdFormatter, tokenValueFormatter } from "morpher-trading-sdk";
+import {  usdFormatter, tokenValueFormatter } from "morpher-trading-sdk";
 import { usePortfolioStore } from "@/store/portfolio";
 import { useNavigate } from "react-router-dom";
 import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
 import { useTranslation } from "react-i18next";
-import { Trade } from "@/components/trade/Trade";
 import { TradeView } from "@/components/trade/TradeView";
 
 export function PortfolioScreen() {
     const { address } = useAccount();
 
     const account = useAccount();
-    const {  morpherTradeSDK, setSelectedMarketId, selectedMarketId, marketListAll, setSelectedMarket, setMarketData } = useMarketStore();
+    const {  morpherTradeSDK, setSelectedMarketId, selectedMarketId, marketListAll, setSelectedMarket } = useMarketStore();
     const { positionList, setPositionList, setPortfolio, positionValue, currencyList, setReturns, returns } = usePortfolioStore();
     const [timeRange, setTimeRange] = useState<"d" | "w" | "m" | "y">("d");
     const [chartData, setChartData] = useState<[number, number][]>([]);

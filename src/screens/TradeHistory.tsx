@@ -1,17 +1,8 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useMarketStore } from "@/store/market";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { TOrder, TORders, usdFormatter } from "morpher-trading-sdk";
 import { tokenValueFormatter } from "morpher-trading-sdk";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,

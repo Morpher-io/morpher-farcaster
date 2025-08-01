@@ -8,7 +8,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
@@ -19,10 +18,8 @@ import {
 } from "@/components/ui/popover";
 import { tokenValueFormatter } from "morpher-trading-sdk";
 import { TMarketType } from "morpher-trading-sdk";
-import { TMarket, StrictOHLCArray } from "morpher-trading-sdk";
-import { useAccount } from "wagmi";
+import { TMarket } from "morpher-trading-sdk";
 import { useMarketStore } from "../../store/market";
-import { usePortfolioStore } from "@/store/portfolio";
 import { Input } from "../ui/input";
 import { useTranslation } from "react-i18next";
 
@@ -52,7 +49,6 @@ export function MarketSelector() {
     setMarketListAll,
   } = useMarketStore();
 
-  const { address } = useAccount();
 
   React.useEffect(() => {
     if (marketType && marketType !== displayCategory) {
@@ -171,26 +167,26 @@ export function MarketSelector() {
     checkFades();
   };
 
-  const formatMarketCap = (num: number | string | undefined | null): string => {
-    if (num === null || num === undefined) return "N/A";
-    const number = Number(num);
-    if (isNaN(number) || number === 0) return "N/A";
+  // const formatMarketCap = (num: number | string | undefined | null): string => {
+  //   if (num === null || num === undefined) return "N/A";
+  //   const number = Number(num);
+  //   if (isNaN(number) || number === 0) return "N/A";
 
-    const tiers = [
-      { value: 1e12, symbol: "T" },
-      { value: 1e9, symbol: "B" },
-      { value: 1e6, symbol: "M" },
-      { value: 1e3, symbol: "k" },
-    ];
+  //   const tiers = [
+  //     { value: 1e12, symbol: "T" },
+  //     { value: 1e9, symbol: "B" },
+  //     { value: 1e6, symbol: "M" },
+  //     { value: 1e3, symbol: "k" },
+  //   ];
 
-    const tier = tiers.find((t) => number >= t.value);
+  //   const tier = tiers.find((t) => number >= t.value);
 
-    if (tier) {
-      return `$${(number / tier.value).toFixed(2)}${tier.symbol}`;
-    }
+  //   if (tier) {
+  //     return `$${(number / tier.value).toFixed(2)}${tier.symbol}`;
+  //   }
 
-    return `$${number.toFixed(2)}`;
-  };
+  //   return `$${number.toFixed(2)}`;
+  // };
 
   const outputMarket = (market: TMarket, closeOverride?: number) => {
     const StatusBadge = ({ status }: { status: string }) => {
@@ -262,8 +258,6 @@ export function MarketSelector() {
       </div>
     );
   };
-
-  const account = useAccount();
 
   React.useEffect(() => {
     if (selectedMarketId && marketListAll) {

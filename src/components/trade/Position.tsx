@@ -5,10 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAccount } from "wagmi";
-import { useMarketStore } from "@/store/market";
 import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
-import { TPosition } from "morpher-trading-sdk";
 import { Button } from "../ui/button";
 import { Loader2Icon } from "lucide-react";
 import { usePortfolioStore } from "@/store/portfolio";
@@ -22,10 +19,8 @@ export function Position( {closeButton}: PositionProps) {
   if (closeButton == undefined) {
     closeButton = true
   }
-  const account = useAccount();
-  const { selectedPosition, setSelectedPosition, setTradeDirection, setClosePercentage, tradeDirection, currencyList } = usePortfolioStore();
-  const { selectedMarket } = useMarketStore();
-    const [closeExecuting, setCloseExecuting] = React.useState(false);
+  const { selectedPosition, setTradeDirection, setClosePercentage, tradeDirection, currencyList } = usePortfolioStore();
+  const [closeExecuting] = React.useState(false);
   
 
     const executeClose = async () => {

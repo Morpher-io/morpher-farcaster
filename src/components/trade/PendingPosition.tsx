@@ -29,7 +29,7 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
   const account: any = useAccount();
   const [closeExecuting, setCloseExecuting] = useState(false);
   const [tradeError, setTradeError] = useState<string | undefined>(undefined);
-  const { data: walletClient, isError, isLoading } = useWalletClient();
+  const { data: walletClient } = useWalletClient();
   const publicClient: any = usePublicClient();
 
   const getOrder = async () => {

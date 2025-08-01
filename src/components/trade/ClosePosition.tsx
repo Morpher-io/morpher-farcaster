@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
-import { ChevronsUpDown, Loader2Icon } from "lucide-react"
+import { useState, useEffect } from "react";
+import {  Loader2Icon } from "lucide-react"
 import { usePortfolioStore } from "@/store/portfolio";
-import { sdk } from "@farcaster/frame-sdk";
 
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
@@ -11,49 +10,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { MorpherTradeSDK, tokenValueFormatter, TradeCallback, usdFormatter  } from "morpher-trading-sdk";
-import { TCurrency, TCurrencyDetails } from "morpher-trading-sdk";
+
+import { TradeCallback,   } from "morpher-trading-sdk";
+import { } from "morpher-trading-sdk";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { PublicClient } from "viem";
 import { useMarketStore } from "@/store/market";
 import { Position } from "./Position";
 
 export function ClosePosition() {
-  const [open, setOpen] = useState(false)
   const { 
-    tradeAmount, 
-    setTradeAmount, 
     selectedCurrency, 
     setSelectedCurrency, 
-    selectedCurrencyDetails, 
     setSelectedCurrencyDetails,
     currencyList,
-    setCurrencyList,
     closePercentage,
     setClosePercentage,
     selectedPosition,
     orderUpdate,
     setSelectedPosition
   } = usePortfolioStore();
-  const { address } = useAccount();
   const { morpherTradeSDK,   marketData } = useMarketStore()
   const [tradeExecuting, setTradeExecuting] = useState(false);
   const [tradeError, setTradeError] = useState<string | undefined>(undefined);
   const account: any = useAccount();
-  const { data: walletClient, isError, isLoading } = useWalletClient();
+  const { data: walletClient } = useWalletClient();
   const publicClient:any = usePublicClient()
 
     const tradeComplete = (result: TradeCallback) => {
@@ -78,12 +58,13 @@ export function ClosePosition() {
     }
     setTradeExecuting(true)
 
-    let currencyDetails = currencyList?.[selectedCurrency || 'ETH']
+    // let currencyDetails = currencyList?.[selectedCurrency || 'ETH']
 
-    let tradeAmountFormatted = 0n;
-    if (tradeAmount && Number(tradeAmount) > 0 && currencyDetails) {
-        tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10**(currencyDetails.decimals || 18)));
-    }
+    // let tradeAmountFormatted = 0n;
+
+    // if (tradeAmount && Number(tradeAmount) > 0 && currencyDetails) {
+    //     tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10**(currencyDetails.decimals || 18)));
+    // }
 
 
     morpherTradeSDK.closePosition({ account, walletClient: walletClient as any, publicClient, market_id: selectedPosition?.market_id || '', closePercentage:closePercentage || 0, callback: tradeComplete })

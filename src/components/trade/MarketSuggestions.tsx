@@ -6,7 +6,7 @@ import { Loader2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export function MarketSuggestions() {
-  const { morpherTradeSDK, setSelectedMarketId, setMarketType, marketType, trendingMarkets, getTrendingMarkets, setSelectedMarket } = useMarketStore();
+  const { morpherTradeSDK, setSelectedMarketId, setMarketType, trendingMarkets, getTrendingMarkets, setSelectedMarket } = useMarketStore();
   const { t } = useTranslation();
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);

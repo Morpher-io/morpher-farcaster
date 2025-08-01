@@ -94,33 +94,33 @@ export function LeverageImpactVisualizer({
     },
   ];
 
-  const CustomDotLabel = (props: any) => {
-    const { cx, cy, point } = props;
-    if (!point || typeof cx !== "number" || typeof cy !== "number") return null;
-    return (
-      <>
-        <text
-          x={cx}
-          y={cy - 10}
-          textAnchor="middle"
-          fill={point.fill}
-          fontSize={10}
-          fontWeight="bold"
-        >
-          {point.name}
-        </text>
-        <text
-          x={cx}
-          y={cy + 15}
-          textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize={10}
-        >
-          ${tokenValueFormatter(point.price)}
-        </text>
-      </>
-    );
-  };
+  // const CustomDotLabel = (props: any) => {
+  //   const { cx, cy, point } = props;
+  //   if (!point || typeof cx !== "number" || typeof cy !== "number") return null;
+  //   return (
+  //     <>
+  //       <text
+  //         x={cx}
+  //         y={cy - 10}
+  //         textAnchor="middle"
+  //         fill={point.fill}
+  //         fontSize={10}
+  //         fontWeight="bold"
+  //       >
+  //         {point.name}
+  //       </text>
+  //       <text
+  //         x={cx}
+  //         y={cy + 15}
+  //         textAnchor="middle"
+  //         fill="var(--muted-foreground)"
+  //         fontSize={10}
+  //       >
+  //         ${tokenValueFormatter(point.price)}
+  //       </text>
+  //     </>
+  //   );
+  // };
 
   if (domain[0] === domain[1]) {
     return null;

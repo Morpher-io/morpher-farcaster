@@ -72,6 +72,7 @@
         "LEVERAGE": "Hebel",
         "SHORT_DESCRIPTION": "Short zu gehen bedeutet, dass Sie profitieren, wenn der Preis von {{market}} fällt. Steigt der Preis, sinkt der Wert Ihrer Position.",
         "TRADE_AMOUNT_DESCRIPTION": "Sie investieren immer mit MPH in {{market}}. Sie wählen den Betrag an MPH, den Sie investieren möchten, und dieser wird in eine Position platziert. Wenn Sie mit ETH oder USDC investieren, wird der ausgewählte Betrag über Uniswap in MPH umgerechnet, bevor er transparent über unsere Morpher Smart Contracts investiert wird. Investieren Sie nur, was Sie sich leisten können zu verlieren, handeln Sie verantwortungsbewusst.",
+        "CONNECTING_WALLET": "Wallet verbinden",
         "menu": {
             "HOME": "Startseite",
             "PORTFOLIO": "Portfolio",
