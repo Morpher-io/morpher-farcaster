@@ -414,7 +414,7 @@ export function LeaderboardScreen() {
 
        <Button
               variant="default"
-              className="w-[calc(100vw-30px)]  rounded-full fixed bottom-19 "
+              className="w-[calc(100vw-30px)]   fixed bottom-20 "
               onClick={() => navigate('/')}
             >
               {t('BEAT_THEM_PROMPT')}

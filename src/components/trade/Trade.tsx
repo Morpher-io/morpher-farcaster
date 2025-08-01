@@ -268,7 +268,7 @@ export function Trade() {
       ) : (
         <div className="">
           <div className="flex items-center mb-2">
-            <Label>{t('TRADE_AMOUNT')}</Label>
+            <Label className="text-lg font-bold ">{t('TRADE_AMOUNT')}</Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="ml-1.5">
@@ -297,7 +297,7 @@ export function Trade() {
                     key={currency}
                     value={currency}
                     disabled={!details.balance || BigInt(details.balance) === 0n}
-                    className="flex-col h-auto"
+                    className={"flex-col h-auto " + (currency == selectedCurrency ? 'border-primary' : '') }
                   >
                     <img
                       src={`/src/assets/icons/${currency}.svg`}
@@ -310,7 +310,7 @@ export function Trade() {
                       {Number(details.balance || 0) > 0 ? tokenValueFormatter(
                         Number(details.balance || 0) /
                           10 ** (details.decimals || 1)
-                      ) : "N/A"}
+                      ) : "0.00"}
                     </span>
                     </div>
                   </TabsTrigger>
@@ -325,7 +325,7 @@ export function Trade() {
                     placeholder="0.00"
                     value={inputValue}
                     onChange={handleInputChange}
-                    className="w-full h-auto border-none bg-transparent p-0 text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="w-full h-auto border-none bg-transparent p-0 text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-primary placeholder:opacity-60"
                   />
                 </div>
                 <ToggleGroup
@@ -383,7 +383,7 @@ export function Trade() {
                     variant="outline"
                     size="sm"
                     className={cn(
-                      "text-xs h-8",
+                      "text-xs rounded-sm h-8",
                       value < 0
                         ? "text-secondary hover:bg-secondary/10"
                         : "text-primary hover:bg-primary/10"
@@ -398,7 +398,7 @@ export function Trade() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs h-8 font-bold text-white bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90 transition-opacity hover:text-white"
+                className="text-xs h-8 rounded-sm font-bold text-white bg-[var(--blue)] hover:opacity-90 transition-opacity hover:text-white"
                 onClick={setMaxAmount}
               >
                 Max <Rocket />
@@ -426,7 +426,7 @@ export function Trade() {
       <div className="my-4 h-px bg-gray-200" />
 
       <div className="flex items-center justify-between mb-2">
-        <Label>{t('TRADE_TYPE')}</Label>
+        <Label className="text-lg font-bold">{t('TRADE_TYPE')}</Label>
         <ToggleGroup
           type="single"
           value={tradeType}

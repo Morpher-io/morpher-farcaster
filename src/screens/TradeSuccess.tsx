@@ -126,7 +126,7 @@ export function TradeSuccessScreen() {
 
           <div className="mt-10 w-full">
 
-            {((Number(orderUpdate?.close_shares_amount || 0) > 0) || (Number(orderUpdate?.return_percentage || 0) > 0)) && (
+            {((Number(orderUpdate?.open_mph_token_amount || 0) > 0) || (Number(orderUpdate?.return_percentage || 0) > 0)) && (
             <Button
               variant="default"
               className="w-full rounded-full "

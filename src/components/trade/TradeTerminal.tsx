@@ -10,6 +10,7 @@ import { OpenPositionItem } from "./OpenPositionItem";
 import { TradeView } from "./TradeView";
 import { useTranslation } from "react-i18next";
 import { TrendingUp } from "lucide-react";
+import { Button } from "../ui/button";
 
 export function TradeTerminal() {
   const { address } = useAccount();
@@ -60,8 +61,8 @@ export function TradeTerminal() {
                 className="flex items-center justify-between py-4 cursor-pointer"
                 onClick={() => setSelectedMarketId("CRYPTO_BTC")}
               >
-                <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-muted-foreground" />
+                <div className="h-9 w-9 rounded-full bg-[var(--primary-light)] flex items-center justify-center">
+                  <TrendingUp  color="var(--primary)" className="h-5 w-5  " />
                 </div>
                 <div>
                   <p className="font-semibold text-base">
@@ -72,9 +73,9 @@ export function TradeTerminal() {
                   </p>
 
                 </div>
-                <p className="font-medium text-base text-primary hover:underline">
+                <Button   className="font-medium text-base hover:underline">
                   {t("START_TRADING")}
-                </p>
+                </Button>
               </div>
             </div>
           </>

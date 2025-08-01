@@ -225,7 +225,7 @@ export function PortfolioSummary() {
                 className="h-6 w-6"
                 onClick={() => setIsChartOpen(true)}
               >
-                <PieChartIcon className="h-4 w-4" />
+                <PieChartIcon color="var(--primary)" className="h-4 w-4" />
               </Button>
             </div>
             <p className="text-2xl font-bold">
@@ -233,17 +233,12 @@ export function PortfolioSummary() {
             </p>
           </div>
         </div>
-        {portfolio?.returns_rank ? (
+        
           <div className="text-right">
             <p className="text-sm font-semibold text-muted-foreground">🏆 {t('RANK')}</p>
-            <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>#{portfolio?.returns_rank}</p>
+            <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>#{portfolio?.returns_rank && portfolio?.returns_rank > 0 ? portfolio?.returns_rank : ''}</p>
           </div>
-        ) :  (
-          <div className="text-right">
-            <p className="text-sm font-semibold text-muted-foreground">🏆{t('RANK')}</p>
-            <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>?</p>
-          </div>
-        )}
+        
       </div>
       <Dialog open={isChartOpen} onOpenChange={setIsChartOpen}>
         <DialogContent>

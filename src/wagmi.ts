@@ -9,7 +9,7 @@ export const config = createConfig({
   connectors: [farcasterFrame()],
   transports: {
     [baseSepolia.id]: http(),
-    [base.id]: http(),
+    [base.id]: http('https://base-mainnet.infura.io/v3/783aa55e91654307a788557b041e8222'), // TEMPORARY - trial user - set this from the backend 
   },
 });
 
