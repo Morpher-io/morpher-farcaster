@@ -82,7 +82,7 @@ export function PortfolioStats() {
             <div className="">
               {stat.data ? (
                 <>
-                  <p className={`font-semibold text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-primary"}`}>
+                  <p className={`font-semibold text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-[var(--dark)]"}`}>
                     {stat.data.isPositive ? "+" : ""}$ {usdFormatter(stat.data.valueUsd)}
                     {isFinite(stat.data.percent) && (
                       <span className="text-xs ml-1">
@@ -90,7 +90,7 @@ export function PortfolioStats() {
                       </span>
                     )}
                   </p>
-                  <p className={`text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-primary"}`}>
+                  <p className={`text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-[var(--dark)]"}`}>
                     {stat.data.isPositive ? "+" : ""}{tokenValueFormatter(stat.data.valueMph)} MPH
                   </p>
                 </>

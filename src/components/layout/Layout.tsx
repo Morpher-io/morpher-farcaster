@@ -46,8 +46,8 @@ export function Layout({ children }: LayoutProps) {
                     location.pathname === item.path && 'bg-primary',
                   )}
                   style={{
-                    mask: `url(/src/assets/icons/${item.image.toLowerCase()}.svg) no-repeat center / contain`,
-                    WebkitMask: `url(/src/assets/icons/${item.image.toLowerCase()}.svg) no-repeat center / contain`,
+                    mask: `url(/assets/icons/${item.image.toLowerCase()}.svg) no-repeat center / contain`,
+                    WebkitMask: `url(/assets/icons/${item.image.toLowerCase()}.svg) no-repeat center / contain`,
                   }}
                 />
                 <span className='mt-0 font-semibold'>{item.label}</span>

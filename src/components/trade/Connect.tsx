@@ -18,7 +18,7 @@ export function Connect() {
       <div className="flex-1 flex items-center justify-center">
         <div id="logo-text" className=" flex flex-col items-center">
           <img
-            src={`/src/assets/logos/morpher.svg`}
+            src={`/assets/logos/morpher.svg`}
             alt={`Morpher Logo`}
             className="h-25 w-25 animate-spin [animation-duration:20s]"
           />

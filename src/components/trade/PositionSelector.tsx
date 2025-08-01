@@ -86,8 +86,8 @@ export function PositionSelector() {
               <div
                 className="mr-1 h-3 w-3 bg-[currentColor]"
                 style={{
-                  mask: `url(/src/assets/icons/${(Number(position?.total_return_percent || 0)) > 0 ? "increase" : "decrease"}.svg) no-repeat center / contain`,
-                  WebkitMask: `url(/src/assets/icons/${(Number(position?.total_return_percent || 0)) > 0 ? "increase" : "decrease"}.svg) no-repeat center / contain`,
+                  mask: `url(/assets/icons/${(Number(position?.total_return_percent || 0)) > 0 ? "increase" : "decrease"}.svg) no-repeat center / contain`,
+                  WebkitMask: `url(/assets/icons/${(Number(position?.total_return_percent || 0)) > 0 ? "increase" : "decrease"}.svg) no-repeat center / contain`,
                 }}
               />
             )}

@@ -107,7 +107,7 @@ export function TradeSuccessScreen() {
         >
           <div>
             <img
-              src={`/src/assets/logos/trade-complete.svg`}
+              src={`/assets/logos/trade-complete.svg`}
               alt={`Morpher Logo`}
               className="mt-2"
             />

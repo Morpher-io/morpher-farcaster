@@ -373,11 +373,11 @@ export function MarketSelector() {
                   )[]
                 ).map((type) => {
                   const iconMap: Partial<Record<TMarketType, string>> = {
-                    stock: "/src/assets/types/stock.svg",
-                    forex: "/src/assets/types/forex.svg",
-                    index: "/src/assets/types/index.svg",
-                    commodity: "/src/assets/types/commodity.svg",
-                    crypto: "/src/assets/types/crypto.svg",
+                    stock: "/assets/types/stock.svg",
+                    forex: "/assets/types/forex.svg",
+                    index: "/assets/types/index.svg",
+                    commodity: "/assets/types/commodity.svg",
+                    crypto: "/assets/types/crypto.svg",
                   };
                   const iconSrc = iconMap[type as TMarketType];
 

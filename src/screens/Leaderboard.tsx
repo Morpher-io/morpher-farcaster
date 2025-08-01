@@ -369,7 +369,7 @@ export function LeaderboardScreen() {
     <div className="mx-4">
       <div className="flex flex-col content-center mt-4">
         <img
-            src={`/src/assets/icons/trophy.svg`}
+            src={`/assets/icons/trophy.svg`}
             alt={`Trophy Icon`}
 
             className="h-15 w-15 m-auto "

@@ -80,7 +80,7 @@ export function TokenSelector() {
               <Button variant="ghost" role="combobox" aria-expanded={open} className="w-auto justify-between text-lg font-bold  p-2">
                 {selectedCurrency && (
                   <img
-                    src={`/src/assets/icons/${selectedCurrency}.svg`}
+                    src={`/assets/icons/${selectedCurrency}.svg`}
                     alt={`${selectedCurrency} logo`}
                     className="mr-0 h-6 w-6"
                   />
@@ -106,7 +106,7 @@ export function TokenSelector() {
                       >
                         <div className="flex items-center">
                           <img
-                            src={`/src/assets/icons/${currency}.svg`}
+                            src={`/assets/icons/${currency}.svg`}
                             alt={`${currency} logo`}
                             className="mr-2 h-4 w-4"
                           />

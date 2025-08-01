@@ -5,14 +5,14 @@ export function Header() {
     <header className="flex items-center justify-between  px-4 py-3 items-center ">
       <div>
           <img
-            src={`/src/assets/logos/morpher-header.svg`}
+            src={`/assets/logos/morpher-header.svg`}
             alt={`Morpher Logo`}
             className=""
         />
       </div>
       <div className="cursor-pointer">
        <img
-            src={`/src/assets/icons/info.svg`}
+            src={`/assets/icons/info.svg`}
             alt={`info icon`}
             className=""
         />
@@ -24,7 +24,7 @@ export function Header() {
             <div>
             
               <img
-                src={`/src/assets/icons/menu.svg`}
+                src={`/assets/icons/menu.svg`}
                 alt={`Hamburger Menu`}
                  />
               <span className="sr-only">Open menu</span>

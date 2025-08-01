@@ -300,7 +300,7 @@ export function Trade() {
                     className={"flex-col h-auto " + (currency == selectedCurrency ? 'border-primary' : '') }
                   >
                     <img
-                      src={`/src/assets/icons/${currency}.svg`}
+                      src={`/assets/icons/${currency}.svg`}
                       alt={`${currency} logo`}
                       className="h-6 w-6 mb-1"
                     />
@@ -345,7 +345,7 @@ export function Trade() {
                     className="p-1.5 data-[state=on]:bg-primary/20"
                   >
                     <img
-                      src={`/src/assets/icons/${selectedCurrency}.svg`}
+                      src={`/assets/icons/${selectedCurrency}.svg`}
                       alt={`${selectedCurrency} logo`}
                       className="h-5 w-5"
                     />
@@ -356,7 +356,7 @@ export function Trade() {
                     className="p-1.5 data-[state=on]:bg-primary/20"
                   >
                     <img
-                      src="/src/assets/icons/USDC.svg"
+                      src="/assets/icons/USDC.svg"
                       alt="USD logo"
                       className="h-5 w-5"
                     />
@@ -507,7 +507,7 @@ export function Trade() {
         }}>
           <img
             className="mr-2 w-5"
-            src={`/src/assets/icons/info.svg`}
+            src={`/assets/icons/info.svg`}
             alt={`Info Icon`}
           />
           Enter amount to trade

@@ -141,6 +141,8 @@ export function MarketSuggestions() {
                       alt={`${market.name} logo`}
                       className="h-8 w-8 rounded-lg mb-2"
                   />
+                  <div className="text-[var(--dark-red)] bg-[var(--secondary-light)]"></div>
+                  <div className="text-[var(--dark-red)]  bg-[var(--primary-light)] "></div>
                 <p className="font-semibold  text-sm truncate">{market.symbol}</p>
                 <div
                   className={`flex p-1 bg-[var(${(market?.change_percent || 0) >= 0 ? "--primary-light" : "--secondary-light"})] items-center justify-center font-semibold rounded-full text-xs text-[var(${(market?.change_percent || 0) >= 0 ? "--dark" : "--dark-red"})] `}
