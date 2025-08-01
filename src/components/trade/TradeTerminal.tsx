@@ -24,17 +24,17 @@ export function TradeTerminal() {
 
   const fetchCurrencyList = async () => {
     if (address && publicClient && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
-      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
+      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{ symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}` }, { symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` }] })
       setCurrencyList(fetchedCurrencyList);
     }
   }
 
-  React.useEffect(()=> {
+  React.useEffect(() => {
     if (address && publicClient && !currencyList && morpherTradeSDK.ready) {
       fetchCurrencyList()
 
     }
-  }, [address, publicClient, currencyList, morpherTradeSDK.ready]) 
+  }, [address, publicClient, currencyList, morpherTradeSDK.ready])
 
 
   return (
@@ -60,24 +60,21 @@ export function TradeTerminal() {
                 className="flex items-center justify-between py-4 cursor-pointer"
                 onClick={() => setSelectedMarketId("CRYPTO_BTC")}
               >
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center">
-                    <TrendingUp className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-base">
-                      {t("NO_OPEN_POSITIONS_YET")}
-                    </p>
-                    <p className="text-sm text-muted-foreground truncate max-w-[150px]">
-                      {t("TRADE_YOUR_FIRST_MARKET")}
-                    </p>
-                  </div>
+                <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <div className="text-right">
-                  <p className="font-medium text-base text-primary hover:underline">
-                    {t("START_TRADING")}
+                <div>
+                  <p className="font-semibold text-base">
+                    {t("NO_OPEN_POSITIONS_YET")}
                   </p>
+                  <p className="text-sm text-muted-foreground truncate max-w-[150px]">
+                    {t("TRADE_YOUR_FIRST_MARKET")}
+                  </p>
+
                 </div>
+                <p className="font-medium text-base text-primary hover:underline">
+                  {t("START_TRADING")}
+                </p>
               </div>
             </div>
           </>
