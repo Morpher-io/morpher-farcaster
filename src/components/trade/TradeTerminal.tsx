@@ -9,11 +9,12 @@ import { useMarketStore } from "@/store/market";
 import { OpenPositionItem } from "./OpenPositionItem";
 import { TradeView } from "./TradeView";
 import { useTranslation } from "react-i18next";
+import { TrendingUp } from "lucide-react";
 
 export function TradeTerminal() {
   const { address } = useAccount();
   const { setEthAddress, setCurrencyList, currencyList, positionList } = usePortfolioStore();
-  const { morpherTradeSDK } = useMarketStore();
+  const { morpherTradeSDK, setSelectedMarketId } = useMarketStore();
   const publicClient = usePublicClient();
   const { t } = useTranslation();
 
@@ -23,17 +24,17 @@ export function TradeTerminal() {
 
   const fetchCurrencyList = async () => {
     if (address && publicClient && morpherTradeSDK.tokenAddress && morpherTradeSDK.usdcAddress) {
-      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}`}, {symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` } ]  })
+      const fetchedCurrencyList = await morpherTradeSDK.getCurrencyList({ address, publicClient, tokenAddresses: [{ symbol: 'MPH', address: morpherTradeSDK.tokenAddress as `0x${string}` }, { symbol: 'USDC', address: morpherTradeSDK.usdcAddress as `0x${string}` }] })
       setCurrencyList(fetchedCurrencyList);
     }
   }
 
-  React.useEffect(()=> {
+  React.useEffect(() => {
     if (address && publicClient && !currencyList && morpherTradeSDK.ready) {
       fetchCurrencyList()
 
     }
-  }, [address, publicClient, currencyList, morpherTradeSDK.ready]) 
+  }, [address, publicClient, currencyList, morpherTradeSDK.ready])
 
 
   return (
@@ -43,14 +44,41 @@ export function TradeTerminal() {
       <PortfolioStats />
       <MarketSuggestions />
       <MarketSelector />
-      {positionList && positionList.length > 0 && (
-        <>
-          <h2 className="text-lg font-bold mt-2">{t('OPEN_POSITIONS')}</h2>
-          {positionList.map((position) => (
-            <OpenPositionItem key={position.id} position={position} />
-          ))}
-        </>
-      )}
+      {positionList &&
+        (positionList.length > 0 ? (
+          <>
+            <h2 className="text-lg font-bold mt-2">{t("OPEN_POSITIONS")}</h2>
+            {positionList.map((position) => (
+              <OpenPositionItem key={position.id} position={position} />
+            ))}
+          </>
+        ) : (
+          <>
+            <h2 className="text-lg font-bold mt-2">{t("OPEN_POSITIONS")}</h2>
+            <div className="border-b">
+              <div
+                className="flex items-center justify-between py-4 cursor-pointer"
+                onClick={() => setSelectedMarketId("CRYPTO_BTC")}
+              >
+                <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-semibold text-base">
+                    {t("NO_OPEN_POSITIONS_YET")}
+                  </p>
+                  <p className="text-sm text-muted-foreground truncate max-w-[150px]">
+                    {t("TRADE_YOUR_FIRST_MARKET")}
+                  </p>
+
+                </div>
+                <p className="font-medium text-base text-primary hover:underline">
+                  {t("START_TRADING")}
+                </p>
+              </div>
+            </div>
+          </>
+        ))}
       <TradeView />
     </div>
   );

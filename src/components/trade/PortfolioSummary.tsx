@@ -235,7 +235,7 @@ export function PortfolioSummary() {
         </div>
         {portfolio?.returns_rank ? (
           <div className="text-right">
-            <p className="text-sm font-semibold text-muted-foreground">🏆{t('RANK')}</p>
+            <p className="text-sm font-semibold text-muted-foreground">🏆 {t('RANK')}</p>
             <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>#{portfolio?.returns_rank}</p>
           </div>
         ) :  (
