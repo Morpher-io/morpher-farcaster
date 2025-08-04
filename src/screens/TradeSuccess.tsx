@@ -51,7 +51,7 @@ export function TradeSuccessScreen() {
         text = t('TRADE_CLOSE_SHARE', {market: selectedMarket?.name || orderUpdate?.market_id, returnPercentage})
       }
 
-      const embeds:[string] = [`https://www.morpher.com/`];
+      const embeds:[string] = [`https://farcaster.xyz/miniapps/dWezHCjv5UqF/morpher`];
 
       await sdk.actions.composeCast({
         text,
