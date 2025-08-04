@@ -122,8 +122,7 @@ export function Trade() {
     if (inputMode === "token") {
       const numValue = parseFloat(value);
       if (!isNaN(numValue) && numValue > maxBalance) {
-        tokenAmountStr = maxBalance.toString();
-        setInputValue(tokenAmountStr);
+        setInputValue(tokenValueFormatter(maxBalance));
       } else {
         tokenAmountStr = value || "";
       }
