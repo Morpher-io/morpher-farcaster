@@ -15,7 +15,7 @@ import { Button } from "../ui/button";
 export function TradeTerminal() {
   const { address } = useAccount();
   const { setEthAddress, setCurrencyList, currencyList, positionList } = usePortfolioStore();
-  const { morpherTradeSDK, setSelectedMarketId, setOpenSearch } = useMarketStore();
+  const { morpherTradeSDK, setOpenSearch } = useMarketStore();
   const publicClient = usePublicClient();
   const { t } = useTranslation();
 

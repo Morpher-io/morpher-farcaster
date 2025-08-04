@@ -321,12 +321,13 @@ export function Trade() {
               <div className="flex justify-between items-center gap-2">
                 <div className="flex-1 min-w-0">
                   <Input
-                    placeholder="0.00"
+                    placeholder={"0.00 " + selectedCurrency}
                     value={inputValue}
                     onChange={handleInputChange}
                     className="w-full h-auto border-none bg-transparent p-0 text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-primary placeholder:opacity-60"
                   />
                 </div>
+                {selectedCurrency !== "USDC" && (
                 <ToggleGroup
                   type="single"
                   value={inputMode}
@@ -336,7 +337,7 @@ export function Trade() {
                     }
                   }}
                   className="p-0.5 border bg-background"
-                  disabled={selectedCurrency === "USDC"}
+                  
                 >
                   <ToggleGroupItem
                     value="token"
@@ -361,6 +362,7 @@ export function Trade() {
                     />
                   </ToggleGroupItem>
                 </ToggleGroup>
+                )}
                 
               </div>
               <div className="grid grid-cols-5 gap-2 py-2">
