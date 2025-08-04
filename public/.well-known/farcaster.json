@@ -1,1 +1,20 @@
-{}
+{
+  "miniapp": {
+    "version": "1",
+    "name": "Morpher",
+    "iconUrl": "https://farcaster.morpher.com/assets/icons/MPH.svg",
+    "homeUrl": "https://farcaster.morpher.com",
+    "imageUrl": "https://www.morpher.com/img/og_homepage_fb.png",
+    "buttonTitle": "📈 Trade",
+    "splashImageUrl": "https://farcaster.morpher.com/assets/icons/MPH.svg",
+    "splashBackgroundColor": "#00c386",
+    "requiredChains": [
+      "eip155:8453"
+    ],
+    "requiredCapabilities": [
+      "actions.signIn",
+      "wallet.getEthereumProvider",
+      "actions.swapToken"
+    ]
+  }
+}
