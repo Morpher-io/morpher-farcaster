@@ -1,41 +1,41 @@
 {
-  "accountAssociation": {
-    "header": "",
-    "payload": "",
-    "signature": ""
-  },
-  "miniapp": {
-    "version": "1",
-    "name": "Morpher",
-    "description": "Trade a wide variety of markets, including stocks, forex, commodities, and indices, directly from within Farcaster clients like Warpcast.",
-    "iconUrl": "https://farcaster.morpher.com/assets/icons/MPH.svg",
-    "homeUrl": "https://farcaster.morpher.com",
-    "splashImageUrl": "https://farcaster.morpher.com/assets/icons/MPH.svg",
-    "splashBackgroundColor": "#00c386",
-    "subtitle": "Trade stocks, forex & crypto.",
-    "primaryCategory": "finance",
-    "tags": [
-      "trading",
-      "finance",
-      "stocks",
-      "crypto",
-      "forex"
-    ],
-    "ogTitle": "Morpher Trading on Farcaster",
-    "ogDescription": "Trade stocks, forex, crypto, and more, directly inside your Farcaster client.",
-    "ogImageUrl": "https://www.morpher.com/img/og_homepage_fb.png",
-    "screenshotUrls": [
-        "https://farcaster.morpher.com/assets/screenshots/mainscreen.png",
-        "https://farcaster.morpher.com/assets/screenshots/tradeabnb.png",
-        "https://farcaster.morpher.com/assets/screenshots/shortleverage.png"
-    ],
-    "requiredChains": [
-      "eip155:8453"
-    ],
-    "requiredCapabilities": [
-      "actions.signIn",
-      "wallet.getEthereumProvider",
-      "actions.composeCast"
-    ]
-  }
+    "accountAssociation": {
+        "header": "eyJmaWQiOjMwNzQzMCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweEI2Y2RDODI5QzY4NDEzMUIzMWMxNzU0NDIyQUE3MDlFRDYyRkI0NjgifQ",
+        "payload": "eyJkb21haW4iOiJmYXJjYXN0ZXIubW9ycGhlci5jb20ifQ",
+        "signature": "phsgb4RxPPfDI2VznZOFssZikXW4rLMCV5RmHbujr2Yp7VUXHKOvwguuPPNiu137ttYjAxnlQUE7ip/irfPZXxs="
+    },
+    "miniapp": {
+        "version": "1",
+        "name": "Morpher",
+        "description": "Trade a wide variety of markets, including stocks, forex, commodities, and indices, directly from within Farcaster clients like Warpcast.",
+        "iconUrl": "https://farcaster.morpher.com/assets/icons/MPH.svg",
+        "homeUrl": "https://farcaster.morpher.com",
+        "splashImageUrl": "https://farcaster.morpher.com/assets/icons/MPH.svg",
+        "splashBackgroundColor": "#00c386",
+        "subtitle": "Trade stocks, forex & crypto.",
+        "primaryCategory": "finance",
+        "tags": [
+            "trading",
+            "finance",
+            "stocks",
+            "crypto",
+            "forex"
+        ],
+        "ogTitle": "Morpher Trading on Farcaster",
+        "ogDescription": "Trade stocks, forex, crypto, and more, directly inside your Farcaster client.",
+        "ogImageUrl": "https://www.morpher.com/img/og_homepage_fb.png",
+        "screenshotUrls": [
+            "https://farcaster.morpher.com/assets/screenshots/mainscreen.png",
+            "https://farcaster.morpher.com/assets/screenshots/tradeabnb.png",
+            "https://farcaster.morpher.com/assets/screenshots/shortleverage.png"
+        ],
+        "requiredChains": [
+            "eip155:8453"
+        ],
+        "requiredCapabilities": [
+            "actions.signIn",
+            "wallet.getEthereumProvider",
+            "actions.composeCast"
+        ]
+    }
 }
