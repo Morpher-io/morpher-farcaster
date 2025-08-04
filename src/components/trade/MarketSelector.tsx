@@ -48,8 +48,16 @@ export function MarketSelector() {
     setSelectedMarket,
     marketListAll,
     setMarketListAll,
+    openSearch,
+    setOpenSearch
   } = useMarketStore();
 
+  React.useEffect(() => {
+    if (openSearch) {
+      setOpen(true)
+    }
+  }, [openSearch])
+  
 
   React.useEffect(() => {
     if (marketType && marketType !== displayCategory) {
@@ -96,7 +104,12 @@ export function MarketSelector() {
         console.log('inputRef', inputRef)
         inputRef.current?.focus();
       }, 100);
+    } else {
+      if (openSearch) {
+        setOpenSearch(false)
+      }
     }
+
   }, [open, marketType]);
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -329,6 +342,7 @@ export function MarketSelector() {
 
   return (
     <div className="flex flex-col gap-4">
+      
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
