@@ -24,7 +24,11 @@
     "ogTitle": "Morpher Trading on Farcaster",
     "ogDescription": "Trade stocks, forex, crypto, and more, directly inside your Farcaster client.",
     "ogImageUrl": "https://www.morpher.com/img/og_homepage_fb.png",
-    "screenshotUrls": [],
+    "screenshotUrls": [
+        "https://farcaster.morpher.com/assets/screenshots/mainscreen.png",
+        "https://farcaster.morpher.com/assets/screenshots/tradeabnb.png",
+        "https://farcaster.morpher.com/assets/screenshots/shortleverage.png"
+    ],
     "requiredChains": [
       "eip155:8453"
     ],
