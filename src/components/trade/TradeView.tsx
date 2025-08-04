@@ -599,6 +599,7 @@ export function TradeView() {
                           onValueChange={(value) => setClosePercentage(value[0])}
                           max={100}
                           step={5}
+                          className="mt-4 mb-4"
                         />
                         <Button
                           onClick={handleClosePosition}

@@ -149,7 +149,7 @@ export function ClosePosition() {
           onValueChange={(value) => setClosePercentage(value[0])}
           max={100}
           step={1}
-          className="my-4"
+          className="mt-4 mb-4"
         />
         <div id="percentageBreakdown" className="flex justify-between text-xs">
           {[0, 25, 50, 75, 100].map((percentage) => (

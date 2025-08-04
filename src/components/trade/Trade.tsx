@@ -398,7 +398,7 @@ export function Trade() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs h-8 rounded-sm font-bold text-white bg-[var(--blue)] hover:opacity-90 transition-opacity hover:text-white"
+                className="text-xs h-8 rounded-sm font-bold text-white bg-[var(--blue)] hover:bg-[var(--blue)]  hover:opacity-70 transition-opacity hover:text-white"
                 onClick={setMaxAmount}
               >
                 Max <Rocket />
@@ -479,7 +479,7 @@ export function Trade() {
           max={10}
           step={0.2}
           onValueChange={setLeverage}
-          className="mt-4"
+          className="mt-4 mb-4"
         />
         {leverage[0] > 1 && marketData && (
           <LeverageImpactVisualizer

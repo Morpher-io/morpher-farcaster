@@ -30,6 +30,7 @@ export function MarketSelector() {
   const [open, setOpen] = React.useState(false);
   const [filter, setFilter] = React.useState("");
   const [isMarketListLoading, setIsMarketListLoading] = React.useState(false);
+  const [visibleCount, setVisibleCount] = React.useState(50);
   const [displayCategory, setDisplayCategory] = React.useState<
     TMarketType | "all"
   >("all");
@@ -165,6 +166,17 @@ export function MarketSelector() {
     const walk = (x - startX) * 1.5; // multiplier for scroll speed
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
     checkFades();
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop <= clientHeight + 5) {
+      if (marketList) {
+        setVisibleCount((prevCount) =>
+          Math.min(prevCount + 50, marketList.length)
+        );
+      }
+    }
   };
 
   // const formatMarketCap = (num: number | string | undefined | null): string => {
@@ -311,6 +323,10 @@ export function MarketSelector() {
     }
   }, [displayCategory, morpherTradeSDK.ready, marketListAll, filter]);
 
+  React.useEffect(() => {
+    setVisibleCount(50);
+  }, [displayCategory, filter]);
+
   return (
     <div className="flex flex-col gap-4">
       <Popover open={open} onOpenChange={setOpen}>
@@ -430,7 +446,7 @@ export function MarketSelector() {
               />
             </div>
 
-            <CommandList>
+            <CommandList onScroll={handleScroll}>
               <CommandEmpty>
                 {isMarketListLoading ? (
                   <div className="flex items-center justify-center p-2">
@@ -444,27 +460,23 @@ export function MarketSelector() {
               <CommandGroup>
                 {!isMarketListLoading &&
                   marketList &&
-                  marketList.map((market, index) => (
-                    <>
-                      {index < 80 && (
-                        <CommandItem
-                          key={market.market_id}
-                          value={JSON.stringify(market)}
-                          onSelect={(currentValue) => {
-                            const market: TMarket = JSON.parse(currentValue);
-                            setSelectedMarketId(
-                              market.market_id === selectedMarketId
-                                ? ""
-                                : market.market_id
-                            );
-                            setOpen(false);
-                          }}
-                          className="py-3"
-                        >
-                          {outputMarket(market)}
-                        </CommandItem>
-                      )}
-                    </>
+                  marketList.slice(0, visibleCount).map((market) => (
+                    <CommandItem
+                      key={market.market_id}
+                      value={JSON.stringify(market)}
+                      onSelect={(currentValue) => {
+                        const market: TMarket = JSON.parse(currentValue);
+                        setSelectedMarketId(
+                          market.market_id === selectedMarketId
+                            ? ""
+                            : market.market_id
+                        );
+                        setOpen(false);
+                      }}
+                      className="py-3"
+                    >
+                      {outputMarket(market)}
+                    </CommandItem>
                   ))}
               </CommandGroup>
             </CommandList>
