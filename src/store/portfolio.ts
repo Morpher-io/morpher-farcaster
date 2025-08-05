@@ -43,6 +43,7 @@ interface PortfolioState {
   leaderboard: {[type: string ]: TLeaderBoard[]};
   getLeaderboard: (parameters: {app: string, type: "order" | "returns", eth_address: TAddress} ) => void;
   context?: TContext;
+  refreshPortfolio: () => void;
   setContext: (context?: {
     eth_address: TAddress;
     id: string;
@@ -55,7 +56,7 @@ interface PortfolioState {
 
 export const usePortfolioStore = create<PortfolioState>((set, get) => {
   const fetchPortfolioData = async () => {
-    const { eth_address } = get();
+    const { eth_address, selectedCurrencyDetails, currencyList } = get();
 
     if (!eth_address) {
       set({ loading: false });
@@ -79,16 +80,25 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         positionValue += Number(position.value);
       });
 
-      let currencyList = get().currencyList
+      
       if (currencyList) {
         if (currencyList.USDC) {
           currencyList.USDC.balance = portfolio.usdc_balance
+          if (selectedCurrencyDetails && selectedCurrencyDetails.symbol == 'USDC') {
+            selectedCurrencyDetails.balance= portfolio.usdc_balance
+          }
         }
         if (currencyList.MPH) {
           currencyList.MPH.balance = portfolio.cash_balance
+          if (selectedCurrencyDetails && selectedCurrencyDetails.symbol == 'MPH') {
+            selectedCurrencyDetails.balance= portfolio.cash_balance
+          }
         }
         if (currencyList.ETH) {
           currencyList.ETH.balance = portfolio.eth_balance
+          if (selectedCurrencyDetails && selectedCurrencyDetails.symbol == 'ETH') {
+            selectedCurrencyDetails.balance= portfolio.eth_balance
+          }
         }
       }
 
@@ -97,6 +107,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         positionList,
         positionValue,
         currencyList,
+        selectedCurrencyDetails,
         returns: {
           w: returnsW || [],
         },
@@ -138,6 +149,9 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
           set({ context:ctx })
         })
       }
+    },
+    refreshPortfolio: () => {
+      fetchPortfolioData();
     },
     getLeaderboard: (parameters) => {
 

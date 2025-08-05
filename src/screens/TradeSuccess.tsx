@@ -73,7 +73,7 @@ export function TradeSuccessScreen() {
       
       let returnPercentage = orderUpdate.return_percentage > 0 ? '+ ' : '- ';
       
-      returnPercentage += Math.round(orderUpdate.return_percentage * 100) / 100      
+      returnPercentage += Math.abs(Math.round(orderUpdate.return_percentage * 100) / 100 )
       returnPercentage += '%'
       return returnPercentage
 

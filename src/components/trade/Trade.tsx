@@ -12,7 +12,7 @@ import {
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
-import { Loader2Icon, Info, TrendingUp, TrendingDown, Rocket } from "lucide-react"
+import { Loader2Icon, Info, TrendingUp, TrendingDown, Rocket, RefreshCw, RefreshCwIcon } from "lucide-react"
 import {
   TradeCallback,
   TCurrency,
@@ -26,8 +26,12 @@ import { cn } from "@/lib/utils"
 import { LeverageImpactVisualizer } from "./LeverageImpactVisualizer"
 import { useTranslation } from "react-i18next";
 
+
+
 export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
+  const [balanceRefreshing, setBalanceRefreshing] = React.useState(false);
+  
   const [tradeError, setTradeError] = React.useState<string | undefined>(
     undefined
   );
@@ -44,6 +48,7 @@ export function Trade() {
     setLeverage,
     marketData,
     livePrice,
+    
   } = useMarketStore();
   const {
       tradeAmount,
@@ -56,7 +61,8 @@ export function Trade() {
       loading,
       setTradeComplete,
       orderUpdate,
-      setClosePercentage
+      setClosePercentage,
+      refreshPortfolio
   } = usePortfolioStore()
 
   const account: any = useAccount();
@@ -190,6 +196,16 @@ export function Trade() {
             setLeverage([1])
   }
 
+  const refreshBalance = async () => {
+    setBalanceRefreshing(true)
+
+    refreshPortfolio();
+
+    setTimeout(()=> {
+      setBalanceRefreshing(false)
+    }, 30000)
+  }
+
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === 'error') {
       let error = result.err
@@ -266,6 +282,7 @@ export function Trade() {
         </div>
       ) : (
         <div className="">
+          <div className="flex justify-between">
           <div className="flex items-center mb-2">
             <Label className="text-lg font-bold ">{t('TRADE_AMOUNT')}</Label>
             <TooltipProvider>
@@ -280,7 +297,17 @@ export function Trade() {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            
           </div>
+          {!balanceRefreshing && (
+            <div className="cursor-pointer" onClick={() => refreshBalance()}>
+              <RefreshCwIcon width="18" />
+            </div>
+          
+          )}
+          </div>
+          
+          
           <Tabs
             value={selectedCurrency}
             onValueChange={(value) => {
