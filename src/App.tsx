@@ -73,8 +73,21 @@ function App() {
     }
   }, [address]);
 
+  const sdkActions = async () => {
+    try {
+      await sdk.actions.ready();
+
+      if (import.meta.env.VITE_NODE_ENV !== 'development') {
+        await sdk.actions.addMiniApp()
+      }
+    } catch (err:any) {
+      console.log('Error adding mini app: ' + err.toString())
+    }
+  }
+
   useEffect(() => {
-    sdk.actions.ready();
+    sdkActions()
+    
   }, [])
   
 

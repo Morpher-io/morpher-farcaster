@@ -122,8 +122,7 @@ export function Trade() {
     if (inputMode === "token") {
       const numValue = parseFloat(value);
       if (!isNaN(numValue) && numValue > maxBalance) {
-        tokenAmountStr = maxBalance.toString();
-        setInputValue(tokenAmountStr);
+        setInputValue(tokenValueFormatter(maxBalance));
       } else {
         tokenAmountStr = value || "";
       }
@@ -322,12 +321,13 @@ export function Trade() {
               <div className="flex justify-between items-center gap-2">
                 <div className="flex-1 min-w-0">
                   <Input
-                    placeholder="0.00"
+                    placeholder={"0.00 " + selectedCurrency}
                     value={inputValue}
                     onChange={handleInputChange}
                     className="w-full h-auto border-none bg-transparent p-0 text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-primary placeholder:opacity-60"
                   />
                 </div>
+                {selectedCurrency !== "USDC" && (
                 <ToggleGroup
                   type="single"
                   value={inputMode}
@@ -337,7 +337,7 @@ export function Trade() {
                     }
                   }}
                   className="p-0.5 border bg-background"
-                  disabled={selectedCurrency === "USDC"}
+                  
                 >
                   <ToggleGroupItem
                     value="token"
@@ -362,6 +362,7 @@ export function Trade() {
                     />
                   </ToggleGroupItem>
                 </ToggleGroup>
+                )}
                 
               </div>
               <div className="grid grid-cols-5 gap-2 py-2">
@@ -398,7 +399,7 @@ export function Trade() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs h-8 rounded-sm font-bold text-white bg-[var(--blue)] hover:opacity-90 transition-opacity hover:text-white"
+                className="text-xs h-8 rounded-sm font-bold text-white bg-[var(--blue)] hover:bg-[var(--blue)]  hover:opacity-70 transition-opacity hover:text-white"
                 onClick={setMaxAmount}
               >
                 Max <Rocket />
@@ -479,7 +480,7 @@ export function Trade() {
           max={10}
           step={0.2}
           onValueChange={setLeverage}
-          className="mt-4"
+          className="mt-4 mb-4"
         />
         {leverage[0] > 1 && marketData && (
           <LeverageImpactVisualizer

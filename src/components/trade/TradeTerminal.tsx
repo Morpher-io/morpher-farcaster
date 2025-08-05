@@ -15,7 +15,7 @@ import { Button } from "../ui/button";
 export function TradeTerminal() {
   const { address } = useAccount();
   const { setEthAddress, setCurrencyList, currencyList, positionList } = usePortfolioStore();
-  const { morpherTradeSDK, setSelectedMarketId } = useMarketStore();
+  const { morpherTradeSDK, setOpenSearch } = useMarketStore();
   const publicClient = usePublicClient();
   const { t } = useTranslation();
 
@@ -58,25 +58,27 @@ export function TradeTerminal() {
             <h2 className="text-lg font-bold mt-2">{t("OPEN_POSITIONS")}</h2>
             <div className="border-b">
               <div
-                className="flex items-center justify-between py-4 cursor-pointer"
-                onClick={() => setSelectedMarketId("CRYPTO_BTC")}
+                className="flex items-center  py-4 cursor-pointer"
+                onClick={() => setOpenSearch(true)}
               >
-                <div className="h-9 w-9 rounded-full bg-[var(--primary-light)] flex items-center justify-center">
+                <div className="h-9 w-9 rounded-full bg-[var(--primary-light)] flex items-center justify-center self-start">
                   <TrendingUp  color="var(--primary)" className="h-5 w-5  " />
                 </div>
-                <div>
+                <div className=" ml-4">
                   <p className="font-semibold text-base">
                     {t("NO_OPEN_POSITIONS_YET")}
                   </p>
-                  <p className="text-sm text-muted-foreground truncate max-w-[150px]">
+                  <p className="text-sm text-muted-foreground  ">
                     {t("TRADE_YOUR_FIRST_MARKET")}
+                    <Button  className="font-medium text-base hover:underline mt-4">
+                     {t("START_TRADING")}
+                    </Button>
                   </p>
 
                 </div>
-                <Button   className="font-medium text-base hover:underline">
-                  {t("START_TRADING")}
-                </Button>
+                
               </div>
+              
             </div>
           </>
         ))}

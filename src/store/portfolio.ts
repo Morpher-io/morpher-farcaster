@@ -65,7 +65,6 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     try {
       const portfolio:any = await morpherTradeSDK.getPortfolio({ eth_address });
 
-      console.log({portfolio})
 
       const positionList = await morpherTradeSDK.getPositions({ eth_address });
       if (portfolio) {
@@ -80,10 +79,24 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         positionValue += Number(position.value);
       });
 
+      let currencyList = get().currencyList
+      if (currencyList) {
+        if (currencyList.USDC) {
+          currencyList.USDC.balance = portfolio.usdc_balance
+        }
+        if (currencyList.MPH) {
+          currencyList.MPH.balance = portfolio.cash_balance
+        }
+        if (currencyList.ETH) {
+          currencyList.ETH.balance = portfolio.eth_balance
+        }
+      }
+
       set({
         portfolio,
         positionList,
         positionValue,
+        currencyList,
         returns: {
           w: returnsW || [],
         },

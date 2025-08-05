@@ -11,11 +11,11 @@ export function Header() {
         />
       </div>
       <div className="cursor-pointer">
-       <img
+       {/* <img
             src={`/assets/icons/info.svg`}
             alt={`info icon`}
             className=""
-        />
+        /> */}
         </div>
       {/* <nav>
 

@@ -32,6 +32,8 @@ interface MarketState {
   setLeverage: (leverage: number[]) => void;
   getTrendingMarkets: () => void;
   trendingMarkets?: TMarketData[];
+  openSearch?: boolean;
+  setOpenSearch: (open: boolean) => void;
 }
 
 export const useMarketStore = create<MarketState>((set, get) => ({
@@ -44,6 +46,9 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   selectedMarketId: "",
   setSelectedMarketId: (marketId) => set({ selectedMarketId: marketId }),
   selectedMarket: undefined,
+  openSearch: false,
+  setOpenSearch: (open) => set({ openSearch: open }),
+
     setSelectedMarket: (market) => {
     set({ selectedMarket: market });
     if (market?.market_id) {

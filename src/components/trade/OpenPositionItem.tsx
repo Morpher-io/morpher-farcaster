@@ -31,6 +31,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
     undefined
   );
 
+  const [timeoutTimer, setTimeoutTimer]  = React.useState<NodeJS.Timeout>();
 
 
 
@@ -124,12 +125,36 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
       
       setTradeError(error || t('ERROR_EXECUTING_TRADE'))
     } else {
-      setIsExpanded(false);
+
+      let timer = setTimeout(() => {
+        setIsExpanded(false);
+        setIsClosing(false);
+      }, 20000)
+
+      setTimeoutTimer(timer)
+      
     }
 
-    setIsClosing(false);
+    
   };
 
+  React.useEffect(() => {
+    if (isClosing) {
+      if (timeoutTimer) {
+        clearTimeout(timeoutTimer)
+        setTimeoutTimer(undefined)
+      }
+     setTimeout(() => {
+        setIsClosing(false);
+      }, 1000)
+    }
+    if (isExpanded) {
+      if (orderUpdate?.status == 'success') {
+        setIsExpanded(false);
+      }
+    }
+        
+  }, [orderUpdate])
   
   const refreshMarketData = async () => {
     console.log('refreshMarketData')
@@ -291,6 +316,7 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               onValueChange={(value) => setClosePercentage(value[0])}
               max={100}
               step={5}
+              className="mt-4 mb-4"
             />
             <div className="grid grid-cols-3 gap-2">
               <Button
