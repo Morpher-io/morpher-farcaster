@@ -56,9 +56,7 @@ export function PortfolioSummary() {
     if (!profileImage) {
       sdk.context.then(context => {
             
-        console.log('context', context)
         profileImage = context.user.pfpUrl
-        console.log('profileImage', profileImage)
         if (profileImage)
         setProfileImage(profileImage)
 

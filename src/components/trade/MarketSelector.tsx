@@ -69,7 +69,6 @@ export function MarketSelector() {
 
   const fetchMarketsAll = async () => {
     setIsMarketListLoading(true);
-    console.log("Fetching all market categories.");
     const marketTypes: TMarketType[] = [
       "crypto",
       "stock",
@@ -101,9 +100,11 @@ export function MarketSelector() {
   React.useEffect(() => {
     if (open) {
       setTimeout(() => {
-        console.log('inputRef', inputRef)
         inputRef.current?.focus();
-      }, 100);
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 200);
+      }, 200);
     } else {
       if (openSearch) {
         setOpenSearch(false)

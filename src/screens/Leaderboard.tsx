@@ -23,7 +23,7 @@ export function LeaderboardScreen() {
   const account = useAccount();
   const { getLeaderboard, leaderboard,  } = usePortfolioStore();
   const [filter] = useState("");
-  const [type, setType]= useState<'returns' | 'order'>('order');
+  const [type, setType]= useState<'returns' | 'order'>('returns');
   let navigate = useNavigate();
   const { morpherTradeSDK } = useMarketStore();
   const [selectedEntry, setSelectedEntry] = useState<TLeaderBoard>();
@@ -70,7 +70,6 @@ export function LeaderboardScreen() {
       
     }))
 
-    console.log('types', types)
 
     setPortfolio({position_count, total_value, types })
   }
@@ -98,7 +97,6 @@ export function LeaderboardScreen() {
 
   useEffect(() => {
     if (account?.address) {
-      console.log('getLeaderboard')
       getLeaderboard({
         eth_address: account?.address,
         app: import.meta.env.VITE_MORPHER_APP_NAME,
@@ -108,7 +106,7 @@ export function LeaderboardScreen() {
   }, [account, getLeaderboard, type]);
 
   const outputLeaderboardEntry = (entry: TLeaderBoard, rank: number) => {
-    const value = `+ ${usdFormatter(entry.returns || 0)} %` ;
+    const value =  `${(entry.returns || 0) >= 0 ? '+' : '-'} ${usdFormatter(Math.abs((entry.returns || 0) * 100))} %` ;
     const displayName =
       entry.display_name ||
       
@@ -133,11 +131,11 @@ export function LeaderboardScreen() {
             <p className="text-base truncate">{displayName}</p>
             {type == "order" ? (
               <p className=" text-xs">
-                <span className="text-primary">{value}</span> on {entry.market_name}
+                <span className={(entry.returns || 0) >= 0 ? "text-primary" : "text-secondary"}>{value}</span> on {entry.market_name}
               </p>
             ) : (
               <p className=" text-xs">
-                <span className="text-primary">{value}</span> {t('IN_LAST_30_DAYS')}
+                <span className={(entry.returns || 0) >= 0 ? "text-primary" : "text-secondary"}>{value}</span> {t('IN_LAST_30_DAYS')}
               </p>
             )}
           </div>
@@ -319,7 +317,7 @@ export function LeaderboardScreen() {
             <div className="flex justify-between items-center p-4 border-b">
               <p className="text-muted-foreground">{t('AMOUNT')}</p>
               <p className="font-semibold">
-                {usdFormatter(
+                $ {usdFormatter(
                   ((Number(order.token_amount || 0) / 10 ** 18 || 0) *
                     (Number(order.mph_price) / 10 ** 8) || 1)
                 )}
@@ -327,17 +325,19 @@ export function LeaderboardScreen() {
             </div>
             <div className="flex justify-between items-center p-4 border-b">
               <p className="text-muted-foreground">{t('DIRECTION')}</p>
-              <p className="font-semibold capitalize">{order.direction}</p>
+              <p className="font-semibold capitalize">{order.opening_direction || order.direction}</p>
             </div>
             <div className="flex justify-between items-center p-4 border-b">
               <p className="text-muted-foreground">{t('ENTRY_PRICE')}</p>
               <p className="font-semibold capitalize">
-                {Number(order.price) / 10 ** 8}
+                $ { usdFormatter(Number(order.opening_price || order.price) / 10 ** 8)}
               </p>
             </div>
             <div className="flex justify-between items-center p-4 border-b">
               <p className="text-muted-foreground">{t('CLOSING_PRICE')}</p>
-              <p className="font-semibold capitalize">tbd</p>
+              <p className="font-semibold capitalize">
+              $ { usdFormatter(Number(order.price) / 10 ** 8)}
+              </p>
             </div>
             <div className="flex justify-between items-center p-4 border-b">
               <p className="text-muted-foreground">{t('LEVERAGE')}</p>
@@ -348,7 +348,7 @@ export function LeaderboardScreen() {
             <div className="flex justify-between items-center p-4">
               <p className="text-muted-foreground">{t('RETURNS')}</p>
               <p className="font-semibold capitalize">
-                {selectedEntry?.returns}%
+                {usdFormatter(Number(selectedEntry?.returns || 0) * 100)}%
               </p>
             </div>
           </div>
@@ -376,13 +376,14 @@ export function LeaderboardScreen() {
           />
       <h2 className="text-lg font-bold mt-4 m-auto">{t('menu.LEADERBOARD')}</h2>
       <div className="flex m-auto gap-3 text-sm mt-4 font-bold">
-        <div className={type=='order' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('order')}>
-          {t('TOP_TRADES')}
-        </div>
-        <div className={type=='returns' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('returns')}>
+                <div className={type=='returns' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('returns')}>
           {t('TOP_RETURNS')}
           
         </div>
+        <div className={type=='order' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('order')}>
+          {t('TOP_TRADES')}
+        </div>
+
       </div>
       </div>
 

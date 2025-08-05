@@ -268,7 +268,9 @@ export function TradeHistoryScreen() {
                 <Button
                   onClick={() =>
                     window.open(
-                      `https://sepolia.basescan.org/tx/${selectedOrder.tx_hash}`,
+                      import.meta.env.VITE_NODE_ENV !== 'development' ?
+                       `https://sepolia.basescan.org/tx/${selectedOrder.tx_hash}` :
+                       `https://basescan.org/tx/${selectedOrder.tx_hash}`,
                       "_blank"
                     )
                   }
