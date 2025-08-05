@@ -1,5 +1,7 @@
 # Morpher Trading Farcaster Mini App
 
+**[Try it on Farcaster](https://farcaster.xyz/miniapps/dWezHCjv5UqF/morpher)**
+
 This is a Farcaster Mini App for the Morpher Trading platform. It allows users to trade a wide variety of markets, including stocks, forex, commodities, and indices, directly from within Farcaster clients like Warpcast.
 
 ## ✨ Features
@@ -10,6 +12,12 @@ This is a Farcaster Mini App for the Morpher Trading platform. It allows users t
 -   **Market Insights**: View real-time price charts for different time ranges (1D, 1W, 1M, etc.).
 -   **Position Management**: View your current positions, including PnL, entry price, and leverage.
 -   **Intuitive UI**: A clean and modern user interface built with React, TypeScript, Shadcn/ui, and Tailwind CSS.
+
+## 📸 Screenshots
+
+| Main Screen | Trade Screen | Leverage Selector |
+| :---: | :---: | :---: |
+| <img src="https://farcaster.morpher.com/assets/screenshots/mainscreen.png" alt="Main trading screen" width="250"> | <img src="https://farcaster.morpher.com/assets/screenshots/tradeabnb.png" alt="Trading BNB" width="250"> | <img src="https://farcaster.morpher.com/assets/screenshots/shortleverage.png" alt="Short leverage selection" width="250"> |
 
 ## 🛠️ Tech Stack
 
