@@ -11,7 +11,7 @@
         "iconUrl": "https://farcaster.morpher.com/assets/screenshots/icon.png",
         "homeUrl": "https://farcaster.morpher.com",
         "splashImageUrl": "https://farcaster.morpher.com/assets/screenshots/splash.png",
-        "heroImageUrl": "https://farcaster.morpher.com/assets/screenshots/og_image_1.png",
+        "heroImageUrl": "https://farcaster.morpher.com/assets/screenshots/og_image_3.png",
         "splashBackgroundColor": "#00c386",
         "subtitle": "Trade US Equities and Crypto.",
         "primaryCategory": "finance",
@@ -26,7 +26,7 @@
         ],
         "ogTitle": "Morpher Trading on Farcaster",
         "ogDescription": "Trade stocks, forex, crypto, and more, directly inside your Farcaster client.",
-        "ogImageUrl": "https://farcaster.morpher.com/assets/screenshots/og_image_1.png",
+        "ogImageUrl": "https://farcaster.morpher.com/assets/screenshots/og_image_3.png",
         "screenshotUrls": [
             "https://farcaster.morpher.com/assets/screenshots/mainscreen.png",
             "https://farcaster.morpher.com/assets/screenshots/tradeabnb.png",
