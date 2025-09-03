@@ -17,6 +17,7 @@
 /.next/
 /out/
 /.turbo/
+/dist/
 
 # production
 /build
