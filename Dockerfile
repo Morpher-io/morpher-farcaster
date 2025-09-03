@@ -41,21 +41,19 @@ RUN \
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nextjs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app /app
+COPY --chown=nextjs:nextjs --from=builder /app /app
 RUN npm prune --production
-
-RUN chown -R nextjs:nextjs /app
 
 USER nextjs
 
-EXPOSE 3000
+EXPOSE 80
 
-ENV PORT 3000
+ENV PORT=80
 
-CMD ["npm", "start"]
+CMD ["npm", "start", "-- --port 80"]
