@@ -38,17 +38,24 @@ RUN \
   fi
 
 # Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
 
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
 
-FROM public.ecr.aws/nginx/nginx:stable-alpine AS runner
+RUN addgroup --system --gid 1001 nextjs
+RUN adduser --system --uid 1001 nextjs
 
+COPY --from=builder /app /app
+RUN npm prune --production
 
-RUN addgroup --system --gid 1001 reactjs
-RUN adduser --system --uid 1001 reactjs
+RUN chown -R nextjs:nextjs /app
 
-ARG ENABLE_HTACCESS=false
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY ./nginx/.htpasswd /etc/nginx/conf.d/.htpasswd
-RUN if [ "$ENABLE_HTACCESS" = "true" ] ; then sed -ri -e "s!#auth!auth!g" /etc/nginx/conf.d/default.conf ; fi
-COPY --from=builder --chown=reactjs:reactjs /app/dist /usr/share/nginx/html
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT 3000
+
+CMD ["npm", "start"]

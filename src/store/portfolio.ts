@@ -1,47 +1,67 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 // import { TAddress, TCurrency, TCurrencyDetails } from '../../../morpher-trading-sdk/src/types'
 // import { MorpherTradeSDK } from '../../../morpher-trading-sdk/src/index'
 // import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from '../../../morpher-trading-sdk/src/v2.router';
 
-import { TAddress, TCurrency, TCurrencyDetails, TOrder, TPortfolio } from 'morpher-trading-sdk'
-import { MorpherTradeSDK } from 'morpher-trading-sdk';
-import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from 'morpher-trading-sdk';
+import {
+  TAddress,
+  TCurrency,
+  TCurrencyDetails,
+  TOrder,
+  TPortfolio,
+} from "morpher-trading-sdk";
+import { MorpherTradeSDK } from "morpher-trading-sdk";
+import {
+  TPortfolioDataPoint,
+  TPosition,
+  TContext,
+  TLeaderBoard,
+} from "morpher-trading-sdk";
 export type TCurrencyList = Partial<Record<TCurrency, TCurrencyDetails>>;
-const morpherTradeSDK = new MorpherTradeSDK(import.meta.env.VITE_MORPHER_API_ENDPOINT);
+const morpherTradeSDK = new MorpherTradeSDK(
+  process.env.NEXT_PUBLIC_API_ENDPOINT || "",
+);
 
 interface PortfolioState {
-  tradeAmount: string
-  setTradeAmount: (tradeAmount: string) => void
-  selectedCurrency: TCurrency | undefined
-  setSelectedCurrency: (currency: TCurrency | undefined) => void
-  selectedCurrencyDetails: TCurrencyDetails | undefined
-  setSelectedCurrencyDetails: (details: TCurrencyDetails | undefined) => void
-  currencyList: TCurrencyList | undefined
-  setCurrencyList: (list: TCurrencyList | undefined) => void
-  loading: boolean
-  setLoading: (loading: boolean) => void
-  eth_address?: TAddress
-  setEthAddress: (eth_address?: TAddress) => void
-  orderUpdate?: TOrder
-  closePercentage?: number
-  setClosePercentage: (closePercentage: number | undefined) => void
-  tradeDirection: 'open' | 'close'
-  setTradeDirection: (tradeDirection: 'open' | 'close') => void
+  tradeAmount: string;
+  setTradeAmount: (tradeAmount: string) => void;
+  selectedCurrency: TCurrency | undefined;
+  setSelectedCurrency: (currency: TCurrency | undefined) => void;
+  selectedCurrencyDetails: TCurrencyDetails | undefined;
+  setSelectedCurrencyDetails: (details: TCurrencyDetails | undefined) => void;
+  currencyList: TCurrencyList | undefined;
+  setCurrencyList: (list: TCurrencyList | undefined) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+  eth_address?: TAddress;
+  setEthAddress: (eth_address?: TAddress) => void;
+  orderUpdate?: TOrder;
+  closePercentage?: number;
+  setClosePercentage: (closePercentage: number | undefined) => void;
+  tradeDirection: "open" | "close";
+  setTradeDirection: (tradeDirection: "open" | "close") => void;
 
   positionList?: TPosition[];
   setPositionList: (positionList?: TPosition[]) => void;
   selectedPosition?: TPosition;
   setSelectedPosition: (position?: TPosition) => void;
-  
+
   portfolio?: TPortfolio;
   setPortfolio: (portfolio?: any) => void;
   positionValue?: number;
   tradeComplete: boolean;
   setTradeComplete: (complete?: boolean) => void;
-  returns: {[type: string ]: TPortfolioDataPoint[]}
-  setReturns: (type: "d" | "w" | "m" | "y", returns?: TPortfolioDataPoint[]) => void;
-  leaderboard: {[type: string ]: TLeaderBoard[]};
-  getLeaderboard: (parameters: {app: string, type: "order" | "returns", eth_address: TAddress} ) => void;
+  returns: { [type: string]: TPortfolioDataPoint[] };
+  setReturns: (
+    type: "d" | "w" | "m" | "y",
+    returns?: TPortfolioDataPoint[],
+  ) => void;
+  leaderboard: { [type: string]: TLeaderBoard[] };
+  getLeaderboard: (parameters: {
+    app: string;
+    type: "order" | "returns";
+    eth_address: TAddress;
+  }) => void;
   context?: TContext;
   refreshPortfolio: () => void;
   setContext: (context?: {
@@ -64,40 +84,51 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     }
     set({ loading: true });
     try {
-      const portfolio:any = await morpherTradeSDK.getPortfolio({ eth_address });
-
+      const portfolio: any = await morpherTradeSDK.getPortfolio({
+        eth_address,
+      });
 
       const positionList = await morpherTradeSDK.getPositions({ eth_address });
-      if (portfolio) {
+      if (portfolio && positionList) {
         portfolio.positions_count = positionList.length;
       }
-      
-           
-      const returnsW = await morpherTradeSDK.getReturns({ eth_address, type: 'w' })
-      
+
+      const returnsW = await morpherTradeSDK.getReturns({
+        eth_address,
+        type: "w",
+      });
+
       let positionValue = 0;
       positionList?.forEach((position) => {
         positionValue += Number(position.value);
       });
 
-      
       if (currencyList) {
         if (currencyList.USDC) {
-          currencyList.USDC.balance = portfolio.usdc_balance
-          if (selectedCurrencyDetails && selectedCurrencyDetails.symbol == 'USDC') {
-            selectedCurrencyDetails.balance= portfolio.usdc_balance
+          currencyList.USDC.balance = portfolio.usdc_balance;
+          if (
+            selectedCurrencyDetails &&
+            selectedCurrencyDetails.symbol == "USDC"
+          ) {
+            selectedCurrencyDetails.balance = portfolio.usdc_balance;
           }
         }
         if (currencyList.MPH) {
-          currencyList.MPH.balance = portfolio.cash_balance
-          if (selectedCurrencyDetails && selectedCurrencyDetails.symbol == 'MPH') {
-            selectedCurrencyDetails.balance= portfolio.cash_balance
+          currencyList.MPH.balance = portfolio.cash_balance;
+          if (
+            selectedCurrencyDetails &&
+            selectedCurrencyDetails.symbol == "MPH"
+          ) {
+            selectedCurrencyDetails.balance = portfolio.cash_balance;
           }
         }
         if (currencyList.ETH) {
-          currencyList.ETH.balance = portfolio.eth_balance
-          if (selectedCurrencyDetails && selectedCurrencyDetails.symbol == 'ETH') {
-            selectedCurrencyDetails.balance= portfolio.eth_balance
+          currencyList.ETH.balance = portfolio.eth_balance;
+          if (
+            selectedCurrencyDetails &&
+            selectedCurrencyDetails.symbol == "ETH"
+          ) {
+            selectedCurrencyDetails.balance = portfolio.eth_balance;
           }
         }
       }
@@ -116,13 +147,17 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
       console.error("Failed to fetch portfolio data:", error);
       if (error.message && error.message.includes("No portfolio was found")) {
         set({
-
           positionList: [],
           returns: { d: [], w: [], m: [], y: [] },
         });
       } else {
         // For other errors, clear the portfolio to avoid showing stale data
-        set({ portfolio: undefined, returns: {}, positionList: undefined, leaderboard: undefined });
+        set({
+          portfolio: undefined,
+          returns: {},
+          positionList: undefined,
+          leaderboard: undefined,
+        });
       }
     } finally {
       set({ loading: false });
@@ -130,14 +165,15 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
   };
 
   return {
-    tradeAmount: '',
+    tradeAmount: "",
     leaderboard: {},
     returns: {},
     setTradeAmount: (tradeAmount) => set({ tradeAmount }),
     selectedCurrency: undefined,
     setSelectedCurrency: (currency) => set({ selectedCurrency: currency }),
     selectedCurrencyDetails: undefined,
-    setSelectedCurrencyDetails: (details) => set({ selectedCurrencyDetails: details }),
+    setSelectedCurrencyDetails: (details) =>
+      set({ selectedCurrencyDetails: details }),
     currencyList: undefined,
     setCurrencyList: (list) => set({ currencyList: list }),
     loading: true,
@@ -145,30 +181,31 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     eth_address: undefined,
     setContext: (context) => {
       if (context) {
-        morpherTradeSDK.setContext(context).then (ctx => {
-          set({ context:ctx })
-        })
+        morpherTradeSDK.setContext(context).then((ctx) => {
+          set({ context: ctx });
+        });
       }
     },
     refreshPortfolio: () => {
       fetchPortfolioData();
     },
     getLeaderboard: (parameters) => {
-
       let leaderboard = get().leaderboard;
       if (leaderboard && leaderboard[parameters.type]) {
-        return
+        return;
       }
       if (parameters) {
-        morpherTradeSDK.getLeaderboard({type: parameters.type, app: parameters.app, eth_address: parameters.eth_address}).then(data => {
-          
-          leaderboard[parameters.type] = data
-          set({ leaderboard })
-
-        })
-        
+        morpherTradeSDK
+          .getLeaderboard({
+            type: parameters.type,
+            app: parameters.app,
+            eth_address: parameters.eth_address,
+          })
+          .then((data) => {
+            leaderboard[parameters.type] = data;
+            set({ leaderboard });
+          });
       }
-    
     },
     setEthAddress: (eth_address) => {
       const current_eth_address = get().eth_address;
@@ -179,29 +216,38 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
         fetchPortfolioData();
 
         morpherTradeSDK.subscribeToOrder(eth_address, (update: any) => {
-          if (update.data.status == 'cancelled' ) {
-            const eth_address = get().eth_address || ''
+          if (update.data.status == "cancelled") {
+            const eth_address = get().eth_address || "";
 
-            set({ orderUpdate: {id: update.data.id, status: 'cancelled', eth_address, direction:'', type: '', created_at: 0  } });
+            set({
+              orderUpdate: {
+                id: update.data.id,
+                status: "cancelled",
+                eth_address,
+                direction: "",
+                type: "",
+                created_at: 0,
+              },
+            });
           } else {
             if (update.data.orderId) {
-              morpherTradeSDK.getOrders({
-                eth_address: eth_address,
-                order_id: update.data.orderId
-              }).then(orders => {
-                if (orders && orders.length > 0) {
-                  let order = orders[0]
-                  set({ orderUpdate: order });
-                  if (order.status == 'success') {
-                    set({ tradeComplete: true });
+              morpherTradeSDK
+                .getOrders({
+                  eth_address: eth_address,
+                  order_id: update.data.orderId,
+                })
+                .then((orders) => {
+                  if (orders && orders.length > 0) {
+                    let order = orders[0];
+                    set({ orderUpdate: order });
+                    if (order.status == "success") {
+                      set({ tradeComplete: true });
+                    }
                   }
-
-                }
-              })
+                });
             }
           }
-   
-                
+
           fetchPortfolioData(); // Refetch on order update
         });
       } else {
@@ -211,18 +257,17 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     },
     closePercentage: 100,
     setClosePercentage: (closePercentage) => set({ closePercentage }),
-    tradeDirection: 'open' as 'open' | 'close',
+    tradeDirection: "open" as "open" | "close",
     setTradeDirection: (tradeDirection) => set({ tradeDirection }),
 
     positionList: undefined,
     setPositionList: (positionList) => {
-      let positionValue = 0
-      positionList?.forEach(position => {
-        positionValue += Number(position.value)
-      })
-      
-      set({ positionList, positionValue })
+      let positionValue = 0;
+      positionList?.forEach((position) => {
+        positionValue += Number(position.value);
+      });
 
+      set({ positionList, positionValue });
     },
 
     selectedPosition: undefined,
@@ -240,9 +285,9 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => {
     },
     setReturns: (type, returns) => {
       if (!returns) returns = [];
-      let r = get().returns
-      r[type] = returns
-      set({ returns: r })
-    }
+      let r = get().returns;
+      r[type] = returns;
+      set({ returns: r });
+    },
   };
 });

@@ -1,28 +1,47 @@
-# Conventions and Best Practices
+# Project Conventions
 
-This document outlines the coding conventions and best practices to be followed in this project.
+This document outlines the coding conventions and best practices for our project, which uses Next.js, TypeScript, Tailwind CSS, and shadcn/ui.
 
-## React
+## General Principles
 
-1.  **Component Naming**: Use PascalCase for component names (e.g., `MyComponent`). File names should match the component name (e.g., `MyComponent.tsx`).
-2.  **Functional Components and Hooks**: Prefer functional components and hooks over class components.
-3.  **Props**:
-    *   Use clear and descriptive prop names.
-    *   Destructure props at the beginning of the component.
-    *   Define prop types using TypeScript interfaces or types.
-4.  **State Management**:
-    *   Use the `useState` hook for local component state.
-    *   For more complex state management, consider `useReducer` or a dedicated state management library (e.g., Zustand, Redux Toolkit) if the project scales.
-5.  **Side Effects**: Manage side effects using the `useEffect` hook. Remember to include a dependency array to control when the effect runs. Clean up any subscriptions or event listeners in the return function of `useEffect`.
-6.  **File Structure**: Organise components logically, for example, by feature or by type (e.g., `components/`, `features/`, `pages/`).
-7.  **JSX**:
-    *   Keep JSX readable. If a component's render logic becomes too complex, break it down into smaller components.
-    *   Use parentheses for multi-line JSX.
-8.  **Keys**: Always provide a unique `key` prop when rendering lists of elements.
-9.  **Immutability**: Treat state and props as immutable. When updating state based on previous state, use the functional update form of `setState`.
-10. **Code Splitting**: Use `React.lazy` and `Suspense` for code-splitting to improve initial load times for larger applications.
-11. **Error Boundaries**: Implement error boundaries to catch JavaScript errors in their child component tree and display a fallback UI.
-12. **Accessibility (a11y)**: Write accessible components by using semantic HTML, ARIA attributes where necessary, and ensuring keyboard navigability.
+- **Consistency**: Strive for consistent code style and patterns across the codebase.
+- **Readability**: Write code that is easy to understand and maintain.
+- **Simplicity**: Prefer simple solutions over complex ones.
+
+---
+
+## Next.js
+
+We use the Next.js App Router.
+
+- **File-based Routing**: Directory and file names in `src/app` define the routes. Use route groups `()` for organization without affecting the URL path.
+- **Server Components by Default**: Components are Server Components by default. Only use Client Components when necessary (e.g., for hooks like `useState`, `useEffect`, or event listeners). Mark  
+  them with `"use client";` at the top of the file.
+- **Data Fetching**:
+  - Use `async/await` in Server Components for data fetching. This leverages React's Suspense for streaming UI.
+  - For Client Components, use libraries like SWR or React Query, or fetch within a `useEffect` hook.
+- **Component Organization**:
+  - Place page components directly in `src/app/[route]/page.tsx`.
+  - Reusable components should be in `src/components/`.
+  - UI components from shadcn/ui are in `src/components/ui/`.
+- **Metadata**: Use the `generateMetadata` function in `layout.tsx` or `page.tsx` files to manage page metadata for SEO.
+
+---
+
+## TypeScript
+
+We use TypeScript to ensure type safety.
+
+- **Strict Mode**: `tsconfig.json` should have `strict: true` enabled.
+- **Explicit Types**:
+  - Define explicit types for function parameters and return values.
+  - Use interfaces or types for object shapes. Prefer `type` for component props and `interface` for objects that might be extended.
+- **Naming Conventions**:
+  - Use `PascalCase` for types, interfaces, and component names (e.g., `type UserProfile`, `interface IProduct`, `function MyComponent`).
+  - Use `camelCase` for variables and functions (e.g., `const userName`, `function getUser()`).
+- **Non-null Assertion**: Avoid using the non-null assertion operator (`!`) unless you are absolutely certain the value is not `null` or `undefined`. Prefer type guards or optional chaining (`?.`).
+
+---
 
 ## Tailwind CSS
 
@@ -54,20 +73,6 @@ This document outlines the coding conventions and best practices to be followed 
 7.  **Directory Structure**: Keep Shadcn/ui components organised, typically within a `components/ui` directory as per the default setup.
 8.  **Dependencies**: Be mindful of the peer dependencies required by Shadcn/ui components (e.g., Radix UI primitives, Tailwind CSS).
 
-## Magic UI
-
-1.  **Installation and Usage**: Follow the official Magic UI documentation for integrating components.
-2.  **Customisation**: Magic UI components are designed to be customisable. Leverage the props and styling options provided.
-3.  **Animation and Interactivity**:
-    *   Use animations purposefully to enhance user experience, not distract from it.
-    *   Ensure animations are performant and smooth.
-4.  **Responsiveness**: Test Magic UI components across different screen sizes and devices to ensure they are responsive and adapt well.
-5.  **Accessibility**: As with any UI component, ensure that the use of Magic UI components does not negatively impact the accessibility of your application. Test with screen readers and keyboard navigation.
-6.  **Bundle Size**: Be mindful of the bundle size impact of any UI library. Magic UI often focuses on modern, visually rich components, so ensure you are only using what you need and that it's optimised.
-7.  **Integration with Tailwind/Shadcn**:
-    *   Magic UI components can often be styled or augmented using Tailwind CSS utility classes.
-    *   They can be composed alongside Shadcn/ui components to build rich interfaces. Ensure consistent styling and behaviour when mixing components from different libraries.
-8.  **Props and API**: Familiarise yourself with the props and API of each Magic UI component you use to leverage its full potential and customise it effectively.
 
 ## Farcaster Mini Apps
 

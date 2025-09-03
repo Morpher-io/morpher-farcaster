@@ -1,0 +1,7 @@
+# See .gitignore for comments
+
+.next/
+.turbo/
+node_modules/
+build/
+out/
