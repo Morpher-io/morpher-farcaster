@@ -40,5 +40,10 @@
             "wallet.getEthereumProvider",
             "actions.composeCast"
         ]
+    },
+    "baseBuilder": {
+        "allowedAddresses": [
+            "0xC885E6282026cB8439d32B7058cEf13b19D58afE"
+        ]
     }
 }
