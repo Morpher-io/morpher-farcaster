@@ -23,7 +23,7 @@
             "stocks",
             "crypto",
             "forex"
-        ],
+        ], 
         "ogTitle": "Morpher Trading on Farcaster",
         "ogDescription": "Trade stocks, forex, crypto, and more, directly inside your Farcaster client.",
         "ogImageUrl": "https://farcaster.morpher.com/assets/screenshots/og_image_3.png",
