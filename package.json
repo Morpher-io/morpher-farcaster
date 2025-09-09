@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -H 127.0.0.1 -p 3019 --turbopack",
     "build": "next build --turbopack",
-    "start": "next start",
+    "start": "next start -H 127.0.0.1 -p 3019",
     "lint": "eslint",
     "format": "prettier --write ."
   },

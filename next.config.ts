@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["*.a.pinggy.link"],
-  // output: 'standalone',
+  output: 'standalone',
 
 
   /* config options here */

@@ -47,8 +47,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nextjs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --chown=nextjs:nextjs --from=builder /app /app
-RUN npm prune --production
+COPY --chown=nextjs:nextjs --from=builder /app/public ./public
+COPY --chown=nextjs:nextjs --from=builder /app/.next/standalone ./
+COPY --chown=nextjs:nextjs --from=builder /app/.next/static ./.next/static
 
 USER nextjs
 
@@ -56,4 +57,4 @@ EXPOSE 3000
 
 ENV PORT=3000
 
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
