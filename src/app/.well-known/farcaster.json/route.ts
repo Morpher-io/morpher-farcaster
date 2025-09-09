@@ -20,6 +20,11 @@ export async function GET() {
       payload: process.env.FARCASTER_PAYLOAD,
       signature: process.env.FARCASTER_SIGNATURE,
     },
+    baseBuilder: {
+        allowedAddresses: [
+            "0xC885E6282026cB8439d32B7058cEf13b19D58afE"
+        ]
+    },
     frame: withValidProperties({
       version: "1",
       name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
@@ -48,6 +53,10 @@ export async function GET() {
         "wallet.getEthereumProvider",
         "actions.composeCast",
       ],
+
+
+        
+    
     }),
   });
 }
