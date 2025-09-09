@@ -24,7 +24,7 @@
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "lucide-react": "^0.542.0",
-    "morpher-trading-sdk": "^0.1.13",
+    "morpher-trading-sdk": "^0.1.14",
     "next": "^15.5.2",
     "next-intl": "^4.3.5",
     "react": "^19.1.0",

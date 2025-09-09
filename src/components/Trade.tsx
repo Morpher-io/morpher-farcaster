@@ -208,13 +208,13 @@ export function Trade() {
 
   const tradeComplete = (result: TradeCallback) => {
     if (result.result === "error") {
-      let error = result.err;
-      if (result.error_code) {
-        const err_message = t("errors." + result.error_code.toUpperCase());
-        if (err_message !== "errors." + result.error_code.toUpperCase()) {
-          error = err_message;
-        }
-      }
+        let error = result.err
+      // if (result.error_code) {
+      //   const err_message = t('errors.' + result.error_code.toUpperCase());
+      //   if (err_message !== 'errors.' + result.error_code.toUpperCase()) {
+      //     error = err_message
+      //   }
+      // }
 
       setTradeError(error || "An error occurred while executing the trade.");
       setTradeComplete(false);
