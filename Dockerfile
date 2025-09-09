@@ -50,13 +50,10 @@ RUN adduser --system --uid 1001 nextjs
 COPY --chown=nextjs:nextjs --from=builder /app /app
 RUN npm prune --production
 
-# Grant the node binary the capability to bind to privileged ports
-RUN apk add --no-cache libcap && setcap 'cap_net_bind_service=+ep' $(which node)
-
 USER nextjs
 
-EXPOSE 80
+EXPOSE 3000
 
-ENV PORT=80
+ENV PORT=3000
 
-CMD ["npm", "start", "-- --port 80"]
+CMD ["npm", "start"]
