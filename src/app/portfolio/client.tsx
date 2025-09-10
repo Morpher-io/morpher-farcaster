@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { PortfolioChart } from "@/components/PortfolioChart";
 import { useMarketStore } from "@/store/market";
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { usdFormatter, tokenValueFormatter } from "morpher-trading-sdk";
 import { usePortfolioStore } from "@/store/portfolio";
 
@@ -21,6 +21,9 @@ import { Footer } from "@/components/Footer";
 import { TradeSuccessScreen } from "@/components/TradeSuccess";
 
 export default function PortfolioScreen() {
+
+  const { data: signMessageData, error, signMessage, variables } = useSignMessage()
+
   const { address } = useAccount();
   const account = useAccount();
   const {
@@ -77,6 +80,21 @@ export default function PortfolioScreen() {
     }
   }, [selectedMarketId, marketListAll, setSelectedMarket]);
 
+  useEffect(() => {
+    if (signMessageData) {
+      console.log('signed message', signMessageData)
+    }
+  }, [signMessageData])
+
+
+  const signMsg = () => {
+    try {
+      signMessage({ message: "Morpher Registration" });
+    } catch (err) {
+      console.log('sign error', err)
+    }
+
+  }
   const getProtfolio = async () => {
     if (account?.address && morpherTradeSDK) {
       try {
@@ -115,6 +133,7 @@ export default function PortfolioScreen() {
   useEffect(() => {
     if (account?.address && morpherTradeSDK) {
       getProtfolio();
+      signMsg();
     }
   }, [account, morpherTradeSDK]);
 
@@ -224,6 +243,10 @@ export default function PortfolioScreen() {
               </CardContent>
             </Card>
             <h2 className="mt-6 mb-2 text-lg font-bold">{t("POSITIONS")}</h2>
+            signature:<br />
+            <div>
+              {signMessageData}
+            </div>
 
             {/* {marketData.pending_order_id ? (
                               <PendingPosition marketData={marketData} />

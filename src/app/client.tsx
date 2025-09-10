@@ -27,7 +27,6 @@ export default function Home() {
 
   useEffect(() => {
     if (!isFrameReady) {
-      console.log('setFrameReady')
       setFrameReady();
 
       if (process.env.NODE_ENV !== 'development') {
@@ -64,7 +63,6 @@ export default function Home() {
       setContext(user_data);
     }
 
-    console.log('context', {address, context})
   }, [morpherTradeSDK, address, context]);
 
   return (
