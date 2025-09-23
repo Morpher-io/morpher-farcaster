@@ -51,6 +51,9 @@ interface PortfolioState {
     user_name?: string;
     display_name?: string;
     profile_image?: string;
+    platformType?: string;
+    clientFid?: number;
+    added?: boolean;
     
   }) => void;
 }
