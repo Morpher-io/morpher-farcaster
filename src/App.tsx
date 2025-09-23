@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 function App() {
 
   const { morpherTradeSDK  } = useMarketStore();
-  const { setEthAddress, tradeComplete, setContext  } = usePortfolioStore();
+  const { setEthAddress, tradeComplete, setContext, context  } = usePortfolioStore();
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
   const { address, isConnected } = useAccount();
@@ -39,7 +39,6 @@ function App() {
   useEffect(() => {
     if (morpherTradeSDK.ready && address) {
       sdk.context.then(context => {
-        console.log('context', context)
         
         let user_data = {
           app: import.meta.env.VITE_MORPHER_APP_NAME,
@@ -47,7 +46,10 @@ function App() {
           user_name: context.user.username,
           display_name: context.user.displayName,
           eth_address: address,
-          profile_image: context.user.pfpUrl
+          profile_image: context.user.pfpUrl,
+          platformType: context?.client?.platformType || '',
+          clientFid: context?.client?.clientFid,
+          added: context?.client?.added,
         }
 
         setContext(user_data)
@@ -79,7 +81,9 @@ function App() {
       await sdk.actions.ready();
 
       if (import.meta.env.VITE_NODE_ENV !== 'development') {
-        await sdk.actions.addMiniApp()
+        if (context && !context.added) {
+          await sdk.actions.addMiniApp()
+        }
       }
     } catch (err:any) {
       console.log('Error adding mini app: ' + err.toString())
@@ -89,7 +93,7 @@ function App() {
   useEffect(() => {
     sdkActions()
     
-  }, [])
+  }, [context])
   
 
   return (

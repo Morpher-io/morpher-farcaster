@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Filter, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import sdk from "@farcaster/miniapp-sdk";
 
 export function TradeHistoryScreen() {
   const { t } = useTranslation();
@@ -25,7 +24,6 @@ export function TradeHistoryScreen() {
   const { currencyList } = usePortfolioStore();
   const [orders, setOrders] = useState<TORders | undefined>(undefined);
   const [filter, setFilter] = useState("");
-  const [ctx, setCtx] = useState<any>();
 
   const [selectedOrder, setSelectedOrder] = useState<TOrder | undefined>(
     undefined
@@ -44,10 +42,6 @@ export function TradeHistoryScreen() {
     return symbol;
   };
 
-      
-    sdk.context.then(context => {
-      setCtx(context)
-    })
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) {
@@ -274,7 +268,6 @@ export function TradeHistoryScreen() {
             </div>
             {selectedOrder.tx_hash && (
               <DialogFooter>
-                {ctx ? JSON.stringify(ctx) : ''}
                 <Button
                   onClick={() =>
                     window.open(

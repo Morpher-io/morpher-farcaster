@@ -51,6 +51,7 @@ interface PortfolioState {
     user_name?: string;
     display_name?: string;
     profile_image?: string;
+    
   }) => void;
 }
 
