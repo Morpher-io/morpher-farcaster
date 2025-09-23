@@ -1,20 +1,20 @@
 import { usePortfolioStore } from "@/store/portfolio";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import {  usdFormatter, TLeaderBoard, TAddress, TOrder, tokenValueFormatter, TPosition } from "morpher-trading-sdk";
+import {  usdFormatter, TLeaderBoard, TAddress, TOrder, TPosition } from "morpher-trading-sdk";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useMarketStore } from "@/store/market";
 import { sdk } from "@farcaster/miniapp-sdk";
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
-import { Pie, PieChart, Cell } from "recharts";
+// import {
+//   ChartContainer,
+//   ChartLegend,
+//   ChartTooltip,
+//   ChartTooltipContent,
+//   type ChartConfig,
+// } from "@/components/ui/chart";
+// import { Pie, PieChart, Cell } from "recharts";
 import { useTranslation } from "react-i18next";
 import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
   
@@ -187,18 +187,18 @@ export function LeaderboardScreen() {
   };
 
   if (portfolio) {
-    const chartData = Object.entries(portfolio.types).map(([name, value]) => ({
-      name,
-      value,
-    }));
+    // const chartData = Object.entries(portfolio.types).map(([name, value]) => ({
+    //   name,
+    //   value,
+    // }));
 
-    const chartConfig = chartData.reduce((acc, { name }, index) => {
-      acc[name] = {
-        label: name,
-        color: `var(--chart-${index + 1})`,
-      };
-      return acc;
-    }, {} as ChartConfig);
+    // const chartConfig = chartData.reduce((acc, { name }, index) => {
+    //   acc[name] = {
+    //     label: name,
+    //     color: `var(--chart-${index + 1})`,
+    //   };
+    //   return acc;
+    // }, {} as ChartConfig);
     return (
       <div className="mx-4">
         <div className="flex items-center mt-4">

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useMarketStore } from "@/store/market";
-import { TMarket, TMarketData, TMarketType } from "morpher-trading-sdk";
+import { TMarket, TMarketType } from "morpher-trading-sdk";
 import { Card, CardContent } from "../ui/card";
 import { Loader2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
