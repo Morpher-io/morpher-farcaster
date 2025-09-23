@@ -14,7 +14,7 @@ import { Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import { format as formatDate } from "date-fns";
 import { cn } from "@/lib/utils";
-import sdk from "@farcaster/frame-sdk";
+import sdk from "@farcaster/miniapp-sdk";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { useMarketStore } from "@/store/market";

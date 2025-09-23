@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { usePortfolioStore } from "@/store/portfolio";
 import { Button } from "@/components/ui/button";
-import { sdk } from "@farcaster/frame-sdk";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { tokenValueFormatter } from "morpher-trading-sdk";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";

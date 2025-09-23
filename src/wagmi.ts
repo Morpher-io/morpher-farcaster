@@ -1,4 +1,4 @@
-import { farcasterFrame } from "@farcaster/frame-wagmi-connector";
+import { farcasterFrame } from "@farcaster/miniapp-wagmi-connector";
 import { http, createConfig } from "wagmi";
 import {  baseSepolia, base } from "wagmi/chains"; 
 

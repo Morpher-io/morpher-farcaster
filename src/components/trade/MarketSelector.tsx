@@ -398,7 +398,7 @@ export function MarketSelector() {
                 className={`flex select-none gap-1 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
               >
                 {(
-                  ["all", "stock", "forex", "index", "commodity", "crypto"] as (
+                  ["all", "crypto", "stock", "forex", "index", "commodity"] as (
                     | TMarketType
                     | "all"
                   )[]

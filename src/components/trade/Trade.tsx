@@ -350,6 +350,7 @@ export function Trade() {
                   <Input
                     placeholder={"0.00 " + selectedCurrency}
                     value={inputValue}
+                    type="number"
                     onChange={handleInputChange}
                     className="w-full h-auto border-none bg-transparent p-0 text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-primary placeholder:opacity-60"
                   />

@@ -27,7 +27,7 @@ This is a Farcaster Mini App for the Morpher Trading platform. It allows users t
 -   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 -   **UI Components**: [Shadcn/ui](https://ui.shadcn.com/)
 -   **Wallet Integration**: [Wagmi](https://wagmi.sh/)
--   **Farcaster Integration**: [@farcaster/frame-sdk](https://github.com/farcasterxyz/frames)
+-   **Farcaster Integration**: [@farcaster/miniapp-sdk](https://github.com/farcasterxyz/frames)
 -   **Trading Logic**: Morpher Trading SDK
 
 ## 🚀 Getting Started

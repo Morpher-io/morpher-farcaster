@@ -11,7 +11,7 @@ import { Layout } from "./components/layout/Layout";
 import { Header } from "./components/app/Header";
 import { usePortfolioStore } from "./store/portfolio";
 import { useMarketStore } from "./store/market";
-import { sdk } from "@farcaster/frame-sdk";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { useTranslation } from "react-i18next";
 
 
@@ -39,6 +39,7 @@ function App() {
   useEffect(() => {
     if (morpherTradeSDK.ready && address) {
       sdk.context.then(context => {
+        console.log('context', context)
         
         let user_data = {
           app: import.meta.env.VITE_MORPHER_APP_NAME,

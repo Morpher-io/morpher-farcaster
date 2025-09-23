@@ -20,11 +20,12 @@ import { useTranslation } from "react-i18next";
 interface PendingPositionProps {
   marketData: TMarketDetail;
 }
+import { sdk } from "@farcaster/miniapp-sdk";
 
 export function PendingPosition({ marketData }: PendingPositionProps) {
   const { t } = useTranslation();
   
-  const { morpherTradeSDK, order, setOrder } = useMarketStore();
+  const { morpherTradeSDK, order, setOrder, selectedMarket } = useMarketStore();
 
   const account: any = useAccount();
   const [closeExecuting, setCloseExecuting] = useState(false);
@@ -64,6 +65,30 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
     }, 2000);
   };
 
+      const share = async () => {
+  
+        let leverage = ''
+        if (order?.leverage && Number(order.leverage) / 10**8 > 1) {
+          leverage += t('TRADE_OPEN_LEVERAGE', {leverage:  Number(order.leverage)/ 10**8 })
+        }
+  
+        let text = t('TRADE_OPEN_SHARE', {leverage: leverage, type: order?.direction == "long" ? t("MESSAGE_LONG") : t("MESSAGE_SHORT"), market: selectedMarket?.name || order?.market_id, currency:order?.order_currency})
+        
+        text += '!'
+  
+  
+        if (Number(order?.close_shares_amount || 0) > 0) {
+          text = t('TRADE_CLOSE_SHARE', {market: selectedMarket?.name || order?.market_id, returnPercentage: 0})
+        }
+  
+        const embeds:[string] = [`https://farcaster.xyz/miniapps/dWezHCjv5UqF/morpher`];
+  
+        await sdk.actions.composeCast({
+          text,
+          embeds,
+        });
+      }
+
   const executeClose = () => {
     try {
       setTradeError(undefined);
@@ -100,6 +125,16 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
           <CardTitle>{t('PENDING_ORDER')}</CardTitle>
           <CardDescription>
             {t('ORDER_EXECUTION')}
+
+              {((Number(order?.open_mph_token_amount || 0) > 0)) && (
+            <Button
+              variant="default"
+              className="w-full rounded-full mt-2"
+              onClick={() => share()}
+            >
+              {t('SHARE')}
+            </Button>
+            )}
             
           </CardDescription>
         </CardHeader>
@@ -110,11 +145,6 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
             {t('ORDER_MARKET_HOURS')}
           </p>
           )}
-          
-          <Button className="w-full mt-4" onClick={executeClose} variant={"default"}>
-            {closeExecuting && <Loader2Icon className="animate-spin" />}
-            <span className="text-white">{t('CANCEL_ORDER_BUTTON')}</span>
-          </Button>
 
           {tradeError && (
             <div className="text-red-500 text-sm mt-2">{tradeError}</div>
@@ -149,6 +179,11 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
               </p>
             </div>
           )}
+
+          <Button className="w-full mt-4 text-muted-foreground" onClick={executeClose} variant={"outline"}>
+            {closeExecuting && <Loader2Icon className="animate-spin" />}
+            <span className="">{t('CANCEL_ORDER_BUTTON')}</span>
+          </Button>
         </CardContent>
       </Card>
     </div>

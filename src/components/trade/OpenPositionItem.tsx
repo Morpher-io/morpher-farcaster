@@ -18,10 +18,15 @@ import { PendingPosition } from "./PendingPosition";
 
 interface OpenPositionItemProps {
   position: TPosition;
+  showClose?: boolean;
 }
 
-export function OpenPositionItem({ position }: OpenPositionItemProps) {
+export function OpenPositionItem({ position, showClose }: OpenPositionItemProps) {
   const { t } = useTranslation();
+
+  if (showClose == undefined) {
+    showClose = true
+  }
   
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [closePercentage, setClosePercentage] = React.useState(100);
@@ -311,13 +316,16 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
           </div>
 
           <div className="space-y-4">
-            <Slider
-              value={[closePercentage]}
-              onValueChange={(value) => setClosePercentage(value[0])}
-              max={100}
-              step={5}
-              className="mt-4 mb-4"
-            />
+            {showClose && (
+              <Slider
+                value={[closePercentage]}
+                onValueChange={(value) => setClosePercentage(value[0])}
+                max={100}
+                step={5}
+                className="mt-4 mb-4"
+              />
+            )}
+          
             <div className="grid grid-cols-3 gap-2">
               <Button
                 variant="outline"
@@ -326,14 +334,16 @@ export function OpenPositionItem({ position }: OpenPositionItemProps) {
               >
                 {t('VIEW_MARKET')}
               </Button>
-              <Button
-                onClick={handleClosePosition}
-                disabled={isClosing || closePercentage === 0}
-                className="col-span-2"
-              >
-                {isClosing && <Loader2Icon className="animate-spin mr-2" />}
-                {t('CLOSE_PERCENTAGE', { closePercentage })}
-              </Button>
+              {showClose && (
+                <Button
+                  onClick={handleClosePosition}
+                  disabled={isClosing || closePercentage === 0}
+                  className="col-span-2"
+                >
+                  {isClosing && <Loader2Icon className="animate-spin mr-2" />}
+                  {t('CLOSE_PERCENTAGE', { closePercentage })}
+                </Button>
+              )}
             </div>
             {tradeError && (
               <p className="text-red-500 text-sm text-center">{tradeError}</p>

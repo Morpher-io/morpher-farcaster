@@ -72,7 +72,7 @@ This document outlines the coding conventions and best practices to be followed 
 ## Farcaster Mini Apps
 
 1.  **SDK Usage**:
-    *   Utilise the official `@farcaster/frame-sdk` for interacting with the Farcaster client environment.
+    *   Utilise the official `@farcaster/miniapp-sdk` for interacting with the Farcaster client environment.
     *   Keep the SDK updated to the latest version to leverage new features and security patches. Refer to the changelog.
 2.  **Manifest File (`farcaster.json`)**:
     *   Host a valid `farcaster.json` file at `/.well-known/farcaster.json` on your app's domain.
@@ -95,7 +95,7 @@ This document outlines the coding conventions and best practices to be followed 
     *   Alternatively, use `sdk.actions.signIn()` for the standard Sign In with Farcaster (SIWF) flow. Ensure server-side verification of the SIWF message.
     *   Support Auth Addresses by setting `acceptAuthAddress: true` in `signIn` options if applicable.
 6.  **Wallet Interactions**:
-    *   **Ethereum**: Use `sdk.wallet.getEthereumProvider()` to get an EIP-1193 provider. Consider using libraries like Wagmi with the `@farcaster/frame-wagmi-connector`.
+    *   **Ethereum**: Use `sdk.wallet.getEthereumProvider()` to get an EIP-1193 provider. Consider using libraries like Wagmi with the `@farcaster/miniapp-wagmi-connector`.
     *   **Solana**: Use `sdk.wallet.getSolanaProvider()` or the `@farcaster/mini-app-solana` package for Wallet Standard integration, often with Wallet Adapter.
     *   Clearly communicate transaction details to users and handle potential errors.
 7.  **Notifications**:

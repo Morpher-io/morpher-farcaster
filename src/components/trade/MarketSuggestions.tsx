@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useMarketStore } from "@/store/market";
-import { TMarket, TMarketType } from "morpher-trading-sdk";
+import { TMarket, TMarketData, TMarketType } from "morpher-trading-sdk";
 import { Card, CardContent } from "../ui/card";
 import { Loader2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -30,11 +30,25 @@ export function MarketSuggestions() {
 
   const loading = trendingMarkets === undefined;
 
+  const statusOrder = (market:any) => {
+    if (market.status === 'open') 
+      return 1
+    else if (market.status === 'pre') 
+      return 2
+    else
+      return 3
+  }
+
+
   const sortedTrendingMarkets = React.useMemo(() => {
     if (!trendingMarkets) return [];
+
     return Object.values(trendingMarkets)
-      .sort((a, b) => (Number(b.change_percent || 0)) - (Number(a.change_percent || 0)));
+      .sort((a, b) => statusOrder(a) - statusOrder(b) ||(Number(b.change_percent || 0)) - (Number(a.change_percent || 0)) );
+
+      //
   }, [trendingMarkets]);
+
 
   const checkFades = React.useCallback(() => {
     const el = scrollContainerRef.current;

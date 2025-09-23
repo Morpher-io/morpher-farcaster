@@ -1,12 +1,12 @@
 import { usePortfolioStore } from "@/store/portfolio";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import {  usdFormatter, TLeaderBoard, TAddress, TOrder, tokenValueFormatter } from "morpher-trading-sdk";
+import {  usdFormatter, TLeaderBoard, TAddress, TOrder, tokenValueFormatter, TPosition } from "morpher-trading-sdk";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useMarketStore } from "@/store/market";
-import { sdk } from "@farcaster/frame-sdk";
+import { sdk } from "@farcaster/miniapp-sdk";
 import {
   ChartContainer,
   ChartLegend,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/chart";
 import { Pie, PieChart, Cell } from "recharts";
 import { useTranslation } from "react-i18next";
+import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
   
 
 export function LeaderboardScreen() {
@@ -27,11 +28,24 @@ export function LeaderboardScreen() {
   let navigate = useNavigate();
   const { morpherTradeSDK } = useMarketStore();
   const [selectedEntry, setSelectedEntry] = useState<TLeaderBoard>();
+  const [positionList, setPositionList] = useState<TPosition[]>();
+
+  const [startDate, setStartDate] = useState<string>('');
+
+  useEffect(() => {
+    if (type == 'returns' && leaderboard && leaderboard[type] && leaderboard[type].length > 0)
+    setStartDate((new Date(Number(leaderboard[type][0].leaderboard_start_date))).getDate() + ' ' + monthNames[(new Date(Number(leaderboard[type][0].leaderboard_start_date))).getMonth()] )
+  else 
+    setStartDate('')
+
+  }, [leaderboard, type])
   
   
   const [order, setOrder] = useState<TOrder>();
 
   const [portfolio, setPortfolio] = useState<any>();
+
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
   const types:any = {}
   const  type_list:any = {'UNIQUE':'Unique', 'CRYPTO':'Crypto', 'STOCK':'Stock', 'FOREX':'Forex', 'F1':'F1', 'MLB':'Major League Baseball', 'INDEX': 'Index', 'COMMODITY': 'Commodity'}
@@ -42,6 +56,8 @@ export function LeaderboardScreen() {
     let positions = await morpherTradeSDK.getPositions({
       eth_address: entry.eth_address.toLowerCase() as TAddress,
     });
+
+    setPositionList(positions)
 
     let position_count = 0
     let total_value = 0
@@ -135,7 +151,7 @@ export function LeaderboardScreen() {
               </p>
             ) : (
               <p className=" text-xs">
-                <span className={(entry.returns || 0) >= 0 ? "text-primary" : "text-secondary"}>{value}</span> {t('IN_LAST_30_DAYS')}
+                <span className={(entry.returns || 0) >= 0 ? "text-primary" : "text-secondary"}>{value}</span> {t('IN_LAST_30_DAYS')} {startDate}
               </p>
             )}
           </div>
@@ -160,7 +176,7 @@ export function LeaderboardScreen() {
                 🏅{t('YOU')}
               </div>
             ) : (
-              <div className="text-xs font-normal text-right bg-[var(--light-green)] text-primary cursor-pointer px-2 py-1 rounded-full" onClick={()=> { openPortfolio(entry) }}>
+              <div className="text-xs font-normal text-right bg-[var(--light-green)] text-primary cursor-pointer px-2 w-[100px] py-1 rounded-full" onClick={()=> { openPortfolio(entry) }}>
                 {t('SHOW_PORTFOLIO')}
               </div>
             )}
@@ -213,8 +229,17 @@ export function LeaderboardScreen() {
         )}
           
         </div>
-        <h2 className="text-lg font-bold ml-2 mt-4">{t('PORTFOLIO_DETAILS')}</h2>
-        <Card className="mt-4 py-0">
+        <h2 className="text-lg font-bold ml-2 mt-4">{t('POSITIONS')}</h2>
+
+        {positionList && positionList.length > 0 ? (
+                        positionList.map((position) => (
+                            <OpenPositionItem key={position.id} position={position} showClose={false} />
+                        ))
+                    ) : positionList && positionList.length === 0 ? (
+                        <h3 className="text-md font-bold ml-2 mt-4">{t('NO_POSITIONS')}</h3>
+                    ) : null}
+
+        {/* <Card className="mt-4 py-0">
           <div>
             <div className="flex justify-between items-center p-4 border-b">
               <p className="text-muted-foreground">{t('TOTAL_POSITIONS')}</p>
@@ -263,7 +288,7 @@ export function LeaderboardScreen() {
             
             
           </div>
-        </Card>
+        </Card> */}
 
                <Button
               variant="default"
@@ -375,6 +400,7 @@ export function LeaderboardScreen() {
             className="h-15 w-15 m-auto "
           />
       <h2 className="text-lg font-bold mt-4 m-auto">{t('menu.LEADERBOARD')}</h2>
+      
       <div className="flex m-auto gap-3 text-sm mt-4 font-bold">
                 <div className={type=='returns' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('returns')}>
           {t('TOP_RETURNS')}
@@ -385,6 +411,9 @@ export function LeaderboardScreen() {
         </div>
 
       </div>
+      { startDate && (
+        <h3 className="text-sm font-semibold mt-4 ml-4">Started {startDate }</h3>
+      ) }
       </div>
 
       {/* <div className="relative mt-4">
@@ -397,21 +426,24 @@ export function LeaderboardScreen() {
         />
       </div> */}
 
-      <div id="leaderboard-list" className="mt-4">
-        {leaderboard &&
-        leaderboard[type] && 
-          leaderboard[type]
-            .filter((entry) =>
-              (entry.display_name || "")
-                .toLowerCase()
-                .includes(filter.toLowerCase())
-            )
-            .map((entry, index) => (
-              <div key={entry.eth_address}>
-                {outputLeaderboardEntry(entry, entry.rank || index)}
-              </div>
-            ))}
-      </div>
+      <div
+          id="leaderboard-list"
+          className={startDate ? 'mt-4 max-h-[calc(100vh-24rem)] flex-1 overflow-y-auto px-4' : 'mt-2 max-h-[calc(100vh-21rem)] flex-1 overflow-y-auto px-4'}
+        >
+          {leaderboard &&
+            leaderboard[type] &&
+            leaderboard[type]
+              .filter((entry) =>
+                (entry.display_name || "")
+                  .toLowerCase()
+                  .includes(filter.toLowerCase()),
+              )
+              .map((entry, index) => (
+                <div key={entry.eth_address}>
+                  {outputLeaderboardEntry(entry, entry.rank || index)}
+                </div>
+              ))}
+        </div>
 
        <Button
               variant="default"
