@@ -6,14 +6,19 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat python3 make gcc g++ musl-dev binutils autoconf automake libtool pkgconfig check-dev file patch git alpine-sdk build-base libgudev-dev
 WORKDIR /app
 
+# Workaround - rebuild the dependancies to avoid missing linux dependancies
+
+COPY package.json ./
+RUN npm i --legacy-peer-deps
+
 # Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci --legacy-peer-deps; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+# COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+# RUN \
+#   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+#   elif [ -f package-lock.json ]; then npm ci --legacy-peer-deps; \
+#   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+#   else echo "Lockfile not found." && exit 1; \
+#   fi
 
 
 # Rebuild the source code only when needed
