@@ -350,7 +350,7 @@ export function MarketSelector() {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between h-[60px]"
+            className="w-full justify-between h-[60px] bg-[var(--card)] border-[var(--primary)] border-1"
           >
             {selectedMarket ? (
               outputMarket(
@@ -358,9 +358,9 @@ export function MarketSelector() {
                 livePrice ? livePrice[selectedMarket.market_id] : undefined
               )
             ) : (
-              <span className="text-muted-foreground flex items-center">
-                <Search className="mr-2 h-4 w-4" />
-                {t("SEARCH_MARKETS")}...
+              <span className="text-foreground flex items-center font-semibold">
+                <Search className="mr-2 h-8 w-8" color="var(--primary)" />
+                {t("SEARCH_MARKETS")}
               </span>
             )}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

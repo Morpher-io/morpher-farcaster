@@ -34,11 +34,11 @@ export function LeaderboardScreen() {
 
   useEffect(() => {
     if (type == 'returns' && leaderboard && leaderboard[type] && leaderboard[type].length > 0)
-    setStartDate((new Date(Number(leaderboard[type][0].leaderboard_start_date))).getDate() + ' ' + monthNames[(new Date(Number(leaderboard[type][0].leaderboard_start_date))).getMonth()] )
-  else 
-    setStartDate('')
+      setStartDate((new Date(Number(leaderboard[type][0].leaderboard_start_date))).getDate() + ' ' + monthNames[(new Date(Number(leaderboard[type][0].leaderboard_start_date))).getMonth()] )
+    else 
+      setStartDate('')
 
-  }, [leaderboard, type])
+  }, [leaderboard[type], type])
   
   
   const [order, setOrder] = useState<TOrder>();
@@ -292,7 +292,7 @@ export function LeaderboardScreen() {
 
                <Button
               variant="default"
-              className="w-[calc(100vw-30px)]  rounded-full fixed bottom-4 mb-16 "
+              className="w-[calc(100vw-30px)] fixed bottom-4 mb-16 "
               onClick={() => followUser()}
             >
               {t('FOLLOW')}
@@ -381,7 +381,7 @@ export function LeaderboardScreen() {
 
                <Button
               variant="default"
-              className="w-[calc(100vw-30px)]  rounded-full fixed bottom-4 mb-16 "
+              className="w-[calc(100vw-30px)] fixed bottom-4 mb-16 "
               onClick={() => followUser()}
             >
               {t('FOLLOW')}

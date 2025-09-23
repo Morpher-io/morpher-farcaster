@@ -2,6 +2,7 @@ import * as React from "react";
 import { tokenValueFormatter } from "morpher-trading-sdk";
 import { LineChart, Line, XAxis, YAxis, ReferenceDot } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
+import { useTranslation } from "react-i18next";
 
 interface LeverageImpactVisualizerProps {
   leverage: number;
@@ -16,6 +17,9 @@ export function LeverageImpactVisualizer({
   marketPrice,
   spread,
 }: LeverageImpactVisualizerProps) {
+
+    const { t } = useTranslation();
+  
   const calculations = React.useMemo(() => {
     if (marketPrice === 0) {
       return { entryPrice: 0, liquidationPrice: 0, profitTargetPrice: 0 };
@@ -131,11 +135,22 @@ export function LeverageImpactVisualizer({
   }, [plotPoints]);
 
   return (
-    <div className="bg-muted p-3 rounded-md mt-4">
-      <h4 className="font-semibold text-sm mb-2 text-center">
-        Leverage Impact
+    <div className="bg-[var(--warning)] p-3 rounded-md mt-4">
+       <h4 className="font-semibold text-sm mb-2 text-left flex items-center">
+        <img
+            src={`/assets/icons/lev.svg`}
+            alt={`leverage icon`}
+            className="w-5 h-5 mr-2"
+        /> 
+        {t('LEV_HEAD')}
       </h4>
-      <div className="h-14 w-full">
+       <p className="text-xs">
+          {t('LEV_DESCRIPTION' )}
+        </p>
+
+
+
+      <div className="h-14 w-full mt-4">
         <ChartContainer config={{}} className="w-full h-full">
           <LineChart
             data={[{ price: domain[0], y: 5 }, { price: domain[1], y: 5 }]}
@@ -175,7 +190,8 @@ export function LeverageImpactVisualizer({
           </LineChart>
         </ChartContainer>
       </div>
-      <div className="flex justify-around mt-4 text-xs">
+
+      <div className="flex justify-around mt-2 text-xs">
         {sortedPlotPoints.map((p) => (
           <div key={p.name} className="flex flex-col items-center text-center">
             <span style={{ color: p.fill }} className="font-bold">
@@ -187,10 +203,17 @@ export function LeverageImpactVisualizer({
           </div>
         ))}
       </div>
-      <p className="text-center text-muted-foreground pt-2 text-xs">
+      <p className="text-left text-foreground pt-2 text-xs mt-4">
         A daily interest fee of ~{((leverage - 1) * 0.03).toFixed(4)}% applies
         to the total position value when using leverage.
       </p>
+
+              <p className="text-xs font-semibold mt-4">
+          {t('RISK_HEAD' )}
+        </p>
+        <p className="text-xs">
+          {t('LEV_RISK' )}
+        </p>
     </div>
   );
 }

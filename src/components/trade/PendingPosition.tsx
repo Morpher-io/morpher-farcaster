@@ -129,7 +129,7 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
               {((Number(order?.open_mph_token_amount || 0) > 0)) && (
             <Button
               variant="default"
-              className="w-full rounded-full mt-2"
+              className="w-full mt-2"
               onClick={() => share()}
             >
               {t('SHARE')}

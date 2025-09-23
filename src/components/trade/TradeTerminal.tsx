@@ -43,8 +43,9 @@ export function TradeTerminal() {
       <PortfolioSummary />
       <div className="h-px bg-gray-200 my-2" />
       <PortfolioStats />
-      <MarketSuggestions />
       <MarketSelector />
+
+      <MarketSuggestions />
       {positionList &&
         (positionList.length > 0 ? (
           <>

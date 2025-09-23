@@ -129,7 +129,7 @@ export function TradeSuccessScreen() {
             {((Number(orderUpdate?.open_mph_token_amount || 0) > 0) || (Number(orderUpdate?.return_percentage || 0) > 0)) && (
             <Button
               variant="default"
-              className="w-full rounded-full "
+              className="w-full "
               onClick={() => share()}
             >
               {t('SHARE')}

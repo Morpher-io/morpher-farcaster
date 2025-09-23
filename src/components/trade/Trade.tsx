@@ -480,20 +480,42 @@ export function Trade() {
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-      <div className="text-xs text-muted-foreground bg-muted p-3 rounded-md mb-4 space-y-2">
+      <div className={`text-xs text-foreground ${tradeType === "long" ? 'bg-[var(--primary-light)]' : 'bg-[var(--secondary-light)]' } p-3 rounded-md mb-4 space-y-2`}>
         {tradeType === "long" ? (
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2 bg-[var(--primary-light)]">
             <TrendingUp className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-            <p>
-              {t('LONG_DESCRIPTION', {market: selectedMarket?.symbol || "the asset" })}
-            </p>
+            <div>
+              <p className="text-xs font-semibold">
+                {t('LONG_HEAD' )}
+              </p>
+              <p>
+                {t('LONG_DESCRIPTION', {market: selectedMarket?.symbol || "the asset" })}
+              </p>
+              <p className="text-xs font-semibold mt-2">
+                {t('RISK_HEAD' )}
+              </p>
+              <p>
+                {t('LONG_RISK' )}
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2 bg-[var(--secondary-light)]">
             <TrendingDown className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
-            <p>
-              {t('SHORT_DESCRIPTION', {market: selectedMarket?.symbol || "the asset" })}
-            </p>
+            <div>
+              <p className="text-xs font-semibold">
+                {t('SHORT_HEAD' )}
+              </p>
+              <p>
+                {t('SHORT_DESCRIPTION', {market: selectedMarket?.symbol || "the asset" })}
+              </p>
+              <p className="text-xs font-semibold mt-2">
+                {t('RISK_HEAD' )}
+              </p>
+              <p>
+                {t('SHORT_RISK' )}
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -531,7 +553,7 @@ export function Trade() {
         </span>
       </Button>
       {(!tradeAmount || Number(tradeAmount) <= 0) && (
-        <p className="text-[var(--info)] flex justify-center items-center cursor-pointer mt-3" onClick={()=> {
+        <p className="text-[var(--info)] flex justify-left items-center cursor-pointer mt-3" onClick={()=> {
           window.scrollTo(0, 0)
         }}>
           <img
@@ -539,7 +561,7 @@ export function Trade() {
             src={`/assets/icons/info.svg`}
             alt={`Info Icon`}
           />
-          Enter amount to trade
+          Add a trade amount to get started
         </p>
       )}
       {tradeError && (
