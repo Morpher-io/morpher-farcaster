@@ -2,19 +2,19 @@
 
 export function Header({ onHelpClick }: { onHelpClick: () => void }) {
   return (
-    <header className="flex items-center justify-between  px-4 py-3 items-center ">
+    <header className="flex items-center justify-between  px-4 py-3 border-b ">
       <div>
           <img
             src={`/assets/logos/morpher-header.svg`}
             alt={`Morpher Logo`}
-            className=""
+            className="w-36"
         />
       </div>
       <div className="cursor-pointer" onClick={onHelpClick}>
        <img
             src={`/assets/icons/help.svg`}
             alt={`help icon`}
-            className=""
+            className="w-6"
         />
         </div>
       {/* <nav>
