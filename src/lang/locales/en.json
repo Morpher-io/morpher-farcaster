@@ -111,6 +111,22 @@
             "MARKET_SPLIT": "There was an error processing the market split information for this order. Please check the market and try again later.",
             "ORDER_TIMEOUT": "Order creation timed out. Order was not created in time. Please try again later.",
             "EXECUTION_ERROR": "Order creation failed. Please try again later"
+        },
+        "onboarding": {
+            "WELCOME_TITLE": "Welcome to Morpher",
+            "WELCOME_SUBTITLE": "Take on Wall Street with $1. Invest in hundreds of markets all in one place - Apple, Bitcoin, Gold, Doge and so much more.",
+            "STEP1_TITLE": "Choose what to trade",
+            "STEP1_DESCRIPTION": "Browse categories or search by name or icon. From Apple, Ethereum to Gold, you’ll find it here.",
+            "STEP2_TITLE": "Go Long or Short",
+            "STEP2_ITEM1": "Enter how much you want to trade",
+            "STEP2_ITEM2": "Pick Long (Buy) or Short (Sell)",
+            "STEP2_ITEM3": "Adjust leverage if you want more risk",
+            "STEP2_ITEM4": "Confirm your trade",
+            "STEP3_TITLE": "Stay In control",
+            "STEP3_DESCRIPTION": "See all your trades in Portfolio.<br/>Close a position anytime, or open a new one.",
+            "START_TRADING_BUTTON": "Start Trading",
+            "LEARN_MORE_BUTTON": "To learn more, check out the",
+            "MORPHER_GUIDE": "Morpher Guide"
         }
     }
 }

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { TradeScreen } from "./screens/Trade";
@@ -13,11 +13,15 @@ import { usePortfolioStore } from "./store/portfolio";
 import { useMarketStore } from "./store/market";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { useTranslation } from "react-i18next";
+import { Onboarding } from "./components/app/Onboarding";
 
 
+
+const ONBOARDING_KEY = 'morpher-onboarding-complete';
 
 function App() {
 
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { morpherTradeSDK  } = useMarketStore();
   const { setEthAddress, tradeComplete, setContext, context  } = usePortfolioStore();
   const chainId = useChainId()
@@ -26,6 +30,21 @@ function App() {
 
   const { i18n: {changeLanguage, language} } = useTranslation();
   
+  useEffect(() => {
+    const onboardingComplete = localStorage.getItem(ONBOARDING_KEY);
+    if (!onboardingComplete) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleCloseOnboarding = () => {
+    localStorage.setItem(ONBOARDING_KEY, 'true');
+    setShowOnboarding(false);
+  };
+
+  const handleShowOnboarding = () => {
+    setShowOnboarding(true);
+  };
 
   useEffect(() => {
     if (language && language  !== 'en') {
@@ -98,9 +117,10 @@ function App() {
 
   return (
     <Router>
+      {showOnboarding && <Onboarding onClose={handleCloseOnboarding} />}
       <Layout>
         { (isConnected && !tradeComplete) && (
-          <Header />
+          <Header onHelpClick={handleShowOnboarding} />
         )}
         
         <main>

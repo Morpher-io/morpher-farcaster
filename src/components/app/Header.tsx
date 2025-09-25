@@ -1,6 +1,6 @@
 
 
-export function Header() {
+export function Header({ onHelpClick }: { onHelpClick: () => void }) {
   return (
     <header className="flex items-center justify-between  px-4 py-3 items-center ">
       <div>
@@ -10,12 +10,12 @@ export function Header() {
             className=""
         />
       </div>
-      <div className="cursor-pointer">
-       {/* <img
-            src={`/assets/icons/info.svg`}
-            alt={`info icon`}
+      <div className="cursor-pointer" onClick={onHelpClick}>
+       <img
+            src={`/assets/icons/help.svg`}
+            alt={`help icon`}
             className=""
-        /> */}
+        />
         </div>
       {/* <nav>
 
