@@ -1,6 +1,6 @@
 import { useMarketStore } from "@/store/market";
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { TOrder, TORders, usdFormatter } from "morpher-trading-sdk";
 import { tokenValueFormatter } from "morpher-trading-sdk";
 import {
@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Filter, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { getAddress, getContract, hashTypedData, keccak256, toHex } from "viem";
+import { morpherOracleAbi } from "@/lib/utils";
 
 export function TradeHistoryScreen() {
   const { t } = useTranslation();
@@ -24,6 +26,10 @@ export function TradeHistoryScreen() {
   const { currencyList } = usePortfolioStore();
   const [orders, setOrders] = useState<TORders | undefined>(undefined);
   const [filter, setFilter] = useState("");
+  const { data: walletClient } = useWalletClient();
+
+  const [sign, setSign] = useState<any>();
+  const publicClient = usePublicClient();
 
   const [selectedOrder, setSelectedOrder] = useState<TOrder | undefined>(
     undefined
@@ -69,6 +75,167 @@ export function TradeHistoryScreen() {
       }
     }
   };
+
+  const testTrade = async () => {
+    try {
+    if (!walletClient || !publicClient || !account?.address) {
+      return
+    }
+    const eth_address = account?.address
+    const chainId = 8453;
+
+				// set the domain parameters
+				const domain: any = {
+					name: "MorpherOracle",
+					version: "1",
+					chainId: Number(chainId),
+					verifyingContract:  '0x694aa11EC58b7dE7F1bb3a83dae00dCa55Dc986B'
+				};
+
+				// set the Permit type parameters
+				
+				const types = {
+					EIP712Domain: [
+						{
+							name: 'name',
+							type: 'string',
+						},
+						{
+							name: 'version',
+							type: 'string',
+						},
+						{
+							name: 'chainId',
+							type: 'uint256',
+						},
+						{
+							name: 'verifyingContract',
+							type: 'address',
+						},
+					],
+					// Person: [
+					// 	{
+					// 		name: 'name',
+					// 		type: 'string',
+					// 	},
+					// 	{
+					// 		name: 'wallet',
+					// 		type: 'address',
+					// 	},
+					// ],
+					CreateOrder: [{
+						name: "_marketId",
+						type: "bytes32"
+						},
+						{
+							name: "_closeSharesAmount",
+							type: "uint256"
+						},
+						{
+							name: "_openMPHTokenAmount",
+							type: "uint256"
+						},
+						{
+							name: "_msgSender",
+							type: "address"
+						},
+						{
+							name: "nonce",
+							type: "uint256"
+						},
+						{
+							name: "deadline",
+							type: "uint256"
+						},
+					],
+				};
+
+				// set the Permit type values
+
+				const deadline = '1758792623000';
+
+        const soliditySha3 = (data: string) => {
+            const return_data = keccak256(toHex(data));
+            return return_data
+        }
+				
+				const market = soliditySha3('CRYPTO_ETH');
+
+
+
+				const contract: any = getContract({
+					abi: morpherOracleAbi,
+					address: '0x694aa11EC58b7dE7F1bb3a83dae00dCa55Dc986B',
+					client: { public: publicClient, wallet: walletClient },
+				});
+
+				
+						
+				const nonce: any = await contract.read.nonces([eth_address]);
+
+				console.log('nonce', nonce)
+
+				const values = {
+					_marketId: market,
+					_closeSharesAmount: '0',
+					_openMPHTokenAmount: BigInt(Number(2) * 10 ** 18).toString(),
+					_msgSender: getAddress(eth_address || ''),
+					nonce: nonce.toString(),
+					deadline: deadline.toString(),
+				};
+
+
+
+				const signature = await walletClient.signTypedData({
+						account:eth_address,
+						domain,
+						types,
+						primaryType: 'CreateOrder',
+						message: values,
+					  });
+
+
+
+
+
+				  const hash = hashTypedData({ message:values, primaryType:'CreateOrder', types, domain: domain as any })
+
+				  console.log('hash', hash)
+
+
+				const valid = await publicClient.verifyTypedData({
+					address: eth_address,
+					domain: domain,
+					types: types,
+					primaryType: 'CreateOrder',
+					message: values,
+					signature
+				});
+
+        				console.log({
+						account:eth_address,
+						domain,
+						types,
+						primaryType: 'CreateOrder',
+						message: values,
+            signature,
+            hash,
+            valid
+					  })
+            setSign({
+						account:eth_address,
+						domain,
+						types,
+						primaryType: 'CreateOrder',
+						message: values,
+            signature,
+            hash,
+            valid
+					  })
+            } catch (err) {
+              console.log('err', err)
+            }
+  }
   useEffect(() => {
     if (account?.address && morpherTradeSDK) {
       getOrders();
@@ -92,6 +259,7 @@ export function TradeHistoryScreen() {
             </div>
           </div>
         </div>
+
 
         <div id="marketValue" className="flex flex-col text-left">
           <p className="text-lg font-bold text-right">
@@ -126,6 +294,13 @@ export function TradeHistoryScreen() {
           className="pl-10"
         />
       </div>
+
+      {sign && (
+        <textarea style={{borderWidth: 1, width: '100%', height: '100px'}} >{JSON.stringify(sign || {})}</textarea> 
+      )}
+      <br></br>
+      
+      <Button onClick={testTrade}>test</Button>
 
       <div id="order-list" className="mt-4">
         {orders &&

@@ -99,6 +99,22 @@
             "MARKET_SPLIT": "Bei der Verarbeitung der Markt-Split-Informationen für diese Order ist ein Fehler aufgetreten. Bitte überprüfen Sie den Markt und versuchen Sie es später erneut.",
             "ORDER_TIMEOUT": "Zeitüberschreitung bei der Ordererstellung. Die Order wurde nicht rechtzeitig erstellt. Bitte versuchen Sie es später erneut.",
             "EXECUTION_ERROR": "Ordererstellung fehlgeschlagen. Bitte versuchen Sie es später erneut."
+        },
+        "onboarding": {
+            "WELCOME_TITLE": "Willkommen bei Morpher",
+            "WELCOME_SUBTITLE": "Fordere die Wall Street mit 1 $ heraus. Investiere an einem Ort in Hunderte von Märkten – Apple, Bitcoin, Gold, Doge und vieles mehr.",
+            "STEP1_TITLE": "Wähle, was du handeln möchtest",
+            "STEP1_DESCRIPTION": "Durchsuche Kategorien oder suche nach Name oder Symbol. Von Apple über Ethereum bis hin zu Gold, hier findest du alles.",
+            "STEP2_TITLE": "Gehe Long oder Short",
+            "STEP2_ITEM1": "Gib ein, wie viel du handeln möchtest",
+            "STEP2_ITEM2": "Wähle Long (Kaufen) oder Short (Verkaufen)",
+            "STEP2_ITEM3": "Passe den Hebel an, wenn du mehr Risiko möchtest",
+            "STEP2_ITEM4": "Bestätige deinen Trade",
+            "STEP3_TITLE": "Behalte die Kontrolle",
+            "STEP3_DESCRIPTION": "Sieh alle deine Trades im Portfolio.<br/>Schließe eine Position jederzeit oder eröffne eine neue.",
+            "START_TRADING_BUTTON": "Mit dem Handeln beginnen",
+            "LEARN_MORE_BUTTON": "Um mehr zu erfahren, sieh dir den",
+            "MORPHER_GUIDE": "Morpher-Leitfaden"
         }
     }
 }
