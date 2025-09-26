@@ -33,7 +33,6 @@ export function TradeSuccessScreen() {
 
   useEffect(() => {
 
-    let usdValue = ''
 
     let orderAmout = 0;
     let orderAmoutUsd = 0;
