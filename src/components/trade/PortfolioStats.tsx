@@ -1,6 +1,5 @@
 import * as React from "react";
 import { usePortfolioStore } from "@/store/portfolio";
-import { Card, CardContent } from "../ui/card";
 import { Loader2Icon } from "lucide-react";
 import { tokenValueFormatter, usdFormatter } from "morpher-trading-sdk";
 import { useTranslation } from "react-i18next";
