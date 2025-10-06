@@ -207,7 +207,7 @@ export function PortfolioSummary() {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b pb-4">
         <div className="flex items-center gap-4">
           <img
             src={profileImage}

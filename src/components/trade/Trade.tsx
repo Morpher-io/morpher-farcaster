@@ -314,9 +314,9 @@ export function Trade() {
               setSelectedCurrency(value as TCurrency);
               setInputMode("token");
             }}
-            className="w-full"
+            className="w-full  "
           >
-            <TabsList className="w-full rounded-b-none border">
+            <TabsList className="w-full rounded-b-none border-1 border-b-0  border-[var(--primary)] pt-2 pl-2 pr-2">
               {currencyList &&
                 Object.entries(currencyList).map(([currency, details]) => (
                   <TabsTrigger
@@ -328,7 +328,7 @@ export function Trade() {
                     <img
                       src={`/assets/icons/${currency}.svg`}
                       alt={`${currency} logo`}
-                      className="h-6 w-6 mb-1"
+                      className="h-6 w-6 mb-0"
                     />
                     <div className="flex flex-col">
                     <span className="font-semibold">{currency}</span>
@@ -344,15 +344,15 @@ export function Trade() {
             </TabsList>
           </Tabs>
           <div className="space-y-2">
-            <div className="bg-muted p-3 rounded-lg rounded-t-none border border-t-0">
-              <div className="flex justify-between items-center gap-2">
+            <div className="bg-muted p-3 rounded-lg rounded-t-none border border-t-0 border-[var(--primary)]">
+              <div className="flex justify-between items-center gap-2  border-t-1 pt-4 border-b-1 pb-4 mb-2">
                 <div className="flex-1 min-w-0">
                   <Input
                     placeholder={"0.00 " + selectedCurrency}
                     value={inputValue}
                     type="number"
                     onChange={handleInputChange}
-                    className="w-full h-auto border-none bg-transparent p-0 text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-primary placeholder:opacity-60"
+                    className="w-full h-auto border-none bg-transparent p-0 text-4xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-primary placeholder:opacity-60"
                   />
                 </div>
                 {selectedCurrency !== "USDC" && (
@@ -412,7 +412,7 @@ export function Trade() {
                     variant="outline"
                     size="sm"
                     className={cn(
-                      "text-xs rounded-sm h-8",
+                      "text-xs max-h-7 rounded-sm h-8",
                       value < 0
                         ? "text-secondary hover:bg-secondary/10"
                         : "text-primary hover:bg-primary/10"
@@ -427,10 +427,10 @@ export function Trade() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs h-8 rounded-sm font-bold text-white bg-[var(--blue)] hover:bg-[var(--blue)]  hover:opacity-70 transition-opacity hover:text-white"
+                className="max-h-7 text-xs h-8 rounded-sm font-bold text-white bg-[var(--primary)] hover:bg-[var(--blue)]  hover:opacity-70 transition-opacity hover:text-white"
                 onClick={setMaxAmount}
               >
-                Max <Rocket />
+                Max 
               </Button>
             </div>
               

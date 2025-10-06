@@ -39,11 +39,13 @@ export function TradeTerminal() {
 
 
   return (
-    <div className="mt-5 mx-4 mb-6 flex flex-col gap-4 bg-white h-full">
+    <div className="mt-5 mx-4 mb-6 flex flex-col gap-3 bg-white h-full">
+
       <PortfolioSummary />
-      <div className="h-px bg-gray-200 my-2" />
+      <h1 className="font-bold text-base mb-0">{t("START_TRADING_NOW")}</h1>
+      <MarketSelector />      
+      {/* <div className="h-px bg-gray-200 my-2" /> */}
       <PortfolioStats />
-      <MarketSelector />
 
       <MarketSuggestions />
       {positionList &&

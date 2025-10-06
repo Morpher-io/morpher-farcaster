@@ -358,7 +358,7 @@ export function MarketSelector() {
                 livePrice ? livePrice[selectedMarket.market_id] : undefined
               )
             ) : (
-              <span className="text-foreground flex items-center font-semibold">
+              <span className="text-foreground flex items-center font-semibold text-sm">
                 <Search className="mr-2 h-8 w-8" color="var(--primary)" />
                 {t("SEARCH_MARKETS")}
               </span>

@@ -74,23 +74,25 @@ export function PortfolioStats() {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2">
-      {stats.map((stat) => (
-        <Card key={stat.title} className="p-2">
-          <CardContent className="flex flex-col items-center  p-1 text-center h-full justify-between">
-            <p className="font-semibold text-muted-foreground text-xs leading-tight mb-1">{stat.title}</p>
-            <div className="">
+    <div>
+      <h1 className="font-bold text-base mb-0 mt-2">{t("INFO")}</h1>
+    
+    <div className="border-1 border-[var(--primary)] rounded-md p-4  mt-2">
+      {stats.map((stat, index) => (
+        <div className={`flex justify-between ${index !== 2 ? 'border-b pb-3' : ''} ${index !== 0 ? 'pt-4' : ''} `} >
+<p className="font-semibold text-foreground text-xs leading-tight mb-1">{stat.title}</p>
+            <div className="min-w-22">
               {stat.data ? (
                 <>
-                  <p className={`font-semibold text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-[var(--dark)]"}`}>
+                  <p className={`font-semibold text-sm mt-0 ${stat.data.isPositive === false ? "text-secondary" : "text-[var(--dark)]"}`}>
                     {stat.data.isPositive ? "+" : ""}$ {usdFormatter(stat.data.valueUsd)}
                     {isFinite(stat.data.percent) && (
-                      <span className="text-xs ml-1">
+                      <span className="text-sm ml-1">
                         <br />({stat.data.percent.toFixed(2)}%)
                       </span>
                     )}
                   </p>
-                  <p className={`text-xs mt-1 ${stat.data.isPositive === false ? "text-secondary" : "text-[var(--dark)]"}`}>
+                  <p className={`text-sm  mt-0 ${stat.data.isPositive === false ? "text-secondary" : "text-[var(--dark)]"}`}>
                     {stat.data.isPositive ? "+" : ""}{tokenValueFormatter(stat.data.valueMph)} MPH
                   </p>
                 </>
@@ -98,9 +100,11 @@ export function PortfolioStats() {
                 <p className="font-bold text-baseline">{stat.value}</p>
               )}
             </div>
-          </CardContent>
-        </Card>
+        </div>
+
       ))}
+
+    </div>
     </div>
   );
 }

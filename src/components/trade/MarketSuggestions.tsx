@@ -148,7 +148,7 @@ export function MarketSuggestions() {
           className={`flex select-none gap-2 overflow-x-auto p-2 no-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
         >
           {sortedTrendingMarkets.map((market: any) => (
-            <Card key={market.market_id} className="p-2 cursor-pointer hover:bg-accent flex-shrink-0 w-32" onClick={() => handleSelectMarket(market)}>
+            <Card key={market.market_id} className="p-2 cursor-pointer hover:bg-accent flex-shrink-0 w-32 border-1 border-[var(--primary)]" onClick={() => handleSelectMarket(market)}>
               <CardContent className="flex flex-col items-center justify-center p-1 text-center">
                   <img
                       src={`data:image/svg+xml;base64,${market.logo_image}`}
