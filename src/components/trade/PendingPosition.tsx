@@ -81,7 +81,7 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
           text = t('TRADE_CLOSE_SHARE', {market: selectedMarket?.name || order?.market_id, returnPercentage: 0})
         }
   
-        const embeds:[string] = [`https://farcaster.xyz/miniapps/dWezHCjv5UqF/morpher`];
+        const embeds:[string] = [`https://farcaster.morpher.com`];
   
         await sdk.actions.composeCast({
           text,
