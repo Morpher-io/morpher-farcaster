@@ -4,15 +4,14 @@ import { Slider } from "@/components/ui/slider"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { usePublicClient, useWalletClient, useAccount } from "wagmi"
 import { useMarketStore } from "@/store/market"
 import { usePortfolioStore } from "@/store/portfolio"
-import { Loader2Icon, Info, TrendingUp, TrendingDown, RefreshCwIcon } from "lucide-react"
+import { Loader2Icon, TrendingUp, TrendingDown, RefreshCwIcon, ChevronDown } from "lucide-react"
 import {
   TradeCallback,
   TCurrency,
@@ -31,6 +30,7 @@ import { useTranslation } from "react-i18next";
 export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
   const [balanceRefreshing, setBalanceRefreshing] = React.useState(false);
+  const [isDescriptionOpen, setIsDescriptionOpen] = React.useState(false);
   
   const [tradeError, setTradeError] = React.useState<string | undefined>(
     undefined
@@ -259,7 +259,7 @@ export function Trade() {
           tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10**(currencyDetails.decimals || 18)));
       }
       
-      morpherTradeSDK.openPosition({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete })
+      morpherTradeSDK.openPosition({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete, gaslessOverride: true })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);
@@ -282,30 +282,48 @@ export function Trade() {
         </div>
       ) : (
         <div className="">
-          <div className="flex justify-between">
-          <div className="flex items-center mb-2">
-            <Label className="text-lg font-bold ">{t('TRADE_AMOUNT')}</Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="ml-1.5">
-                  <Info className="h-4 w-4 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>
-                    {t('TRADE_AMOUNT_DESCRIPTION', {market: selectedMarket?.name || "this market" })}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-          </div>
-          {!balanceRefreshing && (
-            <div className="cursor-pointer" onClick={() => refreshBalance()}>
-              <RefreshCwIcon width="18" />
+          <Collapsible
+            open={isDescriptionOpen}
+            onOpenChange={setIsDescriptionOpen}
+            className="w-full"
+          >
+            <div className="flex justify-between">
+              <div className="flex items-center mb-2">
+                <Label className="text-lg font-bold ">{t('TRADE_AMOUNT')}</Label>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="icon" className="ml-1.5 h-6 w-6">
+                    <ChevronDown
+                      className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+                        isDescriptionOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
+              {!balanceRefreshing && (
+                <div className="cursor-pointer" onClick={() => refreshBalance()}>
+                  <RefreshCwIcon width="18" />
+                </div>
+              )}
             </div>
-          
-          )}
-          </div>
+            <CollapsibleContent className="bg-[var(--warning)] p-3 rounded-lg mb-4">
+              <div className="flex items-start gap-2">
+                <img
+                  src={`/assets/icons/MPH.svg`}
+                  alt={`Morpher Logo`}
+                  className="w-8"
+                />
+                <p
+                  className="text-sm text-muted-foreground"
+                  dangerouslySetInnerHTML={{
+                    __html: t("TRADE_AMOUNT_DESCRIPTION", {
+                      market: selectedMarket?.name || "this market",
+                    }),
+                  }}
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
           
           
           <Tabs

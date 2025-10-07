@@ -86,7 +86,7 @@
         "SHORT": "Short",
         "LEVERAGE": "Leverage",
         "SHORT_DESCRIPTION": "You profit if the price of {{market}} goes down.",
-        "TRADE_AMOUNT_DESCRIPTION": "You always invest into {{market}} with MPH. You choose the amount of MPH you want to invest and this will be placed into a position. If you invest with ETH or USDC then the amount selected will be converted using uniswap to MPH before investing transparently via our Morpher Smart Contracts. Only invest what you can afford to loose, trade responsibly.",
+        "TRADE_AMOUNT_DESCRIPTION": "You can invest in {{market}} right here using MPH, that’s the token used for all trades on Morpher.<br /><br />Just decide how much you want to put in, and that becomes your <b>position</b>.<br /><br />If you have <b>ETH</b> or <b>USDC</b> instead, no worries! We’ll convert it to <b>MPH</b> for you before finishing the trade.  Everything happens automatically on Morpher.<br /><br />And remember: only invest what you can afford to lose. <br /><b>Trade smart</b> and <b>stay safe</b>. ",
         "CONNECTING_WALLET": "Connecting Wallet",
         "LEV_HEAD" : "Leverage Impact",
         "LEV_DESCRIPTION": "Leverage multiplies both profits and losses.",

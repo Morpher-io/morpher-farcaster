@@ -67,7 +67,7 @@ export function ClosePosition() {
     // }
 
 
-    morpherTradeSDK.closePosition({ account, walletClient: walletClient as any, publicClient, market_id: selectedPosition?.market_id || '', closePercentage:closePercentage || 0, callback: tradeComplete })
+    morpherTradeSDK.closePosition({ account, walletClient: walletClient as any, publicClient, market_id: selectedPosition?.market_id || '', closePercentage:closePercentage || 0, callback: tradeComplete, gaslessOverride: true })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);

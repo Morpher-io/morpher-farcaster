@@ -108,6 +108,7 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
         order_id: marketData?.pending_order_id,
         market_id: marketData?.market_id,
         callback: cancelComplete,
+        gaslessOverride: true
       });
     } catch (err: any) {
       console.error("Error executing trade:", err);
