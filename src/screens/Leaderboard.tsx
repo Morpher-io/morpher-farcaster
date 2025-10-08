@@ -24,7 +24,7 @@ export function LeaderboardScreen() {
   const account = useAccount();
   const { getLeaderboard, leaderboard,  } = usePortfolioStore();
   const [filter] = useState("");
-  const [type, setType]= useState<'returns' | 'order'>('returns');
+  const [type, setType]= useState<'returns' | 'order'>('order');
   let navigate = useNavigate();
   const { morpherTradeSDK } = useMarketStore();
   const [selectedEntry, setSelectedEntry] = useState<TLeaderBoard>();
@@ -33,7 +33,7 @@ export function LeaderboardScreen() {
   const [startDate, setStartDate] = useState<string>('');
 
   useEffect(() => {
-    if (type == 'returns' && leaderboard && leaderboard[type] && leaderboard[type].length > 0)
+    if (type == 'order' && leaderboard && leaderboard[type] && leaderboard[type].length > 0)
       setStartDate((new Date(Number(leaderboard[type][0].leaderboard_start_date))).getDate() + ' ' + monthNames[(new Date(Number(leaderboard[type][0].leaderboard_start_date))).getMonth()] )
     else 
       setStartDate('')
@@ -147,18 +147,29 @@ export function LeaderboardScreen() {
             <p className="text-base truncate">{displayName}</p>
             {type == "order" ? (
               <p className=" text-xs">
-                <span className={(entry.returns || 0) >= 0 ? "text-primary" : "text-secondary"}>{value}</span> on {entry.market_name}
+                <span className={(entry.returns || 0) >= 0 ? "text-primary" : "text-secondary"}>{value}</span> {t('SINCE')} {startDate}
               </p>
             ) : (
               <p className=" text-xs">
-                <span className={(entry.returns || 0) >= 0 ? "text-primary" : "text-secondary"}>{value}</span> {t('IN_LAST_30_DAYS')} {startDate}
+                <span className={(entry.returns || 0) >= 0 ? "text-primary" : "text-secondary"}>{value}</span> {t('IN_LAST_30_DAYS')} 
               </p>
             )}
           </div>
         </div>
 
         {type == "order" ? (
-          <div id="userValue" className="flex flex-col text-left">
+            <div id="userValue" className="flex flex-col text-left">
+            {entry.eth_address === account?.address?.toLowerCase() ? (
+              <div className="text-xs font-normal text-right bg-[var(--light-blue)] text-[var(--blue)] px-2 py-1 rounded-full">
+                🏅{t('YOU')}
+              </div>
+            ) : (
+              <div className="text-xs font-normal text-right bg-[var(--light-green)] text-primary cursor-pointer px-2 w-[100px] py-1 rounded-full" onClick={()=> { openPortfolio(entry) }}>
+                {t('SHOW_PORTFOLIO')}
+              </div>
+            )}
+          </div>
+/*           <div id="userValue" className="flex flex-col text-left">
             {entry.eth_address === account?.address?.toLowerCase() ? (
               <div className="text-xs font-normal text-right bg-[var(--light-blue)] text-[var(--blue)] px-2 py-1 rounded-full">
                 🏅{t('YOU')}
@@ -168,7 +179,7 @@ export function LeaderboardScreen() {
                 {t('SHOW_TRADE')}
               </div>
             )}
-          </div>
+          </div> */
         ) : (
           <div id="userValue" className="flex flex-col text-left">
             {entry.eth_address === account?.address?.toLowerCase() ? (
@@ -402,13 +413,14 @@ export function LeaderboardScreen() {
       <h2 className="text-lg font-bold mt-4 m-auto">{t('menu.LEADERBOARD')}</h2>
       
       <div className="flex m-auto gap-3 text-sm mt-4 font-bold">
-                <div className={type=='returns' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('returns')}>
-          {t('TOP_RETURNS')}
-          
-        </div>
         <div className={type=='order' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('order')}>
           {t('TOP_TRADES')}
         </div>
+        <div className={type=='returns' ? `text-primary underline underline-offset-4` : 'cursor-pointer'} onClick={() => setType('returns')}>
+          {t('TOP_RETURNS')}
+          
+        </div>
+
 
       </div>
       { startDate && (

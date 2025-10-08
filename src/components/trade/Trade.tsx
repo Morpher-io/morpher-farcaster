@@ -62,7 +62,8 @@ export function Trade() {
       setTradeComplete,
       orderUpdate,
       setClosePercentage,
-      refreshPortfolio
+      refreshPortfolio,
+      context
   } = usePortfolioStore()
 
   const account: any = useAccount();
@@ -258,8 +259,11 @@ export function Trade() {
       if (tradeAmount && Number(tradeAmount) > 0 && currencyDetails) {
           tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10**(currencyDetails.decimals || 18)));
       }
+
+    let gaslessOverride: boolean | undefined = undefined;
+    if (context?.clientFid === 309857) gaslessOverride = true;
       
-      morpherTradeSDK.openPosition({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete, gaslessOverride: true })
+      morpherTradeSDK.openPosition({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete, gaslessOverride })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);

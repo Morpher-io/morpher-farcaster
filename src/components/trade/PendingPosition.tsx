@@ -21,11 +21,13 @@ interface PendingPositionProps {
   marketData: TMarketDetail;
 }
 import { sdk } from "@farcaster/miniapp-sdk";
+import { usePortfolioStore } from "@/store/portfolio";
 
 export function PendingPosition({ marketData }: PendingPositionProps) {
   const { t } = useTranslation();
   
   const { morpherTradeSDK, order, setOrder, selectedMarket } = useMarketStore();
+  const { context } = usePortfolioStore();
 
   const account: any = useAccount();
   const [closeExecuting, setCloseExecuting] = useState(false);
@@ -101,6 +103,10 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
         return;
       }
 
+      
+    let gaslessOverride: boolean | undefined = undefined;
+    if (context?.clientFid === 309857) gaslessOverride = true;
+
       morpherTradeSDK.cancelOrder({
         account,
         walletClient: walletClient as any,
@@ -108,7 +114,7 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
         order_id: marketData?.pending_order_id,
         market_id: marketData?.market_id,
         callback: cancelComplete,
-        gaslessOverride: true
+        gaslessOverride
       });
     } catch (err: any) {
       console.error("Error executing trade:", err);

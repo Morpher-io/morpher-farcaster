@@ -27,9 +27,11 @@ export function ClosePosition() {
     setClosePercentage,
     selectedPosition,
     orderUpdate,
-    setSelectedPosition
+    setSelectedPosition,
+    context
   } = usePortfolioStore();
   const { morpherTradeSDK,   marketData } = useMarketStore()
+
   const [tradeExecuting, setTradeExecuting] = useState(false);
   const [tradeError, setTradeError] = useState<string | undefined>(undefined);
   const account: any = useAccount();
@@ -67,7 +69,11 @@ export function ClosePosition() {
     // }
 
 
-    morpherTradeSDK.closePosition({ account, walletClient: walletClient as any, publicClient, market_id: selectedPosition?.market_id || '', closePercentage:closePercentage || 0, callback: tradeComplete, gaslessOverride: true })
+
+    let gaslessOverride: boolean | undefined = undefined;
+    if (context?.clientFid === 309857) gaslessOverride = true;
+
+    morpherTradeSDK.closePosition({ account, walletClient: walletClient as any, publicClient, market_id: selectedPosition?.market_id || '', closePercentage:closePercentage || 0, callback: tradeComplete, gaslessOverride })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);
