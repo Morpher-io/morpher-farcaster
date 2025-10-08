@@ -90,7 +90,7 @@ export function LeaderboardScreen() {
     setPortfolio({position_count, total_value, types })
   }
 
-  const openTrade = async (entry: TLeaderBoard) => {
+  /* const openTrade = async (entry: TLeaderBoard) => {
     setSelectedEntry(entry)
     if (!entry.order_id) {
       return
@@ -103,7 +103,7 @@ export function LeaderboardScreen() {
     if (orders && orders.length > 0) {
       setOrder(orders[0]);
     }
-  }
+  } */
 
   const followUser = () => {
     if (selectedEntry?.id)
