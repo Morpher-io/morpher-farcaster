@@ -138,14 +138,14 @@ export function PortfolioSummary() {
 
     if (order_rank) {
       return order_rank.toString()
+    } else {
+      return ''
     }
 
-
-    let returns_rank = portfolio?.returns_rank && portfolio?.returns_rank > 0 ? portfolio?.returns_rank : 9999999
+    // only show leaderboard rank for now
+    // let returns_rank = portfolio?.returns_rank && portfolio?.returns_rank > 0 ? portfolio?.returns_rank : undefined
     
-
-  
-    return (returns_rank || '').toString()
+    // return (returns_rank || '').toString()
     
 
   }, [portfolio])
