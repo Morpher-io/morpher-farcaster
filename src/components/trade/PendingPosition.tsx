@@ -21,13 +21,11 @@ interface PendingPositionProps {
   marketData: TMarketDetail;
 }
 import { sdk } from "@farcaster/miniapp-sdk";
-import { usePortfolioStore } from "@/store/portfolio";
 
 export function PendingPosition({ marketData }: PendingPositionProps) {
   const { t } = useTranslation();
   
   const { morpherTradeSDK, order, setOrder, selectedMarket } = useMarketStore();
-  const { context } = usePortfolioStore();
 
   const account: any = useAccount();
   const [closeExecuting, setCloseExecuting] = useState(false);

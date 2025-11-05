@@ -27,8 +27,7 @@ export function ClosePosition() {
     setClosePercentage,
     selectedPosition,
     orderUpdate,
-    setSelectedPosition,
-    context
+    setSelectedPosition
   } = usePortfolioStore();
   const { morpherTradeSDK,   marketData } = useMarketStore()
 

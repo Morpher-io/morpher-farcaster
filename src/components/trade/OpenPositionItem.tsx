@@ -371,17 +371,17 @@ export function OpenPositionItem({ position, showClose }: OpenPositionItemProps)
     Number(protectionAmount) > 0
   ) {
     const protAmountNum = Number(protectionAmount);
-    const entryPrice = Number(position.average_price) / 10 ** 8;
+    // const entryPrice = Number(position.average_price) / 10 ** 8;
 
-    let pnlRatio = 0;
-    if (position.direction === "long") {
-      pnlRatio = protAmountNum / entryPrice - 1;
-    } else {
-      // short
-      if (protAmountNum > 0) {
-        pnlRatio = entryPrice / protAmountNum - 1;
-      }
-    }
+    // let pnlRatio = 0;
+    // if (position.direction === "long") {
+    //   pnlRatio = protAmountNum / entryPrice - 1;
+    // } else {
+    //   // short
+    //   if (protAmountNum > 0) {
+    //     pnlRatio = entryPrice / protAmountNum - 1;
+    //   }
+    // }
         let result = 0;
     let limit_val = 0;
 
