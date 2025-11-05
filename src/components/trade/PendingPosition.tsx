@@ -105,9 +105,9 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
 
       
     let gaslessOverride: boolean | undefined = undefined;
-    if (context?.clientFid === 309857) gaslessOverride = true;
+    // if (context?.clientFid === 309857) gaslessOverride = true;
 
-      morpherTradeSDK.cancelOrder({
+    morpherTradeSDK.cancelOrder({
         account,
         walletClient: walletClient as any,
         publicClient,

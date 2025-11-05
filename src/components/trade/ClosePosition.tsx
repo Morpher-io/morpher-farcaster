@@ -54,26 +54,26 @@ export function ClosePosition() {
 
   const executeTrade = () => {
     try {
-    setTradeError(undefined)
-    if (tradeExecuting) {
-      return
-    }
-    setTradeExecuting(true)
+      setTradeError(undefined)
+      if (tradeExecuting) {
+        return
+      }
+      setTradeExecuting(true)
 
-    // let currencyDetails = currencyList?.[selectedCurrency || 'ETH']
+      // let currencyDetails = currencyList?.[selectedCurrency || 'ETH']
 
-    // let tradeAmountFormatted = 0n;
+      // let tradeAmountFormatted = 0n;
 
-    // if (tradeAmount && Number(tradeAmount) > 0 && currencyDetails) {
-    //     tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10**(currencyDetails.decimals || 18)));
-    // }
+      // if (tradeAmount && Number(tradeAmount) > 0 && currencyDetails) {
+      //     tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10**(currencyDetails.decimals || 18)));
+      // }
 
 
 
-    let gaslessOverride: boolean | undefined = undefined;
-    if (context?.clientFid === 309857) gaslessOverride = true;
+      let gaslessOverride: boolean | undefined = undefined;
+      // if (context?.clientFid === 309857) gaslessOverride = true;
 
-    morpherTradeSDK.closePosition({ account, walletClient: walletClient as any, publicClient, market_id: selectedPosition?.market_id || '', closePercentage:closePercentage || 0, callback: tradeComplete, gaslessOverride })
+      morpherTradeSDK.closePosition({ account, walletClient: walletClient as any, publicClient, market_id: selectedPosition?.market_id || '', closePercentage:closePercentage || 0, callback: tradeComplete, gaslessOverride })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);

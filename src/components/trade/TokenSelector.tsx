@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronsUpDown } from "lucide-react"
-import { usePortfolioStore } from "@/store/portfolio";
+import { TCurrencyList, usePortfolioStore } from "@/store/portfolio";
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -35,34 +35,52 @@ export function TokenSelector() {
     selectedCurrencyDetails, 
     setSelectedCurrencyDetails,
     currencyList,
+    context
   } = usePortfolioStore();
 
+  const [activeCurrencyList, setActiveCurrencyList] = useState<TCurrencyList | undefined>(undefined)
+
+
+
+
+  useEffect(() => {
+    if (currencyList && context) {
+
+      if (context?.clientFid === 309857) {
+        delete currencyList.USDC
+      }
+      setActiveCurrencyList(currencyList)
+    }
+
+  }, [currencyList, context ])
 
 
       
   useEffect(() => {
-    if (selectedCurrency && currencyList) {
-      setSelectedCurrencyDetails(currencyList[selectedCurrency])
+    if (selectedCurrency && activeCurrencyList) {
+      setSelectedCurrencyDetails(activeCurrencyList[selectedCurrency])
     }
 
-  }, [selectedCurrency, currencyList, setSelectedCurrencyDetails])
+  }, [selectedCurrency, activeCurrencyList, setSelectedCurrencyDetails])
     
   useEffect(() => {
-    if (currencyList) {
-      let currencyWithHighestUsd = currencyList.ETH
-      if ((currencyList.MPH?.usd || 0) > (currencyWithHighestUsd?.usd  || 0)) {
-        currencyWithHighestUsd = currencyList.MPH
+    if (activeCurrencyList) {
+      let currencyWithHighestUsd = activeCurrencyList.ETH
+      if ((activeCurrencyList.MPH?.usd || 0) > (currencyWithHighestUsd?.usd  || 0)) {
+        currencyWithHighestUsd = activeCurrencyList.MPH
       }
 
-      if ((currencyList.USDC?.usd || 0) > (currencyWithHighestUsd?.usd  || 0)) {
-        currencyWithHighestUsd = currencyList.USDC
+      if ((activeCurrencyList.USDC?.usd || 0) > (currencyWithHighestUsd?.usd  || 0)) {
+        currencyWithHighestUsd = activeCurrencyList.USDC
       }
 
       if (currencyWithHighestUsd) {
         setSelectedCurrency(currencyWithHighestUsd.symbol);
       }
     }
-  }, [currencyList, setSelectedCurrency]);
+
+
+  }, [activeCurrencyList, setSelectedCurrency, context]);
 
   return (
     <Card>
@@ -95,7 +113,7 @@ export function TokenSelector() {
                 <CommandList>
                   <CommandEmpty>No token found.</CommandEmpty>
                   <CommandGroup>
-                    {currencyList && Object.entries(currencyList).map(([currency, details]) => (
+                    {activeCurrencyList && Object.entries(activeCurrencyList).map(([currency, details]) => (
                       <CommandItem
                         key={currency}
                         value={currency}

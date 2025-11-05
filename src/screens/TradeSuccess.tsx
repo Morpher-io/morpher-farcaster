@@ -171,7 +171,7 @@ export function TradeSuccessScreen() {
             )}
             <Button
               variant="outline"
-              className="w-full text-[var(--primary)] border-[var(--primary)] mt-4 mb-4 rounded-full "
+              className="w-full text-[var(--primary)] border-[var(--primary)] mt-4 mb-4 rounded-lg "
               onClick={() => closeTradeComplete()}
             >
               {t('TRADE_AGAIN_BUTTON')}
