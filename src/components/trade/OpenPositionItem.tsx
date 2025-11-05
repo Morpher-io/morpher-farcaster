@@ -111,8 +111,6 @@ export function OpenPositionItem({ position, showClose }: OpenPositionItemProps)
       return
     }
     
-
-    
     if (livePrice && livePrice[market.market_id]) {
       setCurrentPrice(livePrice[market.market_id])
     } else {
@@ -120,7 +118,7 @@ export function OpenPositionItem({ position, showClose }: OpenPositionItemProps)
     }
 
 
-  }, [livePrice, market])
+  }, [livePrice[market?.market_id || 'NONE'] , market ])
 
   const pnl = Number(position.total_return || 0);
   const pnlPercent = Number(position.total_return_percent || 0) * 100;

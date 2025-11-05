@@ -20,7 +20,7 @@ interface MarketState {
   setSelectedMarketId: (marketId: string) => void;
   selectedMarket?: TMarket;
   setSelectedMarket: (market?: TMarket) => void;
-  livePrice?: {[market_id:string]: number};
+  livePrice: {[market_id:string]: number};
   setLivePrice: (market_id: string, close?: number) => void;
   marketData?: MarketDetail;
   setMarketData: (marketData?: MarketDetail) => void;
@@ -49,13 +49,15 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   openSearch: false,
   setOpenSearch: (open) => set({ openSearch: open }),
 
-    setSelectedMarket: (market) => {
+  setSelectedMarket: (market) => {
     set({ selectedMarket: market });
     if (market?.market_id) {
       let livePrice = get().livePrice || {}
     
-      livePrice[market.market_id] = market?.close;
-      set({ livePrice })
+      if (!livePrice[market.market_id]) {
+        livePrice[market.market_id] = market?.close;
+        set({ livePrice })
+      }
     }
     
     if (market) {
@@ -78,6 +80,7 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   },
   livePrice: {},
   setLivePrice: (market_id, close) => {
+    
     if (market_id && close) {
       let livePrice = get().livePrice || {}
   

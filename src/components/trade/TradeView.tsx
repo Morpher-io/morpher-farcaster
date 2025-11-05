@@ -91,7 +91,7 @@ export function TradeView() {
       }
   
   
-    }, [livePrice, market])
+    }, [livePrice[market?.market_id || ''], market])
 
   
   const setProtectionAmountPercent = (percent: number) => {
@@ -114,9 +114,7 @@ export function TradeView() {
       setMarketPrice(0)
       return
     }
-    
-
-    
+        
     if (livePrice && livePrice[marketData.market_id]) {
       setMarketPrice(livePrice[marketData.market_id])
     } else {
@@ -124,7 +122,7 @@ export function TradeView() {
     }
 
 
-  }, [livePrice, marketData])
+  }, [livePrice[marketData?.market_id || ''], marketData])
 
   const open = !!selectedMarketId;
 
@@ -233,11 +231,22 @@ export function TradeView() {
 
   const formattedChartData = React.useMemo(() => {
     if (!chartData) return [];
-    return chartData.map(d => ({
-      timestamp: d[0] * 1000,
+    const historicalData = chartData.map(d => ({
+      timestamp: d[0],
       value: d[4] // close price
     }));
-  }, [chartData]);
+
+    if (marketPrice > 0) {
+      return [
+        ...historicalData,
+        {
+          timestamp: Date.now(),
+          value: marketPrice
+        }
+      ];
+    }
+    return historicalData;
+  }, [chartData, marketPrice]);
 
   const isIncreasing = React.useMemo(() => {
     if (formattedChartData.length < 2) return true;
@@ -396,7 +405,7 @@ export function TradeView() {
       const isPositive = change >= 0;
 
       const timeFormat = timeRange === "1D" ? "p" : "PP";
-      const dateText = formatDate(new Date(data.timestamp), timeFormat);
+      const dateText = formatDate(new Date(Number(data.timestamp)), timeFormat);
 
       return (
         <div className="p-2 bg-background border rounded-lg shadow-lg text-sm">
@@ -702,7 +711,7 @@ export function TradeView() {
 
                 {marketData.pending_order_id ? (
                   <PendingPosition marketData={marketData} />
-                ) : marketData.position_id && selectedPosition ? (
+                ) : marketData.position_id && selectedPosition && (
                   <>
                     {showProtectionForm ? (
                       <div className="pb-4 px-2 p-3 rounded-lg border-1 border-[var(--primary)] mb-4 bg-muted">
@@ -1044,9 +1053,10 @@ export function TradeView() {
                     </Card>)}
                   </>
 
-                ) : (
-                  <Trade />
                 )}
+
+                <Trade />
+                
               </div>
             )
           )}

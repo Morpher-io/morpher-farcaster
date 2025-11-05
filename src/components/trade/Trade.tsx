@@ -31,13 +31,16 @@ export function Trade() {
   const [tradeExecuting, setTradeExecuting] = React.useState(false);
   const [balanceRefreshing, setBalanceRefreshing] = React.useState(false);
   const [isDescriptionOpen, setIsDescriptionOpen] = React.useState(false);
-  
+
   const [tradeError, setTradeError] = React.useState<string | undefined>(
+    undefined
+  );
+  const [directionError, setDirectionError] = React.useState<string | undefined>(
     undefined
   );
   const [inputMode, setInputMode] = React.useState<"token" | "usd">("token");
 
-  const [timeoutTimer, setTimeoutTimer]  = React.useState<NodeJS.Timeout>();
+  const [timeoutTimer, setTimeoutTimer] = React.useState<NodeJS.Timeout>();
   const {
     selectedMarketId,
     morpherTradeSDK,
@@ -48,32 +51,48 @@ export function Trade() {
     setLeverage,
     marketData,
     livePrice,
-    
+
   } = useMarketStore();
   const {
-      tradeAmount,
-      setTradeAmount,
-      selectedCurrency,
-      setSelectedCurrency,
-      selectedCurrencyDetails, 
-      setSelectedCurrencyDetails,
-      currencyList,
-      loading,
-      setTradeComplete,
-      orderUpdate,
-      setClosePercentage,
-      refreshPortfolio,
-      context
+    tradeAmount,
+    setTradeAmount,
+    selectedCurrency,
+    setSelectedCurrency,
+    selectedCurrencyDetails,
+    setSelectedCurrencyDetails,
+    currencyList,
+    loading,
+    setTradeComplete,
+    orderUpdate,
+    setClosePercentage,
+    refreshPortfolio,
+    context,
+
+    selectedPosition,
+
   } = usePortfolioStore()
+
+  React.useEffect(() => {
+    if (selectedPosition && selectedPosition.market_id == selectedMarketId) {
+      if (tradeType !== selectedPosition.direction) {
+        setDirectionError(t('TRADE_DIRECTION', { trade_direction: tradeType, position_direction: selectedPosition.direction }))
+      } else {
+        setDirectionError('')
+      }
+    } else {
+      setDirectionError('')
+    }
+
+  }, [selectedPosition, tradeType])
 
   const account: any = useAccount();
   const { data: walletClient } = useWalletClient();
-  const publicClient:any = usePublicClient()
+  const publicClient: any = usePublicClient()
 
   const { t } = useTranslation();
 
   const [activeCurrencyList, setActiveCurrencyList] = React.useState<TCurrencyList | undefined>(undefined)
-   
+
   React.useEffect(() => {
     if (currencyList && context) {
 
@@ -83,22 +102,22 @@ export function Trade() {
       setActiveCurrencyList(currencyList)
     }
 
-  }, [currencyList, context ])
-    
+  }, [currencyList, context])
+
   React.useEffect(() => {
     if (selectedCurrency && activeCurrencyList) {
       setSelectedCurrencyDetails(activeCurrencyList[selectedCurrency])
     }
   }, [selectedCurrency, activeCurrencyList, setSelectedCurrencyDetails])
-    
+
   React.useEffect(() => {
     if (activeCurrencyList) {
       let currencyWithHighestUsd = activeCurrencyList.ETH
-      if ((activeCurrencyList.MPH?.usd || 0) > (currencyWithHighestUsd?.usd  || 0)) {
+      if ((activeCurrencyList.MPH?.usd || 0) > (currencyWithHighestUsd?.usd || 0)) {
         currencyWithHighestUsd = activeCurrencyList.MPH
       }
 
-      if ((activeCurrencyList.USDC?.usd || 0) > (currencyWithHighestUsd?.usd  || 0)) {
+      if ((activeCurrencyList.USDC?.usd || 0) > (currencyWithHighestUsd?.usd || 0)) {
         currencyWithHighestUsd = activeCurrencyList.USDC
       }
 
@@ -151,7 +170,7 @@ export function Trade() {
           setTradeAmount("");
           return;
         }
-        
+
         const tokenValue = numValue / exchangeRate;
         if (tokenValue > maxBalance) {
           tokenAmountStr = maxBalance.toString();
@@ -172,7 +191,7 @@ export function Trade() {
       setInputValue((tokenAmount * exchangeRate).toFixed(2));
     }
   };
-  
+
   const adjustTradeAmountByUsd = (usdAdjustment: number) => {
     const currentTokenAmount = Number(tradeAmount) || 0;
     if (exchangeRate <= 0) return;
@@ -182,7 +201,7 @@ export function Trade() {
     if (newTokenAmount < 0) newTokenAmount = 0;
     if (newTokenAmount > maxBalance) newTokenAmount = maxBalance;
 
-    
+
     updateAmount(Number(tokenValueFormatter(newTokenAmount)));
   };
 
@@ -202,9 +221,9 @@ export function Trade() {
 
   const clearTrade = () => {
     setTradeAmount('')
-            setClosePercentage(undefined)
-            setTradeType('long')
-            setLeverage([1])
+    setClosePercentage(undefined)
+    setTradeType('long')
+    setLeverage([1])
   }
 
   const refreshBalance = async () => {
@@ -212,7 +231,7 @@ export function Trade() {
 
     refreshPortfolio();
 
-    setTimeout(()=> {
+    setTimeout(() => {
       setBalanceRefreshing(false)
     }, 30000)
   }
@@ -226,7 +245,7 @@ export function Trade() {
           error = err_message
         }
       }
-      
+
       setTradeError(error || 'An error occurred while executing the trade.')
       setTradeComplete(false);
       setTradeExecuting(false)
@@ -241,20 +260,20 @@ export function Trade() {
     setTimeoutTimer(timer)
   }
 
-    React.useEffect(() => {
-      if (tradeExecuting) {
-        if (timeoutTimer) {
-          clearTimeout(timeoutTimer)
-          setTimeoutTimer(undefined)
-        }
-        setTimeout(() => {
-          clearTrade();
-          setTradeExecuting(false)
-        }, 1000)
+  React.useEffect(() => {
+    if (tradeExecuting) {
+      if (timeoutTimer) {
+        clearTimeout(timeoutTimer)
+        setTimeoutTimer(undefined)
       }
-      
-    }, [orderUpdate])
-  
+      setTimeout(() => {
+        clearTrade();
+        setTradeExecuting(false)
+      }, 1000)
+    }
+
+  }, [orderUpdate])
+
   const openPosition = () => {
     try {
       setTradeError(undefined)
@@ -267,13 +286,13 @@ export function Trade() {
 
       let tradeAmountFormatted = 0n;
       if (tradeAmount && Number(tradeAmount) > 0 && currencyDetails) {
-          tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10**(currencyDetails.decimals || 18)));
+        tradeAmountFormatted = BigInt(Math.round(Number(tradeAmount) * 10 ** (currencyDetails.decimals || 18)));
       }
 
       let gaslessOverride: boolean | undefined = undefined;
       // if (context?.clientFid === 309857) gaslessOverride = true;
-      
-      morpherTradeSDK.openPosition({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount:tradeAmountFormatted, callback: tradeComplete, gaslessOverride })
+
+      morpherTradeSDK.openPosition({ account, walletClient: walletClient as any, leverage: leverage[0] || 1, direction: tradeType, publicClient, market_id: selectedMarketId || '', currency: selectedCurrency || 'ETH', tradeAmount: tradeAmountFormatted, callback: tradeComplete, gaslessOverride })
     } catch (err: any) {
       console.error('Error executing trade:', err);
       setTradeExecuting(false);
@@ -307,9 +326,8 @@ export function Trade() {
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" size="icon" className="ml-1.5 h-6 w-6">
                     <ChevronDown
-                      className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-                        isDescriptionOpen ? "rotate-180" : ""
-                      }`}
+                      className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isDescriptionOpen ? "rotate-180" : ""
+                        }`}
                     />
                   </Button>
                 </CollapsibleTrigger>
@@ -338,8 +356,8 @@ export function Trade() {
               </div>
             </CollapsibleContent>
           </Collapsible>
-          
-          
+
+
           <Tabs
             value={selectedCurrency}
             onValueChange={(value) => {
@@ -355,7 +373,7 @@ export function Trade() {
                     key={currency}
                     value={currency}
                     disabled={!details.balance || BigInt(details.balance) === 0n}
-                    className={"flex-col h-auto " + (currency == selectedCurrency ? 'border-primary' : '') }
+                    className={"flex-col h-auto " + (currency == selectedCurrency ? 'border-primary' : '')}
                   >
                     <img
                       src={`/assets/icons/${currency}.svg`}
@@ -363,13 +381,13 @@ export function Trade() {
                       className="h-6 w-6 mb-0"
                     />
                     <div className="flex flex-col">
-                    <span className="font-semibold">{currency}</span>
-                    <span className="text-xs font-normal text-muted-foreground">
-                      {Number(details.balance || 0) > 0 ? tokenValueFormatter(
-                        Number(details.balance || 0) /
+                      <span className="font-semibold">{currency}</span>
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {Number(details.balance || 0) > 0 ? tokenValueFormatter(
+                          Number(details.balance || 0) /
                           10 ** (details.decimals || 1)
-                      ) : "0.00"}
-                    </span>
+                        ) : "0.00"}
+                      </span>
                     </div>
                   </TabsTrigger>
                 ))}
@@ -388,92 +406,92 @@ export function Trade() {
                   />
                 </div>
                 {selectedCurrency !== "USDC" && (
-                <ToggleGroup
-                  type="single"
-                  value={inputMode}
-                  onValueChange={(value) => {
-                    if (value) {
-                      setInputMode(value as "token" | "usd");
-                    }
-                  }}
-                  className="p-0.5 border bg-background"
-                  
-                >
-                  <ToggleGroupItem
-                    value="token"
-                    aria-label="Toggle token input"
-                    className="p-1.5 data-[state=on]:bg-primary/20"
+                  <ToggleGroup
+                    type="single"
+                    value={inputMode}
+                    onValueChange={(value) => {
+                      if (value) {
+                        setInputMode(value as "token" | "usd");
+                      }
+                    }}
+                    className="p-0.5 border bg-background"
+
                   >
-                    <img
-                      src={`/assets/icons/${selectedCurrency}.svg`}
-                      alt={`${selectedCurrency} logo`}
-                      className="h-5 w-5"
-                    />
-                  </ToggleGroupItem>
-                  
-                  <ToggleGroupItem
-                    value="usd"
-                    aria-label="Toggle USD input"
-                    className="p-1.5 data-[state=on]:bg-primary/20"
-                  >
-                    <img
-                      src="/assets/icons/USDC.svg"
-                      alt="USD logo"
-                      className="h-5 w-5"
-                    />
-                  </ToggleGroupItem>
-                </ToggleGroup>
+                    <ToggleGroupItem
+                      value="token"
+                      aria-label="Toggle token input"
+                      className="p-1.5 data-[state=on]:bg-primary/20"
+                    >
+                      <img
+                        src={`/assets/icons/${selectedCurrency}.svg`}
+                        alt={`${selectedCurrency} logo`}
+                        className="h-5 w-5"
+                      />
+                    </ToggleGroupItem>
+
+                    <ToggleGroupItem
+                      value="usd"
+                      aria-label="Toggle USD input"
+                      className="p-1.5 data-[state=on]:bg-primary/20"
+                    >
+                      <img
+                        src="/assets/icons/USDC.svg"
+                        alt="USD logo"
+                        className="h-5 w-5"
+                      />
+                    </ToggleGroupItem>
+                  </ToggleGroup>
                 )}
-                
+
               </div>
               <div className="grid grid-cols-5 gap-2 py-2">
-              {[
-                { label: "-$100", value: -100 },
-                { label: "-$10", value: -10 },
-                { label: "+$10", value: 10 },
-                { label: "+$100", value: 100 },
-              ].map(({ label, value }) => {
-                const currentUsdValue = (Number(tradeAmount) || 0) * exchangeRate;
-                const maxUsdValue = maxBalance * exchangeRate;
-                const isDisabled =
-                  value > 0
-                    ? currentUsdValue + value > maxUsdValue
-                    : currentUsdValue + value < 0;
-                return (
-                  <Button
-                    key={label}
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      "text-xs max-h-7 rounded-sm h-8",
-                      value < 0
-                        ? "text-secondary hover:bg-secondary/10"
-                        : "text-primary hover:bg-primary/10"
-                    )}
-                    onClick={() => adjustTradeAmountByUsd(value)}
-                    disabled={isDisabled || exchangeRate <= 0}
-                  >
-                    {label}
-                  </Button>
-                );
-              })}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="max-h-7 text-xs h-8 rounded-sm font-bold text-white bg-[var(--primary)] hover:bg-[var(--blue)]  hover:opacity-70 transition-opacity hover:text-white"
-                onClick={setMaxAmount}
-              >
-                Max 
-              </Button>
-            </div>
-              
+                {[
+                  { label: "-$100", value: -100 },
+                  { label: "-$10", value: -10 },
+                  { label: "+$10", value: 10 },
+                  { label: "+$100", value: 100 },
+                ].map(({ label, value }) => {
+                  const currentUsdValue = (Number(tradeAmount) || 0) * exchangeRate;
+                  const maxUsdValue = maxBalance * exchangeRate;
+                  const isDisabled =
+                    value > 0
+                      ? currentUsdValue + value > maxUsdValue
+                      : currentUsdValue + value < 0;
+                  return (
+                    <Button
+                      key={label}
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "text-xs max-h-7 rounded-sm h-8",
+                        value < 0
+                          ? "text-secondary hover:bg-secondary/10"
+                          : "text-primary hover:bg-primary/10"
+                      )}
+                      onClick={() => adjustTradeAmountByUsd(value)}
+                      disabled={isDisabled || exchangeRate <= 0}
+                    >
+                      {label}
+                    </Button>
+                  );
+                })}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="max-h-7 text-xs h-8 rounded-sm font-bold text-white bg-[var(--primary)] hover:bg-[var(--blue)]  hover:opacity-70 transition-opacity hover:text-white"
+                  onClick={setMaxAmount}
+                >
+                  Max
+                </Button>
+              </div>
+
               <div className="text-xs flex justify-between text-muted-foreground mt-1 px-1">
                 <span>
                   {inputMode === "token" && selectedCurrency !== "USDC"
                     ? `~ $${usdFormatter(usdValue)}`
                     : inputMode === "usd"
-                    ? `~ ${tokenValueFormatter(Number(tradeAmount) || 0)} ${selectedCurrency}`
-                    : ""}
+                      ? `~ ${tokenValueFormatter(Number(tradeAmount) || 0)} ${selectedCurrency}`
+                      : ""}
                 </span>
                 <span>
                   {tokenValueFormatter(maxBalance)} {selectedCurrency}
@@ -481,7 +499,7 @@ export function Trade() {
                 </span>
               </div>
             </div>
-            
+
           </div>
         </div>
       )}
@@ -513,22 +531,22 @@ export function Trade() {
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-      <div className={`text-xs text-foreground ${tradeType === "long" ? 'bg-[var(--primary-light)]' : 'bg-[var(--secondary-light)]' } p-3 rounded-md mb-4 space-y-2`}>
+      <div className={`text-xs text-foreground ${tradeType === "long" ? 'bg-[var(--primary-light)]' : 'bg-[var(--secondary-light)]'} p-3 rounded-md mb-4 space-y-2`}>
         {tradeType === "long" ? (
           <div className="flex items-start gap-2 bg-[var(--primary-light)]">
             <TrendingUp className="h-4 w-4 text-primary shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-semibold">
-                {t('LONG_HEAD' )}
+                {t('LONG_HEAD')}
               </p>
               <p>
-                {t('LONG_DESCRIPTION', {market: selectedMarket?.symbol || "the asset" })}
+                {t('LONG_DESCRIPTION', { market: selectedMarket?.symbol || "the asset" })}
               </p>
               <p className="text-xs font-semibold mt-2">
-                {t('RISK_HEAD' )}
+                {t('RISK_HEAD')}
               </p>
               <p>
-                {t('LONG_RISK' )}
+                {t('LONG_RISK')}
               </p>
             </div>
           </div>
@@ -537,16 +555,16 @@ export function Trade() {
             <TrendingDown className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-semibold">
-                {t('SHORT_HEAD' )}
+                {t('SHORT_HEAD')}
               </p>
               <p>
-                {t('SHORT_DESCRIPTION', {market: selectedMarket?.symbol || "the asset" })}
+                {t('SHORT_DESCRIPTION', { market: selectedMarket?.symbol || "the asset" })}
               </p>
               <p className="text-xs font-semibold mt-2">
-                {t('RISK_HEAD' )}
+                {t('RISK_HEAD')}
               </p>
               <p>
-                {t('SHORT_RISK' )}
+                {t('SHORT_RISK')}
               </p>
             </div>
           </div>
@@ -576,7 +594,7 @@ export function Trade() {
       </div>
       <Button
         onClick={openPosition}
-        disabled={!tradeAmount || Number(tradeAmount) <= 0}
+        disabled={!tradeAmount || Number(tradeAmount) <= 0 || ((directionError || '') !== '')}
         className="w-full"
         variant={tradeType === 'long' ? "default" : "secondary"}
       >
@@ -585,8 +603,20 @@ export function Trade() {
           Trade {selectedMarket?.symbol || selectedMarketId} {tradeType}
         </span>
       </Button>
+      {((directionError || '') !== '') && (
+        <p className="text-[var(--info)] flex justify-left items-center cursor-pointer mt-3" onClick={() => {
+          window.scrollTo(0, 0)
+        }}>
+          <img
+            className="mr-2 w-5"
+            src={`/assets/icons/info.svg`}
+            alt={`Info Icon`}
+          />
+          {directionError}
+        </p>
+      )}
       {(!tradeAmount || Number(tradeAmount) <= 0) && (
-        <p className="text-[var(--info)] flex justify-left items-center cursor-pointer mt-3" onClick={()=> {
+        <p className="text-[var(--info)] flex justify-left items-center cursor-pointer mt-3" onClick={() => {
           window.scrollTo(0, 0)
         }}>
           <img

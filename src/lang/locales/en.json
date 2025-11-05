@@ -86,6 +86,7 @@
         "NO_DATA_AVAILABLE": "No data available for this period",
         "POSITIONS": "Positions",
         "TRADE_AMOUNT": "Trade Amount",
+        "TRADE_DIRECTION": "Cannot trade {{trade_direction}} because you have an existing {{position_direction}} position. Close the position to go {{trade_direction}}",
         "LOSS": "loss",
         "PROFIT" : "profit",
         "SLTP_WARNING": "This price is on the {{type}} -making side.",
