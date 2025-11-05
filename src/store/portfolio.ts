@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 // import { TAddress, TCurrency, TCurrencyDetails } from '../../../morpher-trading-sdk/src/types'
 // import { MorpherTradeSDK } from '../../../morpher-trading-sdk/src/index'
-// import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard } from '../../../morpher-trading-sdk/src/v2.router';
+// import { TPortfolioDataPoint, TPosition, TContext, TLeaderBoard, TOrder, TPortfolio } from '../../../morpher-trading-sdk/src/v2.router';
 
 import { TAddress, TCurrency, TCurrencyDetails, TOrder, TPortfolio } from 'morpher-trading-sdk'
 import { MorpherTradeSDK } from 'morpher-trading-sdk';

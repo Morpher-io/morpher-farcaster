@@ -10,7 +10,7 @@ import { PortfolioChart } from "@/components/trade/PortfolioChart";
 import { useMarketStore } from "@/store/market";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import {  usdFormatter, tokenValueFormatter } from "morpher-trading-sdk";
+import {  usdFormatter, tokenValueFormatter, TMarketType } from "morpher-trading-sdk";
 import { usePortfolioStore } from "@/store/portfolio";
 import { useNavigate } from "react-router-dom";
 import { OpenPositionItem } from "@/components/trade/OpenPositionItem";
@@ -21,48 +21,84 @@ export function PortfolioScreen() {
     const { address } = useAccount();
 
     const account = useAccount();
-    const {  morpherTradeSDK, setSelectedMarketId, selectedMarketId, marketListAll, setSelectedMarket } = useMarketStore();
+    const {  morpherTradeSDK, setSelectedMarketId, selectedMarketId, marketListAll, setSelectedMarket, setMarketListAll } = useMarketStore();
     const { positionList, setPositionList, setPortfolio, positionValue, currencyList, setReturns, returns } = usePortfolioStore();
     const [timeRange, setTimeRange] = useState<"d" | "w" | "m" | "y">("d");
     const [chartData, setChartData] = useState<[number, number][]>([]);
     let navigate = useNavigate();
     const { t } = useTranslation();
+    const [isMarketListLoading, setIsMarketListLoading] = useState(false);
+    
 
     const handleTradeBtc = () => {
         setSelectedMarketId("CRYPTO_BTC");
         navigate("/");
     };
 
-    
-    const fetchMarketData = async ({eth_address, market_id}: {eth_address: `0x${string}`, market_id: string}) => {
-        const sdkMarketData = await morpherTradeSDK.getMarketData({eth_address, market_id})
+
+    const fetchMarketData = async ({ eth_address, market_id }: { eth_address: `0x${string}`, market_id: string }) => {
+        const sdkMarketData = await morpherTradeSDK.getMarketData({ eth_address, market_id })
         console.log('sdkMarketData', sdkMarketData)
         setSelectedMarket(sdkMarketData);
 
     }
 
 
-    
+    const fetchMarketsAll = async () => {
+        if (isMarketListLoading) {
+            return
+        }
+        setIsMarketListLoading(true);
+        const marketTypes: TMarketType[] = [
+            "crypto",
+            "stock",
+            "forex",
+            "index",
+            "commodity",
+        ];
+        try {
+            const allMarketLists = await Promise.all(
+                marketTypes.map((type) => morpherTradeSDK.getMarketList({ type }))
+            );
+            const mergedMarkets = allMarketLists.reduce((acc, current) => {
+                return { ...acc, ...current };
+            }, {});
+            setMarketListAll(mergedMarkets);
+        } catch (error) {
+            console.error("Failed to fetch all markets:", error);
+            setMarketListAll({});
+        }
+
+        setIsMarketListLoading(false);
+    };
+    useEffect(() => {
+        if (!marketListAll) {
+            fetchMarketsAll();
+        }
+    }, [marketListAll]);
+
+
+
     useEffect(() => {
         console.log('selectedMarketId', selectedMarketId)
         if (selectedMarketId && marketListAll) {
             console.log('marketListAll')
-          setSelectedMarket(marketListAll[selectedMarketId])
+            setSelectedMarket(marketListAll[selectedMarketId])
         } else {
-            fetchMarketData({eth_address: address || '0x', market_id: selectedMarketId})
+            fetchMarketData({ eth_address: address || '0x', market_id: selectedMarketId })
         }
-      }, [selectedMarketId, marketListAll, setSelectedMarket])
-    
+    }, [selectedMarketId, marketListAll, setSelectedMarket])
+
 
     const getProtfolio = async () => {
         if (account?.address && morpherTradeSDK) {
             try {
-                let portfolioData = await morpherTradeSDK.getPortfolio({ eth_address: account.address})
+                let portfolioData = await morpherTradeSDK.getPortfolio({ eth_address: account.address })
                 setPortfolio(portfolioData);
-            
+
                 let positions = await morpherTradeSDK.getPositions({
                     eth_address: account.address,
-        
+
                 });
                 setPositionList(positions)
 

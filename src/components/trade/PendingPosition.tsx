@@ -101,13 +101,18 @@ export function PendingPosition({ marketData }: PendingPositionProps) {
         return;
       }
 
-      morpherTradeSDK.cancelOrder({
+      
+    let gaslessOverride: boolean | undefined = undefined;
+    // if (context?.clientFid === 309857) gaslessOverride = true;
+
+    morpherTradeSDK.cancelOrder({
         account,
         walletClient: walletClient as any,
         publicClient,
         order_id: marketData?.pending_order_id,
         market_id: marketData?.market_id,
         callback: cancelComplete,
+        gaslessOverride
       });
     } catch (err: any) {
       console.error("Error executing trade:", err);

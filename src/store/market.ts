@@ -100,8 +100,7 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   getTrendingMarkets: () => {
     morpherTradeSDK.getTrendingMarkets().then(trendingMarkets => {
       
-      
-      set({trendingMarkets})
+      set({trendingMarkets: trendingMarkets as any})
     })
   }
 }));

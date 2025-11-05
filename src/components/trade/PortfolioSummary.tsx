@@ -132,6 +132,24 @@ export function PortfolioSummary() {
     return [minValue - margin, maxValue + margin];
   }, [chartData]);
 
+  const minRank = React.useMemo(() => {
+
+    let order_rank = portfolio?.order_rank && portfolio?.order_rank > 0 ? portfolio?.order_rank : undefined
+
+    if (order_rank) {
+      return order_rank.toString()
+    } else {
+      return ''
+    }
+
+    // only show leaderboard rank for now
+    // let returns_rank = portfolio?.returns_rank && portfolio?.returns_rank > 0 ? portfolio?.returns_rank : undefined
+    
+    // return (returns_rank || '').toString()
+    
+
+  }, [portfolio])
+
   const chartConfig = React.useMemo(
     () => ({
       value: {
@@ -234,7 +252,7 @@ export function PortfolioSummary() {
         
           <div className="text-right">
             <p className="text-sm font-semibold text-muted-foreground">🏆 {t('RANK')}</p>
-            <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>#{portfolio?.returns_rank && portfolio?.returns_rank > 0 ? portfolio?.returns_rank : ''}</p>
+            <p className="text-2xl font-bold text-primary cursor-pointer" onClick={() => navigate('/leaderboard')}>#{minRank}</p>
           </div>
         
       </div>
