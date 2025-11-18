@@ -24,23 +24,24 @@ export function PortfolioStats() {
     }
 
     const startValue = weeklyReturns[0].total;
-    const endValue = weeklyReturns[weeklyReturns.length - 1].total;
 
-    if (typeof startValue !== "number" || typeof endValue !== "number") {
+    if (typeof startValue !== "number") {
       return { valueMph: 0, valueUsd: 0, percent: 0, isPositive: true };
     }
 
-    const changeMph = endValue - startValue;
-    const changeUsd = changeMph * mphToUsdRate;
+    let changeMph = 0
+    
 
     let percentChange = 0;
-    if (startValue !== 0) {
-      percentChange = (changeMph / startValue) * 100;
-    } else if (changeMph !== 0) {
-      percentChange = Infinity;
-    }
+    weeklyReturns.forEach(point => {
+      changeMph += (point.positions * point.returns)
+      percentChange += point.returns
+    })
 
-    return { valueMph: changeMph, valueUsd: changeUsd, percent: percentChange, isPositive: changeMph >= 0 };
+
+    const changeUsd = changeMph * mphToUsdRate;
+
+    return { valueMph: changeMph, valueUsd: changeUsd, percent: percentChange * 100, isPositive: changeMph >= 0 };
   }, [returns, currencyList]);
 
   if (loading) {

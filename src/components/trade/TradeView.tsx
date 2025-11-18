@@ -668,9 +668,9 @@ export function TradeView() {
                 </div>
 
                 {(() => {
-                  const low = Number(marketData.low || 0);
-                  const high = Number(marketData.high || 0);
-                  const open = Number(marketData.open || 0);
+                  const open = chartData && chartData.length > 0 ? chartData[0][1] : 0;
+                  const low = chartData && chartData.length > 0 ? Math.min(...chartData.map(d => d[3])) : 0;
+                  const high = chartData && chartData.length > 0 ? Math.max(...chartData.map(d => d[2])) : 0;
                   const close = Number(marketPrice);
                   const range = high - low;
                   let positionPercent = range > 0 ? ((close - low) / range) * 100 : 50;
