@@ -612,7 +612,7 @@ export function OpenPositionItem({ position, showClose }: OpenPositionItemProps)
               </div>
 
               <div className="grid grid-cols-4 gap-2 py-2 mb-4">
-                {(protectionType === "stop-loss"
+                {((protectionType === "stop-loss" && position.direction === "long" ) || (protectionType === "take-profit" && position.direction === "short" )
                   ? [
                     { label: "-5%", value: -5 },
                     { label: "-10%", value: -10 },
