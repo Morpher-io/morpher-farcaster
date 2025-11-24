@@ -23,25 +23,23 @@ export function PortfolioStats() {
       return { valueMph: 0, valueUsd: 0, percent: 0, isPositive: true };
     }
 
-    const startValue = weeklyReturns[0].total;
-
-    if (typeof startValue !== "number") {
-      return { valueMph: 0, valueUsd: 0, percent: 0, isPositive: true };
-    }
-
-    let changeMph = 0
-    
-
-    let percentChange = 0;
+    let invested = 0
+    let returned = 0
     weeklyReturns.forEach(point => {
-      changeMph += (point.positions * point.returns)
-      percentChange += point.returns
+        invested += point.invested || 0
+        returned += point.returned || 0
     })
+    const startPos = weeklyReturns[0].positions
+    const endPos = weeklyReturns[weeklyReturns.length -1 ].positions
+
+    const returnAmount = endPos - startPos - invested + returned 
+    const totalInvested = invested + startPos 
+    const returnPercentage = returnAmount / totalInvested
 
 
-    const changeUsd = changeMph * mphToUsdRate;
+    const changeUsd = returnAmount * mphToUsdRate;
 
-    return { valueMph: changeMph, valueUsd: changeUsd, percent: percentChange * 100, isPositive: changeMph >= 0 };
+    return { valueMph: returnAmount, valueUsd: changeUsd, percent: returnPercentage * 100, isPositive: returnAmount >= 0 };
   }, [returns, currencyList]);
 
   if (loading) {
